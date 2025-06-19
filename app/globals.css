@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@property --aurora-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spin-aurora {
+  from {
+    --aurora-angle: 0deg;
+  }
+  to {
+    --aurora-angle: 360deg;
+  }
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(1rem);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -9,6 +39,38 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .aurora {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .aurora::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    z-index: 0;
+    --aurora-angle: 0deg;
+    background-image: conic-gradient(
+      from var(--aurora-angle) at 50% 50%,
+      rgba(139, 92, 246, 0.3) 0deg,
+      rgba(236, 72, 153, 0.3) 60deg,
+      rgba(245, 158, 11, 0.3) 120deg,
+      rgba(52, 211, 153, 0.3) 180deg,
+      rgba(59, 130, 246, 0.3) 240deg,
+      rgba(139, 92, 246, 0.3) 360deg
+    );
+    animation: spin-aurora 20s linear infinite;
+  }
+
+  .aurora > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .animate-scroll {
+    animation: scroll 2s ease-in-out infinite;
   }
 }
 
@@ -48,6 +110,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+  
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -90,5 +153,8 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  html {
+    scroll-behavior: smooth;
   }
 }

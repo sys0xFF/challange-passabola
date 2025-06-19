@@ -26,11 +26,11 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#8e44ad",
+          DEFAULT: "#6C338F",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#ffcce6",
+          DEFAULT: "#AC3B4E",
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -42,7 +42,7 @@ const config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#c2ff28",
+          DEFAULT: "#73A841",
           foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
@@ -68,10 +68,21 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        scroll: {
+          "0%": { transform: "translateY(0)", opacity: "1" },
+          "50%": { transform: "translateY(1rem)", opacity: "1" },
+          "100%": { transform: "translateY(1rem)", opacity: "0" },
+        },
+        "card-lift": {
+          "0%": { transform: "translateY(0)", boxShadow: "var(--tw-shadow)" },
+          "100%": { transform: "translateY(-4px)", boxShadow: "var(--tw-shadow-lg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        scroll: "scroll 2s ease-in-out infinite",
+        "card-lift": "card-lift 0.3s ease-out forwards",
       },
     },
   },
