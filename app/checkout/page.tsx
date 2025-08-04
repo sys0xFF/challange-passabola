@@ -743,17 +743,6 @@ export default function CheckoutPage() {
                                     </Button>
                                   </div>
                                 </div>
-
-                                <div className="text-center">
-                                  <Button
-                                    onClick={handlePayment}
-                                    disabled={isProcessing}
-                                    className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
-                                  >
-                                    {isProcessing ? "PROCESSANDO..." : "JÁ FIZ O PAGAMENTO"}
-                                    <CheckCircle className="ml-2 h-4 w-4" />
-                                  </Button>
-                                </div>
                               </>
                             ) : (
                               <div className="text-center py-8">
@@ -830,17 +819,6 @@ export default function CheckoutPage() {
                                 </div>
                               </div>
                             </div>
-
-                            <div className="text-center pt-4">
-                              <Button
-                                onClick={handlePayment}
-                                disabled={!canProcessPayment() || isProcessing}
-                                className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
-                              >
-                                {isProcessing ? "PROCESSANDO PAGAMENTO..." : "FINALIZAR COMPRA"}
-                                <CheckCircle className="ml-2 h-4 w-4" />
-                              </Button>
-                            </div>
                           </div>
                         )}
 
@@ -854,6 +832,26 @@ export default function CheckoutPage() {
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             VOLTAR
                           </Button>
+                          {paymentMethod === "pix" && !pixExpired && (
+                            <Button
+                              onClick={handlePayment}
+                              disabled={isProcessing}
+                              className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+                            >
+                              {isProcessing ? "PROCESSANDO..." : "JÁ FIZ O PAGAMENTO"}
+                              <CheckCircle className="ml-2 h-4 w-4" />
+                            </Button>
+                          )}
+                          {paymentMethod === "card" && (
+                            <Button
+                              onClick={handlePayment}
+                              disabled={!canProcessPayment() || isProcessing}
+                              className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                            >
+                              {isProcessing ? "PROCESSANDO PAGAMENTO..." : "FINALIZAR COMPRA"}
+                              <CheckCircle className="ml-2 h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
