@@ -285,9 +285,11 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <Button className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white">
-                    CONHEÇA NOSSA HISTÓRIA
-                    <ChevronRight className="ml-2 h-4 w-4" />
+                  <Button asChild className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white">
+                    <Link href="/historia">
+                      CONHEÇA NOSSA HISTÓRIA
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                 </div>
               </ScrollAnimation>

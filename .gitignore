@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+/.pnp
+.pnp.js
+.pnp.cjs
 
 # next.js
 /.next/
@@ -9,15 +12,21 @@
 
 # production
 /build
+/dist
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+lerna-debug.log*
 
 # env files
-.env*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # vercel
 .vercel
@@ -25,3 +34,85 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# testing
+/coverage
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# ide/editor
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# logs
+logs
+*.log
+
+# runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# dependency directories
+node_modules/
+jspm_packages/
+
+# optional npm cache directory
+.npm
+
+# optional eslint cache
+.eslintcache
+
+# optional REPL history
+.node_repl_history
+
+# output of 'npm pack'
+*.tgz
+
+# yarn integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+out
+
+# nuxt.js build / generate output
+.nuxt
+dist
+
+# storybook build outputs
+.out
+.storybook-out
+
+# temporary folders
+tmp/
+temp/
+
+# local netlify folder
+.netlify
+
+# turbo
+.turbo
+
+# sentry
+.sentryclirc
