@@ -52,7 +52,10 @@ export default function CarrinhoPage() {
   }
 
   const calculateShipping = () => {
-    if (cep.length !== 8) {
+    // Remove any non-numeric characters to get only the digits
+    const numericCep = cep.replace(/\D/g, "")
+    
+    if (numericCep.length !== 8) {
       alert("Por favor, digite um CEP válido com 8 dígitos")
       return
     }
