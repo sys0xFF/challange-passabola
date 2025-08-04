@@ -161,8 +161,10 @@ copa-passa-bola/
 │   ├── loja/                # E-commerce
 │   ├── doacao/              # Plataforma de doações
 │   ├── voluntaria/          # Portal de voluntariado
+│   ├── historia/            # Nossa história
 │   ├── contato/             # Formulário de contato
-│   └── carrinho/            # Carrinho de compras
+│   ├── carrinho/            # Carrinho de compras
+│   └── checkout/            # Finalização de compras
 ├── components/              # Componentes reutilizáveis
 │   ├── animations/          # Componentes de animação
 │   └── ui/                  # Design system
