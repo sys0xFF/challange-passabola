@@ -92,16 +92,47 @@ Custom Hooks          // Lógica reutilizável
 ## Instalação e Configuração
 
 ### Pré-requisitos
+
+**Node.js >= 18.0.0**
 ```bash
-Node.js >= 18.0.0
-pnpm >= 8.0.0 (recomendado)
+# Windows (usando winget)
+winget install OpenJS.NodeJS
+
+# Windows (usando Chocolatey)
+choco install nodejs
+
+# macOS (usando Homebrew)
+brew install node@18
+
+# Linux (Ubuntu/Debian)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Verificar instalação
+node --version
+npm --version
+```
+
+**pnpm >= 8.0.0 (Gerenciador de Pacotes Recomendado)**
+```bash
+# Instalar pnpm globalmente
+npm install -g pnpm
+
+# Ou usando script oficial
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+
+# Windows (PowerShell)
+iwr https://get.pnpm.io/install.ps1 -useb | iex
+
+# Verificar instalação
+pnpm --version
 ```
 
 ### Instalação Rápida
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/copa-passa-bola.git
-cd copa-passa-bola
+git clone https://github.com/sys0xFF/challange-passabola.git
+cd challange-passabola
 
 # Instale as dependências
 pnpm install
