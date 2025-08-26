@@ -7,6 +7,7 @@ import type React from "react"
 import Image from "next/image"
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -102,6 +103,9 @@ const categories = [
 ]
 
 export default function LojaPage() {
+  // Hook de desenvolvimento
+  useDevAutoFill();
+  
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("todos")
   const [sortBy, setSortBy] = useState("name")
