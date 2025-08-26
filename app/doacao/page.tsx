@@ -5,6 +5,7 @@ import type React from "react"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -48,6 +49,9 @@ const donationAmounts = [
 ]
 
 export default function DoacaoPage() {
+  // Hook de desenvolvimento
+  useDevAutoFill();
+  
   const [currentStep, setCurrentStep] = useState(1)
   const [donationType, setDonationType] = useState<DonationType>(null)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null)
