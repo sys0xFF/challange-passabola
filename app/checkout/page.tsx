@@ -5,6 +5,7 @@ import { Shield } from "lucide-react" // Import Shield component
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -42,6 +43,9 @@ const bebasNeue = Bebas_Neue({
 type PaymentMethod = "pix" | "card" | null
 
 export default function CheckoutPage() {
+  // Hook de desenvolvimento
+  useDevAutoFill();
+  
   const { state, clearCart } = useCart()
   const [currentStep, setCurrentStep] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null)
