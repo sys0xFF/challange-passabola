@@ -5,6 +5,7 @@ import type React from "react"
 import Image from "next/image"
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -44,6 +45,9 @@ export default function CadastroPage() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [wantNotifications, setWantNotifications] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+
+  // Hook de autofill para desenvolvimento
+  useDevAutoFill()
 
   // Team form data
   const [teamData, setTeamData] = useState({
@@ -888,7 +892,7 @@ export default function CadastroPage() {
                             <Checkbox
                               id="notifications"
                               checked={wantNotifications}
-                              onCheckedChange={setWantNotifications}
+                              onCheckedChange={(checked) => setWantNotifications(checked as boolean)}
                               className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                             />
                             <Label htmlFor="notifications" className="text-sm leading-relaxed">
@@ -901,7 +905,7 @@ export default function CadastroPage() {
                             <Checkbox
                               id="terms"
                               checked={acceptTerms}
-                              onCheckedChange={setAcceptTerms}
+                              onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
                               className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                             />
                             <Label htmlFor="terms" className="text-sm leading-relaxed">
