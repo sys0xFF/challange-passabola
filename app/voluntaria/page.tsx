@@ -5,6 +5,7 @@ import type React from "react"
 import Image from "next/image"
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -95,6 +96,9 @@ const volunteerAreas: VolunteerArea[] = [
 ]
 
 export default function VoluntariaPage() {
+  // Hook de desenvolvimento
+  useDevAutoFill();
+  
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedAreas, setSelectedAreas] = useState<string[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
@@ -799,7 +803,7 @@ export default function VoluntariaPage() {
                         <Checkbox
                           id="notifications"
                           checked={wantNotifications}
-                          onCheckedChange={setWantNotifications}
+                          onCheckedChange={(checked) => setWantNotifications(checked === true)}
                           className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                         />
                         <Label htmlFor="notifications" className="text-sm leading-relaxed">
@@ -812,7 +816,7 @@ export default function VoluntariaPage() {
                         <Checkbox
                           id="terms"
                           checked={acceptTerms}
-                          onCheckedChange={setAcceptTerms}
+                          onCheckedChange={(checked) => setAcceptTerms(checked === true)}
                           className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                         />
                         <Label htmlFor="terms" className="text-sm leading-relaxed">
