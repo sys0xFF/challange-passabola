@@ -5,6 +5,7 @@ import type React from "react"
 import Image from "next/image"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -50,6 +51,9 @@ const contactReasons = [
 ]
 
 export default function ContatoPage() {
+  // Hook de desenvolvimento
+  useDevAutoFill();
+  
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
