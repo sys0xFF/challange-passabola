@@ -581,6 +581,63 @@ export const useDevAutoFill = () => {
           console.log("✅ Formulário de doação preenchido!");
         },
 
+        // FUNÇÃO DEBUG PARA DIAS
+        debugDias: () => {
+          console.log("🔍 === DEBUG DETALHADO DOS DIAS ===");
+          
+          // 1. Verificar se estamos na página correta
+          const currentUrl = window.location.pathname;
+          console.log(`URL atual: ${currentUrl}`);
+          
+          // 2. Verificar se estamos no step correto
+          const stepElements = document.querySelectorAll('[class*="step"]');
+          console.log(`Elementos de step encontrados: ${stepElements.length}`);
+          
+          // 3. Verificar o texto "Disponibilidade" na página
+          const disponibilidadeTexto = document.querySelector('h3');
+          if (disponibilidadeTexto) {
+            console.log(`Texto do h3: "${disponibilidadeTexto.textContent}"`);
+          }
+          
+          // 4. Procurar todos os checkboxes
+          const todosCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+          console.log(`Total de checkboxes: ${todosCheckboxes.length}`);
+          
+          // 5. Procurar especificamente por IDs que começam com "dia-"
+          const diasCheckboxes = document.querySelectorAll('input[id^="dia-"]');
+          console.log(`Checkboxes com ID começando em "dia-": ${diasCheckboxes.length}`);
+          
+          if (diasCheckboxes.length === 0) {
+            console.log("❌ NENHUM checkbox de dia encontrado!");
+            console.log("Vamos verificar se os elementos existem mas com IDs diferentes...");
+            
+            // Procurar labels que contenham nomes de dias
+            const labels = document.querySelectorAll('label');
+            console.log(`Total de labels: ${labels.length}`);
+            
+            const diasNomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+            labels.forEach((label, i) => {
+              const texto = label.textContent?.trim();
+              if (diasNomes.includes(texto)) {
+                const forAttr = label.getAttribute('for');
+                console.log(`Label "${texto}" aponta para ID: "${forAttr}"`);
+                
+                const checkbox = forAttr ? document.getElementById(forAttr) : null;
+                if (checkbox) {
+                  console.log(`  ✅ Checkbox encontrado: ${checkbox.tagName}, ID: ${checkbox.id}`);
+                } else {
+                  console.log(`  ❌ Checkbox não encontrado para "${forAttr}"`);
+                }
+              }
+            });
+          } else {
+            console.log("✅ Checkboxes de dias encontrados:");
+            diasCheckboxes.forEach((cb, i) => {
+              console.log(`  ${i + 1}. ID: "${cb.id}"`);
+            });
+          }
+        },
+
         // VOLUNTÁRIA
         voluntaria: () => {
           console.log("Preenchendo cadastro de voluntária...");
@@ -682,15 +739,22 @@ export const useDevAutoFill = () => {
               setTimeout(() => {
                 console.log("� Selecionando disponibilidade...");
                 
-                // Dias da semana - usar IDs corretos
+                // Dias da semana - corrigido para shadcn/ui checkboxes (que são buttons)
                 const diasParaSelecionar = ["Segunda", "Terça", "Quinta", "Sábado"];
                 diasParaSelecionar.forEach(dia => {
+                  console.log(`Tentando selecionar dia: ${dia}`);
+                  
+                  // Os checkboxes do shadcn/ui são elementos button, não input
                   const checkbox = document.getElementById(`dia-${dia}`);
-                  if (checkbox && checkbox instanceof HTMLInputElement) {
+                  
+                  if (checkbox) {
+                    console.log(`✅ Elemento encontrado: ${checkbox.tagName} com ID: ${checkbox.id}`);
+                    
+                    // Para elementos button do shadcn/ui, usar click() diretamente
                     checkbox.click();
                     console.log(`✅ Dia selecionado: ${dia}`);
                   } else {
-                    console.warn(`⚠️ Checkbox do dia não encontrado: ${dia}`);
+                    console.warn(`⚠️ Checkbox do dia não encontrado: dia-${dia}`);
                   }
                 });
                 
