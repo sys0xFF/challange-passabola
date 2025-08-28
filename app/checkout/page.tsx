@@ -6,6 +6,7 @@ import Image from "next/image"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useDevAutoFill } from "@/hooks/use-dev-autofill"
+import { savePurchase } from "@/lib/database-service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -101,13 +102,39 @@ export default function CheckoutPage() {
     return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`
   }
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setIsProcessing(true)
-    setTimeout(() => {
-      setIsProcessing(false)
-      setIsSuccess(true)
-      clearCart()
-    }, 3000)
+    
+    try {
+      const purchaseData = {
+        type: "purchase" as const,
+        customerData,
+        items: state.items,
+        paymentMethod: paymentMethod!,
+        ...(paymentMethod === "card" && { cardData }),
+        pricing: {
+          subtotal,
+          shipping,
+          total,
+        },
+      };
+
+      const result = await savePurchase(purchaseData);
+      
+      if (result.success) {
+        console.log("Purchase saved with ID:", result.id);
+        setIsSuccess(true);
+        clearCart();
+      } else {
+        console.error("Failed to save purchase:", result.error);
+        alert("Erro ao processar compra. Tente novamente.");
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error("Error during purchase processing:", error);
+      alert("Erro ao processar compra. Tente novamente.");
+      setIsProcessing(false);
+    }
   }
 
   const generatePixCode = () => {

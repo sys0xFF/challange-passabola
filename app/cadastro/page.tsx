@@ -6,6 +6,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useDevAutoFill } from "@/hooks/use-dev-autofill"
+import { saveTeamRegistration, saveIndividualRegistration } from "@/lib/database-service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -45,6 +46,7 @@ export default function CadastroPage() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [wantNotifications, setWantNotifications] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Hook de autofill para desenvolvimento
   useDevAutoFill()
@@ -125,18 +127,57 @@ export default function CadastroPage() {
     setPlayers((prev) => prev.map((player) => (player.id === playerId ? { ...player, [field]: value } : player)))
   }
 
-  const handleSubmit = () => {
-    // Here you would normally send data to your backend
-    console.log("Registration data:", {
-      type: registrationType,
-      teamData: registrationType === "team" ? teamData : null,
-      captainData,
-      players: registrationType === "team" ? players : null,
-      files: uploadedFiles,
-      acceptTerms,
-      wantNotifications,
-    })
-    setIsSubmitted(true)
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      if (registrationType === "team") {
+        const teamRegistrationData = {
+          type: "team" as const,
+          teamData,
+          captainData,
+          players,
+          preferences: {
+            acceptTerms,
+            wantNotifications,
+          },
+        };
+
+        const result = await saveTeamRegistration(teamRegistrationData);
+        
+        if (result.success) {
+          console.log("Team registration saved with ID:", result.id);
+          setIsSubmitted(true);
+        } else {
+          console.error("Failed to save team registration:", result.error);
+          alert("Erro ao salvar cadastro. Tente novamente.");
+        }
+      } else if (registrationType === "individual") {
+        const individualRegistrationData = {
+          type: "individual" as const,
+          captainData,
+          preferences: {
+            acceptTerms,
+            wantNotifications,
+          },
+        };
+
+        const result = await saveIndividualRegistration(individualRegistrationData);
+        
+        if (result.success) {
+          console.log("Individual registration saved with ID:", result.id);
+          setIsSubmitted(true);
+        } else {
+          console.error("Failed to save individual registration:", result.error);
+          alert("Erro ao salvar cadastro. Tente novamente.");
+        }
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Erro ao salvar cadastro. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const canProceedToStep2 = () => {
@@ -933,11 +974,11 @@ export default function CadastroPage() {
                           </Button>
                           <Button
                             onClick={handleSubmit}
-                            disabled={!canSubmit()}
+                            disabled={!canSubmit() || isSubmitting}
                             className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
                           >
-                            FINALIZAR CADASTRO
-                            <CheckCircle className="ml-2 h-4 w-4" />
+                            {isSubmitting ? "SALVANDO..." : "FINALIZAR CADASTRO"}
+                            {!isSubmitting && <CheckCircle className="ml-2 h-4 w-4" />}
                           </Button>
                         </div>
                       </CardContent>

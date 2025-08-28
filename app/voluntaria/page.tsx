@@ -6,6 +6,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useDevAutoFill } from "@/hooks/use-dev-autofill"
+import { saveVolunteerRegistration } from "@/lib/database-service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -106,6 +107,7 @@ export default function VoluntariaPage() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [wantNotifications, setWantNotifications] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Form data
   const [formData, setFormData] = useState({
@@ -178,15 +180,35 @@ export default function VoluntariaPage() {
     }))
   }
 
-  const handleSubmit = () => {
-    console.log("Volunteer registration data:", {
-      formData,
-      selectedAreas,
-      files: uploadedFiles,
-      acceptTerms,
-      wantNotifications,
-    })
-    setIsSubmitted(true)
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      const volunteerRegistrationData = {
+        type: "volunteer" as const,
+        formData,
+        selectedAreas,
+        preferences: {
+          acceptTerms,
+          wantNotifications,
+        },
+      };
+
+      const result = await saveVolunteerRegistration(volunteerRegistrationData);
+      
+      if (result.success) {
+        console.log("Volunteer registration saved with ID:", result.id);
+        setIsSubmitted(true);
+      } else {
+        console.error("Failed to save volunteer registration:", result.error);
+        alert("Erro ao salvar cadastro. Tente novamente.");
+      }
+    } catch (error) {
+      console.error("Error during volunteer registration:", error);
+      alert("Erro ao salvar cadastro. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const canProceedToStep2 = () => {
@@ -840,10 +862,10 @@ export default function VoluntariaPage() {
                       </Button>
                       <Button
                         onClick={handleSubmit}
-                        disabled={!canSubmit()}
+                        disabled={!canSubmit() || isSubmitting}
                         className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
                       >
-                        FINALIZAR CADASTRO
+                        {isSubmitting ? "ENVIANDO..." : "FINALIZAR CADASTRO"}
                         <CheckCircle className="ml-2 h-4 w-4" />
                       </Button>
                     </div>

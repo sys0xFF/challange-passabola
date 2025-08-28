@@ -6,6 +6,7 @@ import Image from "next/image"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useDevAutoFill } from "@/hooks/use-dev-autofill"
+import { saveDonation } from "@/lib/database-service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -116,13 +117,34 @@ export default function DoacaoPage() {
     return selectedAmount || Number.parseFloat(customAmount) || 0
   }
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setIsProcessing(true)
-    // Simulate payment processing
-    setTimeout(() => {
-      setIsProcessing(false)
-      setIsSuccess(true)
-    }, 3000)
+    
+    try {
+      const donationData = {
+        type: "donation" as const,
+        donationType: donationType!,
+        amount: getDonationAmount(),
+        paymentMethod: paymentMethod!,
+        ...(donationType === "identified" && { donorData }),
+        ...(paymentMethod === "card" && { cardData }),
+      };
+
+      const result = await saveDonation(donationData);
+      
+      if (result.success) {
+        console.log("Donation saved with ID:", result.id);
+        setIsSuccess(true);
+      } else {
+        console.error("Failed to save donation:", result.error);
+        alert("Erro ao processar doação. Tente novamente.");
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error("Error during donation processing:", error);
+      alert("Erro ao processar doação. Tente novamente.");
+      setIsProcessing(false);
+    }
   }
 
   const generatePixCode = () => {
