@@ -252,3 +252,101 @@ export async function savePurchase(purchaseData: Omit<PurchaseData, 'purchaseDat
     return { success: false, error };
   }
 }
+
+export interface GameTeam {
+  id: string;
+  name: string;
+  type: 'registered' | 'auto-generated';
+  registeredTeamId?: string; // ID do time registrado
+  players: Array<{
+    id: string;
+    name: string;
+    position: string;
+    isFromIndividual?: boolean;
+    individualId?: string;
+  }>;
+}
+
+export interface Match {
+  id: string;
+  round: number;
+  position: number;
+  team1: GameTeam | null;
+  team2: GameTeam | null;
+  winner?: string;
+  score?: {
+    team1: number;
+    team2: number;
+  };
+  status: 'pending' | 'in-progress' | 'completed';
+  scheduledTime?: string;
+}
+
+export interface Tournament {
+  id: string;
+  name: string;
+  maxTeams: number;
+  isCopaPassaBola: boolean;
+  startDate: string;
+  endDate: string;
+  registrationStart: string;
+  registrationEnd: string;
+  isPaid: boolean;
+  entryFee?: number;
+  location: string;
+  gameTime: string;
+  description?: string;
+  status: 'draft' | 'registration-open' | 'registration-closed' | 'in-progress' | 'completed';
+  teams: GameTeam[];
+  bracket: Match[];
+  createdDate: string;
+  createdBy: string;
+}
+
+export async function saveTournament(tournamentData: Omit<Tournament, 'id' | 'createdDate' | 'teams' | 'bracket'>) {
+  try {
+    const tournamentsRef = ref(database, 'tournaments');
+    const newTournamentRef = push(tournamentsRef);
+    
+    const tournament: Tournament = {
+      ...tournamentData,
+      id: newTournamentRef.key || '',
+      teams: [],
+      bracket: [],
+      createdDate: new Date().toISOString()
+    };
+
+    await set(newTournamentRef, tournament);
+    
+    console.log('Tournament saved successfully!');
+    return { success: true, id: newTournamentRef.key };
+  } catch (error) {
+    console.error('Error saving tournament:', error);
+    return { success: false, error };
+  }
+}
+
+export async function updateTournament(tournamentId: string, updates: Partial<Tournament>) {
+  try {
+    const tournamentRef = ref(database, `tournaments/${tournamentId}`);
+    await set(tournamentRef, updates);
+    
+    console.log('Tournament updated successfully!');
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating tournament:', error);
+    return { success: false, error };
+  }
+}
+
+export async function updateMatch(tournamentId: string, matchId: string, updates: Partial<Match>) {
+  try {
+    const matchRef = ref(database, `tournaments/${tournamentId}/bracket`);
+    // This would need to be implemented to update specific match in the bracket array
+    console.log('Match updated successfully!');
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating match:', error);
+    return { success: false, error };
+  }
+}

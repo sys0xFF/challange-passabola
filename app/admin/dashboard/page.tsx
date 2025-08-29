@@ -13,11 +13,14 @@ import {
   getAllVolunteers, 
   getAllDonations, 
   getAllPurchases,
+  getAllTournaments,
   AdminStats 
 } from "@/lib/admin-service"
-import { TeamRegistration, IndividualRegistration, VolunteerRegistration, DonationData, PurchaseData } from "@/lib/database-service"
+import { TeamRegistration, IndividualRegistration, VolunteerRegistration, DonationData, PurchaseData, Tournament } from "@/lib/database-service"
 import { DetailModal } from "@/components/admin/detail-modal"
 import { StatsCards } from "@/components/admin/stats-cards"
+import { TournamentCreateModal } from "@/components/admin/tournament-create-modal"
+import { TournamentDetailsModal } from "@/components/admin/tournament-details-modal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -39,7 +42,10 @@ import {
   CreditCard,
   Download,
   Loader2,
-  Eye
+  Eye,
+  Play,
+  Pause,
+  Settings
 } from "lucide-react"
 
 const bebasNeue = Bebas_Neue({
@@ -58,6 +64,7 @@ export default function AdminDashboardPage() {
   const [volunteers, setVolunteers] = useState<Array<VolunteerRegistration & { id: string }>>([])
   const [donations, setDonations] = useState<Array<DonationData & { id: string }>>([])
   const [purchases, setPurchases] = useState<Array<PurchaseData & { id: string }>>([])
+  const [tournaments, setTournaments] = useState<Array<Tournament & { id: string }>>([])
   const [dataLoading, setDataLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
 
@@ -76,13 +83,14 @@ export default function AdminDashboardPage() {
   const loadDashboardData = async () => {
     try {
       setDataLoading(true)
-      const [statsData, teamsData, individualsData, volunteersData, donationsData, purchasesData] = await Promise.all([
+      const [statsData, teamsData, individualsData, volunteersData, donationsData, purchasesData, tournamentsData] = await Promise.all([
         getAdminStats(),
         getAllTeams(),
         getAllIndividuals(),
         getAllVolunteers(),
         getAllDonations(),
-        getAllPurchases()
+        getAllPurchases(),
+        getAllTournaments()
       ])
 
       setStats(statsData)
@@ -91,6 +99,7 @@ export default function AdminDashboardPage() {
       setVolunteers(volunteersData)
       setDonations(donationsData)
       setPurchases(purchasesData)
+      setTournaments(tournamentsData)
     } catch (error) {
       console.error('Error loading dashboard data:', error)
     } finally {
@@ -154,10 +163,14 @@ export default function AdminDashboardPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-7">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               <span className="hidden sm:inline">Visão Geral</span>
+            </TabsTrigger>
+            <TabsTrigger value="tournaments" className="flex items-center gap-2">
+              <Trophy className="h-4 w-4" />
+              <span className="hidden sm:inline">Jogos</span>
             </TabsTrigger>
             <TabsTrigger value="teams" className="flex items-center gap-2">
               <Trophy className="h-4 w-4" />
@@ -213,6 +226,10 @@ export default function AdminDashboardPage() {
                       <CardContent>
                         <div className="space-y-4">
                           <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Torneios criados:</span>
+                            <Badge variant="outline">{stats?.totalTournaments || 0}</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
                             <span className="text-sm font-medium">Equipes registradas:</span>
                             <Badge variant="outline">{stats?.totalTeams || 0}</Badge>
                           </div>
@@ -228,7 +245,7 @@ export default function AdminDashboardPage() {
                           <div className="flex justify-between items-center">
                             <span className="text-sm font-bold">Total de participantes:</span>
                             <Badge className="bg-[#8e44ad] text-white">
-                              {(stats?.totalTeams || 0) + (stats?.totalIndividuals || 0) + (stats?.totalVolunteers || 0)}
+                              {(stats?.totalTournaments || 0) + (stats?.totalTeams || 0) + (stats?.totalIndividuals || 0) + (stats?.totalVolunteers || 0)}
                             </Badge>
                           </div>
                         </div>
@@ -268,6 +285,107 @@ export default function AdminDashboardPage() {
                     </Card>
                   </div>
                 </motion.div>
+              </TabsContent>
+
+              <TabsContent value="tournaments" className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
+                    JOGOS E TORNEIOS ({tournaments.length})
+                  </h2>
+                  <div className="flex items-center gap-4">
+                    <TournamentCreateModal onTournamentCreated={loadDashboardData} />
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Download className="h-4 w-4" />
+                      Exportar
+                    </Button>
+                  </div>
+                </div>
+
+                <Card>
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nome do Torneio</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Equipes</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Data de Início</TableHead>
+                          <TableHead>Inscrição</TableHead>
+                          <TableHead>Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {tournaments.map((tournament) => (
+                          <TableRow key={tournament.id}>
+                            <TableCell className="font-medium">{tournament.name}</TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  tournament.status === 'in-progress' ? 'default' :
+                                  tournament.status === 'completed' ? 'secondary' :
+                                  tournament.status === 'registration-open' ? 'default' :
+                                  'outline'
+                                }
+                              >
+                                {tournament.status === 'draft' && 'Rascunho'}
+                                {tournament.status === 'registration-open' && 'Inscrições Abertas'}
+                                {tournament.status === 'registration-closed' && 'Inscrições Fechadas'}
+                                {tournament.status === 'in-progress' && 'Em Andamento'}
+                                {tournament.status === 'completed' && 'Finalizado'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <span className="font-bold">{tournament.teams?.length || 0}</span>
+                              <span className="text-muted-foreground"> / {tournament.maxTeams}</span>
+                            </TableCell>
+                            <TableCell>
+                              {tournament.isCopaPassaBola ? (
+                                <Badge className="bg-[#8e44ad] text-white">Copa PB</Badge>
+                              ) : (
+                                <Badge variant="outline">Regular</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                {formatDate(tournament.startDate)}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {tournament.isPaid ? (
+                                <span className="font-medium text-green-600">
+                                  {formatCurrency(tournament.entryFee || 0)}
+                                </span>
+                              ) : (
+                                <Badge variant="secondary">Gratuito</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <TournamentDetailsModal
+                                tournament={tournament}
+                                onTournamentUpdated={loadDashboardData}
+                                trigger={
+                                  <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                    <Eye className="h-4 w-4" />
+                                    Ver Detalhes
+                                  </Button>
+                                }
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {tournaments.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                              Nenhum torneio criado ainda
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="teams" className="space-y-6">

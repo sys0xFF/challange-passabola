@@ -36,7 +36,21 @@ export function StatsCards({ stats }: StatsCardsProps) {
   const goalRevenue = 50000
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Torneios */}
+      <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-amber-200">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Torneios</CardTitle>
+          <Trophy className="h-4 w-4 text-amber-600" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-amber-700">{stats.totalTournaments}</div>
+          <p className="text-xs text-amber-600 mt-1">
+            jogos criados
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Participantes */}
       <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -130,6 +144,20 @@ export function StatsCards({ stats }: StatsCardsProps) {
           />
           <p className="text-xs text-[#8e44ad] mt-2">
             {((totalRevenue / goalRevenue) * 100).toFixed(0)}% da meta
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Card adicional para completar o grid se necessário */}
+      <Card className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900/20 dark:to-slate-800/20 border-slate-200">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Engajamento</CardTitle>
+          <Calendar className="h-4 w-4 text-slate-600" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-slate-700">{((totalParticipants / (stats.totalTournaments || 1)) || 0).toFixed(1)}</div>
+          <p className="text-xs text-slate-600 mt-1">
+            participantes por torneio
           </p>
         </CardContent>
       </Card>
