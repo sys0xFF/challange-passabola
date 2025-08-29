@@ -299,17 +299,23 @@ export default function AdminDashboardPage() {
                           <TableRow key={team.id}>
                             <TableCell className="font-medium">{team.teamData.nomeTime}</TableCell>
                             <TableCell>{team.captainData.nomeCompleto}</TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Mail className="h-4 w-4 text-muted-foreground" />
-                              {team.captainData.email}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                {team.captainData.email}
+                              </div>
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Phone className="h-4 w-4 text-muted-foreground" />
-                              {team.captainData.telefone}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Phone className="h-4 w-4 text-muted-foreground" />
+                                {team.captainData.telefone}
+                              </div>
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {formatDate(team.registrationDate)}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                {formatDate(team.registrationDate)}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <DetailModal
@@ -369,18 +375,24 @@ export default function AdminDashboardPage() {
                           <TableRow key={individual.id}>
                             <TableCell className="font-medium">{individual.captainData.nomeCompleto}</TableCell>
                             <TableCell>{individual.captainData.idade} anos</TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Mail className="h-4 w-4 text-muted-foreground" />
-                              {individual.captainData.email}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                {individual.captainData.email}
+                              </div>
                             </TableCell>
                             <TableCell>{individual.captainData.posicao}</TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4 text-muted-foreground" />
-                              {individual.captainData.cidadeBairro}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                {individual.captainData.cidadeBairro}
+                              </div>
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {formatDate(individual.registrationDate)}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                {formatDate(individual.registrationDate)}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <DetailModal
@@ -535,13 +547,17 @@ export default function AdminDashboardPage() {
                             <TableCell className="font-medium text-green-600">
                               {formatCurrency(donation.amount)}
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <CreditCard className="h-4 w-4 text-muted-foreground" />
-                              {donation.paymentMethod.toUpperCase()}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                {donation.paymentMethod.toUpperCase()}
+                              </div>
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {formatDate(donation.donationDate)}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                {formatDate(donation.donationDate)}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <DetailModal
@@ -624,13 +640,17 @@ export default function AdminDashboardPage() {
                             <TableCell className="font-medium text-green-600">
                               {formatCurrency(purchase.pricing.total)}
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <CreditCard className="h-4 w-4 text-muted-foreground" />
-                              {purchase.paymentMethod.toUpperCase()}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                {purchase.paymentMethod.toUpperCase()}
+                              </div>
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {formatDate(purchase.purchaseDate)}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                {formatDate(purchase.purchaseDate)}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <DetailModal
