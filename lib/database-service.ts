@@ -329,7 +329,23 @@ export async function saveTournament(tournamentData: Omit<Tournament, 'id' | 'cr
 export async function updateTournament(tournamentId: string, updates: Partial<Tournament>) {
   try {
     const tournamentRef = ref(database, `tournaments/${tournamentId}`);
-    await set(tournamentRef, updates);
+    
+    // Primeiro, buscar os dados existentes
+    const { get } = await import('firebase/database');
+    const snapshot = await get(tournamentRef);
+    const existingData = snapshot.val();
+    
+    if (!existingData) {
+      throw new Error('Tournament not found');
+    }
+    
+    // Mesclar os dados existentes com as atualizações
+    const updatedTournament = {
+      ...existingData,
+      ...updates
+    };
+    
+    await set(tournamentRef, updatedTournament);
     
     console.log('Tournament updated successfully!');
     return { success: true };
@@ -341,8 +357,24 @@ export async function updateTournament(tournamentId: string, updates: Partial<To
 
 export async function updateMatch(tournamentId: string, matchId: string, updates: Partial<Match>) {
   try {
-    const matchRef = ref(database, `tournaments/${tournamentId}/bracket`);
-    // This would need to be implemented to update specific match in the bracket array
+    // Primeiro, buscar o torneio completo
+    const { get } = await import('firebase/database');
+    const tournamentRef = ref(database, `tournaments/${tournamentId}`);
+    const snapshot = await get(tournamentRef);
+    const tournament = snapshot.val();
+    
+    if (!tournament) {
+      throw new Error('Tournament not found');
+    }
+    
+    // Atualizar a partida específica no bracket
+    const updatedBracket = tournament.bracket.map((match: Match) => 
+      match.id === matchId ? { ...match, ...updates } : match
+    );
+    
+    // Salvar o bracket atualizado
+    await set(ref(database, `tournaments/${tournamentId}/bracket`), updatedBracket);
+    
     console.log('Match updated successfully!');
     return { success: true };
   } catch (error) {
