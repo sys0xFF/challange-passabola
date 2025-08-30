@@ -296,7 +296,7 @@ export default function Home() {
               <ScrollAnimation delay={0.2}>
                 <div className="relative">
                   <div className="relative h-[500px] rounded-lg overflow-hidden">
-                    <Image src="/image_1.png" alt="Jogadoras da Copa Passa Bola" fill className="object-cover" />
+                    <Image src="/image_1.png" alt="Jogadoras da Copa Passa Bola" fill className="object-cover" style={{ objectPosition: 'center 20%' }} />
                   </div>
                   <div className="absolute -bottom-6 -left-6 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg max-w-xs">
                     <div className="flex items-start gap-3">
@@ -503,21 +503,21 @@ export default function Home() {
                     "A Copa Passa Bola me deu a oportunidade de jogar em um ambiente seguro e acolhedor, onde posso ser quem eu sou sem medo de julgamentos. Encontrei não só um time, mas uma família.",
                   name: "Juliana Martins",
                   role: "Atacante do Leoas FC",
-                  image: "/placeholder.svg?height=100&width=100",
+                  image: "/image_2.png",
                 },
                 {
                   quote:
                     "Como mulher lésbica, sempre enfrentei preconceito nos campos. Na Copa Passa Bola, pela primeira vez, me senti completamente aceita e valorizada como atleta e como pessoa.",
                   name: "Fernanda Oliveira",
                   role: "Goleira do Fênix Futebol Clube",
-                  image: "/placeholder.svg?height=100&width=100",
+                  image: "/image_3.png",
                 },
                 {
                   quote:
                     "O que mais me impressiona na Copa Passa Bola é como ela vai além do esporte. É um movimento político, social e cultural que está realmente mudando a forma como o futebol feminino é visto.",
                   name: "Camila Santos",
                   role: "Treinadora do Guerreiras FC",
-                  image: "/placeholder.svg?height=100&width=100",
+                  image: "/image_4.png",
                 },
               ].map((testimonial, index) => (
                 <ScrollAnimation key={index} delay={index * 0.1}>
