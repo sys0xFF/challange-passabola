@@ -276,15 +276,95 @@ export function generateAutoTeamsFromIndividuals(individuals: Array<IndividualRe
   return teams;
 }
 
-export async function updateTournamentBracket(tournamentId: string, bracket: Match[]): Promise<{ success: boolean; error?: any }> {
+export async function updateTournamentBracket(tournamentId: string, bracket: Match[], teams: GameTeam[]): Promise<{ success: boolean; error?: any }> {
   try {
-    const tournamentRef = ref(database, `tournaments/${tournamentId}/bracket`);
-    await set(tournamentRef, bracket);
+    // Atualizar tanto o bracket quanto os teams e o status do torneio
+    const updates = {
+      bracket,
+      teams,
+      status: 'in-progress' as const // Mudar status para "em andamento" quando o chaveamento for salvo
+    };
     
-    console.log('Tournament bracket updated successfully!');
-    return { success: true };
+    const { updateTournament } = await import('./database-service');
+    const result = await updateTournament(tournamentId, updates);
+    
+    if (result.success) {
+      console.log('Tournament bracket, teams and status updated successfully!');
+    }
+    
+    return result;
   } catch (error) {
     console.error('Error updating tournament bracket:', error);
     return { success: false, error };
+  }
+}
+
+export async function advanceWinnersToNextRound(tournamentId: string, bracket: Match[]): Promise<{ success: boolean; bracket: Match[]; error?: any }> {
+  try {
+    const updatedBracket = [...bracket];
+    
+    // Agrupar partidas por rodada
+    const matchesByRound = bracket.reduce((acc, match) => {
+      if (!acc[match.round]) acc[match.round] = [];
+      acc[match.round].push(match);
+      return acc;
+    }, {} as Record<number, Match[]>);
+    
+    // Para cada rodada, verificar se há vencedores para avançar
+    Object.keys(matchesByRound).forEach(roundStr => {
+      const round = parseInt(roundStr);
+      const roundMatches = matchesByRound[round];
+      const nextRound = round + 1;
+      const nextRoundMatches = matchesByRound[nextRound];
+      
+      if (nextRoundMatches) {
+        roundMatches.forEach((match, index) => {
+          if (match.winner && match.status === 'completed') {
+            const winnerTeam = match.team1?.id === match.winner ? match.team1 : match.team2;
+            const nextMatchIndex = Math.floor(index / 2);
+            const nextMatch = nextRoundMatches[nextMatchIndex];
+            
+            if (nextMatch) {
+              const updatedNextMatchIndex = updatedBracket.findIndex(m => m.id === nextMatch.id);
+              if (updatedNextMatchIndex !== -1) {
+                // Determinar se o vencedor vai para team1 ou team2 da próxima partida
+                const isFirstSlot = index % 2 === 0;
+                if (isFirstSlot) {
+                  updatedBracket[updatedNextMatchIndex] = {
+                    ...updatedBracket[updatedNextMatchIndex],
+                    team1: winnerTeam
+                  };
+                } else {
+                  updatedBracket[updatedNextMatchIndex] = {
+                    ...updatedBracket[updatedNextMatchIndex],
+                    team2: winnerTeam
+                  };
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+    
+    // Verificar se o torneio foi finalizado (última rodada tem vencedor)
+    const maxRound = Math.max(...bracket.map(m => m.round));
+    const finalMatch = bracket.find(m => m.round === maxRound);
+    const tournamentCompleted = finalMatch && finalMatch.status === 'completed';
+    
+    // Atualizar o torneio com o bracket atualizado e status se necessário
+    const { updateTournament } = await import('./database-service');
+    const updates: any = { bracket: updatedBracket };
+    
+    if (tournamentCompleted) {
+      updates.status = 'completed' as const;
+    }
+    
+    const result = await updateTournament(tournamentId, updates);
+    
+    return { success: result.success, bracket: updatedBracket, error: result.error };
+  } catch (error) {
+    console.error('Error advancing winners:', error);
+    return { success: false, bracket, error };
   }
 }
