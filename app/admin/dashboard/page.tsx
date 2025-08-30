@@ -125,6 +125,125 @@ export default function AdminDashboardPage() {
     return new Date(dateString).toLocaleString('pt-BR')
   }
 
+  const exportToCSV = (data: any[], filename: string, type: string) => {
+    let csvContent = ""
+    let headers: string[] = []
+    
+    if (data.length === 0) {
+      alert('Não há dados para exportar')
+      return
+    }
+
+    // Define headers based on type
+    switch (type) {
+      case 'tournaments':
+        headers = ['Nome do Torneio', 'Status', 'Equipes', 'Tipo', 'Data de Início', 'Taxa de Inscrição']
+        csvContent = headers.join(',') + '\n'
+        data.forEach(item => {
+          csvContent += [
+            `"${item.name}"`,
+            `"${item.status === 'draft' ? 'Rascunho' : 
+                item.status === 'registration-open' ? 'Inscrições Abertas' :
+                item.status === 'registration-closed' ? 'Inscrições Fechadas' :
+                item.status === 'in-progress' ? 'Em Andamento' : 'Finalizado'}"`,
+            `"${(item.teams?.length || 0)}/${item.maxTeams}"`,
+            `"${item.isCopaPassaBola ? 'Copa PB' : 'Regular'}"`,
+            `"${formatDate(item.startDate)}"`,
+            `"${item.isPaid ? formatCurrency(item.entryFee || 0) : 'Gratuito'}"`
+          ].join(',') + '\n'
+        })
+        break
+      
+      case 'teams':
+        headers = ['Nome da Equipe', 'Capitão', 'Email', 'Telefone', 'Cidade/Bairro', 'Data de Registro']
+        csvContent = headers.join(',') + '\n'
+        data.forEach(item => {
+          csvContent += [
+            `"${item.teamData.nomeTime}"`,
+            `"${item.captainData.nomeCompleto}"`,
+            `"${item.captainData.email}"`,
+            `"${item.captainData.telefone}"`,
+            `"${item.captainData.cidadeBairro}"`,
+            `"${formatDate(item.registrationDate)}"`
+          ].join(',') + '\n'
+        })
+        break
+
+      case 'individuals':
+        headers = ['Nome', 'Idade', 'Email', 'Telefone', 'Posição', 'Cidade/Bairro', 'Data de Registro']
+        csvContent = headers.join(',') + '\n'
+        data.forEach(item => {
+          csvContent += [
+            `"${item.captainData.nomeCompleto}"`,
+            `"${item.captainData.idade}"`,
+            `"${item.captainData.email}"`,
+            `"${item.captainData.telefone}"`,
+            `"${item.captainData.posicao}"`,
+            `"${item.captainData.cidadeBairro}"`,
+            `"${formatDate(item.registrationDate)}"`
+          ].join(',') + '\n'
+        })
+        break
+
+      case 'volunteers':
+        headers = ['Nome', 'Email', 'Telefone', 'Profissão', 'Áreas de Interesse', 'Data de Registro']
+        csvContent = headers.join(',') + '\n'
+        data.forEach(item => {
+          csvContent += [
+            `"${item.formData.nomeCompleto}"`,
+            `"${item.formData.email}"`,
+            `"${item.formData.telefone}"`,
+            `"${item.formData.profissao}"`,
+            `"${item.selectedAreas.join('; ')}"`,
+            `"${formatDate(item.registrationDate)}"`
+          ].join(',') + '\n'
+        })
+        break
+
+      case 'donations':
+        headers = ['Tipo', 'Doador', 'Email', 'Valor', 'Método de Pagamento', 'Data']
+        csvContent = headers.join(',') + '\n'
+        data.forEach(item => {
+          csvContent += [
+            `"${item.donationType === 'identified' ? 'Identificada' : 'Anônima'}"`,
+            `"${item.donationType === 'identified' && item.donorData ? item.donorData.nomeCompleto : 'Anônimo'}"`,
+            `"${item.donationType === 'identified' && item.donorData ? item.donorData.email : 'N/A'}"`,
+            `"${formatCurrency(item.amount)}"`,
+            `"${item.paymentMethod.toUpperCase()}"`,
+            `"${formatDate(item.donationDate)}"`
+          ].join(',') + '\n'
+        })
+        break
+
+      case 'purchases':
+        headers = ['Pedido', 'Cliente', 'Email', 'Itens', 'Total', 'Método de Pagamento', 'Data']
+        csvContent = headers.join(',') + '\n'
+        data.forEach(item => {
+          csvContent += [
+            `"#${item.orderId}"`,
+            `"${item.customerData.nomeCompleto}"`,
+            `"${item.customerData.email}"`,
+            `"${item.items.length} ${item.items.length === 1 ? 'item' : 'itens'}"`,
+            `"${formatCurrency(item.pricing.total)}"`,
+            `"${item.paymentMethod.toUpperCase()}"`,
+            `"${formatDate(item.purchaseDate)}"`
+          ].join(',') + '\n'
+        })
+        break
+    }
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   if (loading || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#8e44ad] to-[#9b59b6]">
@@ -296,13 +415,11 @@ export default function AdminDashboardPage() {
                   </h2>
                   <div className="flex items-center gap-4">
                     <TournamentCreateModal onTournamentCreated={loadDashboardData} />
-                    <Link href="/admin/populate">
-                      <Button variant="outline" className="flex items-center gap-2">
-                        <Database className="h-4 w-4" />
-                        Popular Dados
-                      </Button>
-                    </Link>
-                    <Button variant="outline" className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => exportToCSV(tournaments, 'torneios', 'tournaments')}
+                    >
                       <Download className="h-4 w-4" />
                       Exportar
                     </Button>
@@ -401,7 +518,11 @@ export default function AdminDashboardPage() {
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     EQUIPES REGISTRADAS ({teams.length})
                   </h2>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={() => exportToCSV(teams, 'equipes', 'teams')}
+                  >
                     <Download className="h-4 w-4" />
                     Exportar
                   </Button>
@@ -476,7 +597,11 @@ export default function AdminDashboardPage() {
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     JOGADORAS INDIVIDUAIS ({individuals.length})
                   </h2>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={() => exportToCSV(individuals, 'jogadoras_individuais', 'individuals')}
+                  >
                     <Download className="h-4 w-4" />
                     Exportar
                   </Button>
@@ -553,7 +678,11 @@ export default function AdminDashboardPage() {
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     VOLUNTÁRIAS CADASTRADAS ({volunteers.length})
                   </h2>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={() => exportToCSV(volunteers, 'voluntarias', 'volunteers')}
+                  >
                     <Download className="h-4 w-4" />
                     Exportar
                   </Button>
@@ -634,7 +763,11 @@ export default function AdminDashboardPage() {
                         {formatCurrency(stats?.totalDonationAmount || 0)}
                       </p>
                     </div>
-                    <Button variant="outline" className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => exportToCSV(donations, 'doacoes', 'donations')}
+                    >
                       <Download className="h-4 w-4" />
                       Exportar
                     </Button>
@@ -725,7 +858,11 @@ export default function AdminDashboardPage() {
                         {formatCurrency(stats?.totalRevenue || 0)}
                       </p>
                     </div>
-                    <Button variant="outline" className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => exportToCSV(purchases, 'compras', 'purchases')}
+                    >
                       <Download className="h-4 w-4" />
                       Exportar
                     </Button>
