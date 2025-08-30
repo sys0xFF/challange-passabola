@@ -153,6 +153,11 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
         return
       }
 
+      if (allTournamentTeams.length % 2 !== 0) {
+        toast.error("O número de times deve ser PAR para gerar chaveamento automático")
+        return
+      }
+
       // Embaralhar times para distribuição aleatória
       const shuffledTeams = [...allTournamentTeams].sort(() => Math.random() - 0.5)
       

@@ -57,8 +57,20 @@ export function TournamentCreateModal({ onTournamentCreated }: TournamentCreateM
         return
       }
 
-      if (!formData.maxTeams || parseInt(formData.maxTeams) < 2) {
+      const maxTeams = parseInt(formData.maxTeams)
+      
+      if (!formData.maxTeams || maxTeams < 2) {
         toast.error("Quantidade mínima de equipes é 2")
+        return
+      }
+
+      if (maxTeams > 16) {
+        toast.error("Sistema suporta no máximo 16 equipes")
+        return
+      }
+
+      if (maxTeams % 2 !== 0) {
+        toast.error("O número de equipes deve ser PAR para permitir chaveamento adequado")
         return
       }
 
@@ -172,11 +184,30 @@ export function TournamentCreateModal({ onTournamentCreated }: TournamentCreateM
                 id="maxTeams"
                 type="number"
                 min="2"
-                max="32"
+                max="16"
+                step="2"
                 value={formData.maxTeams}
                 onChange={(e) => handleInputChange("maxTeams", e.target.value)}
                 placeholder="8"
+                className={
+                  formData.maxTeams && (parseInt(formData.maxTeams) % 2 !== 0 || parseInt(formData.maxTeams) > 16)
+                    ? "border-red-500 focus:border-red-500" 
+                    : ""
+                }
               />
+              {formData.maxTeams && parseInt(formData.maxTeams) % 2 !== 0 && (
+                <p className="text-sm text-red-500">
+                  ⚠️ O número deve ser PAR para permitir chaveamento
+                </p>
+              )}
+              {formData.maxTeams && parseInt(formData.maxTeams) > 16 && (
+                <p className="text-sm text-red-500">
+                  ⚠️ Sistema suporta no máximo 16 equipes
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Suporta: 2, 4, 6, 8, 10, 12, 14, 16 equipes
+              </p>
             </div>
 
             <div className="grid gap-2">

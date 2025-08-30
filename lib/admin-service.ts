@@ -172,52 +172,555 @@ export function generateAutomaticBracket(teams: GameTeam[]): Match[] {
   const numTeams = teams.length;
   if (numTeams < 2) return [];
 
-  // Para torneios eliminatórios, precisamos de potência de 2
-  const nextPowerOf2 = Math.pow(2, Math.ceil(Math.log2(numTeams)));
-  
+  // Verificar se é número par
+  if (numTeams % 2 !== 0) {
+    console.error('Número de times deve ser par para gerar chaveamento');
+    return [];
+  }
+
+  // Suporte até 16 times
+  if (numTeams > 16) {
+    console.error('Sistema suporta no máximo 16 times');
+    return [];
+  }
+
   const matches: Match[] = [];
   let matchId = 1;
 
-  // Primeira rodada
-  const firstRoundMatches = nextPowerOf2 / 2;
-  
-  for (let i = 0; i < firstRoundMatches; i++) {
-    const team1 = i < teams.length ? teams[i] : null;
-    const team2 = (i + firstRoundMatches) < teams.length ? teams[i + firstRoundMatches] : null;
-    
+  // Definir estrutura baseada no número de times
+  if (numTeams === 2) {
+    return generateFinal(teams, matchId);
+  } else if (numTeams === 4) {
+    return generateSemiFinals(teams, matchId);
+  } else if (numTeams === 6) {
+    return generateSixTeamBracket(teams, matchId);
+  } else if (numTeams === 8) {
+    return generateQuarterFinals(teams, matchId);
+  } else if (numTeams === 10) {
+    return generateTenTeamBracket(teams, matchId);
+  } else if (numTeams === 12) {
+    return generateTwelveTeamBracket(teams, matchId);
+  } else if (numTeams === 14) {
+    return generateFourteenTeamBracket(teams, matchId);
+  } else if (numTeams === 16) {
+    return generateSixteenTeamBracket(teams, matchId);
+  }
+
+  return matches;
+}
+
+// Funções específicas para cada formato
+function generateFinal(teams: GameTeam[], startMatchId: number): Match[] {
+  return [{
+    id: `match-${startMatchId}`,
+    round: 1,
+    position: 1,
+    team1: teams[0],
+    team2: teams[1],
+    status: 'pending'
+  }];
+}
+
+function generateSemiFinals(teams: GameTeam[], startMatchId: number): Match[] {
+  const matches: Match[] = [];
+  let matchId = startMatchId;
+
+  // Semifinais
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 1,
+    team1: teams[0],
+    team2: teams[3],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 2,
+    team1: teams[1],
+    team2: teams[2],
+    status: 'pending'
+  });
+
+  // Final
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  return matches;
+}
+
+function generateSixTeamBracket(teams: GameTeam[], startMatchId: number): Match[] {
+  const matches: Match[] = [];
+  let matchId = startMatchId;
+
+  // Primeira rodada - 2 jogos (4 times jogam, 2 passam direto)
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 1,
+    team1: teams[2],
+    team2: teams[5],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 2,
+    team1: teams[3],
+    team2: teams[4],
+    status: 'pending'
+  });
+
+  // Semifinais - times que passaram direto + vencedores
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 1,
+    team1: teams[0], // Passa direto
+    team2: null,     // Vencedor do match-1
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 2,
+    team1: teams[1], // Passa direto
+    team2: null,     // Vencedor do match-2
+    status: 'pending'
+  });
+
+  // Final
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  return matches;
+}
+
+function generateQuarterFinals(teams: GameTeam[], startMatchId: number): Match[] {
+  const matches: Match[] = [];
+  let matchId = startMatchId;
+
+  // Quartas de final
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 1,
+    team1: teams[0],
+    team2: teams[7],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 2,
+    team1: teams[1],
+    team2: teams[6],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 3,
+    team1: teams[2],
+    team2: teams[5],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 4,
+    team1: teams[3],
+    team2: teams[4],
+    status: 'pending'
+  });
+
+  // Semifinais
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 2,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  // Final
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  return matches;
+}
+
+function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[] {
+  const matches: Match[] = [];
+  let matchId = startMatchId;
+
+  // Primeira rodada - 2 jogos (4 times jogam)
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 1,
+    team1: teams[6],
+    team2: teams[9],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 2,
+    team1: teams[7],
+    team2: teams[8],
+    status: 'pending'
+  });
+
+  // Quartas de final - 6 times que passaram direto + 2 vencedores
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 1,
+    team1: teams[0],
+    team2: null, // Vencedor match-1
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 2,
+    team1: teams[1],
+    team2: null, // Vencedor match-2
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 3,
+    team1: teams[2],
+    team2: teams[5],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 4,
+    team1: teams[3],
+    team2: teams[4],
+    status: 'pending'
+  });
+
+  // Semifinais
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 2,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  // Final
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 4,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  return matches;
+}
+
+function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Match[] {
+  const matches: Match[] = [];
+  let matchId = startMatchId;
+
+  // Primeira rodada - 4 jogos (8 times jogam)
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 1,
+    team1: teams[4],
+    team2: teams[11],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 2,
+    team1: teams[5],
+    team2: teams[10],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 3,
+    team1: teams[6],
+    team2: teams[9],
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 4,
+    team1: teams[7],
+    team2: teams[8],
+    status: 'pending'
+  });
+
+  // Quartas de final - 4 times que passaram direto + 4 vencedores
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 1,
+    team1: teams[0],
+    team2: null, // Vencedor match-1
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 2,
+    team1: teams[1],
+    team2: null, // Vencedor match-2
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 3,
+    team1: teams[2],
+    team2: null, // Vencedor match-3
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 4,
+    team1: teams[3],
+    team2: null, // Vencedor match-4
+    status: 'pending'
+  });
+
+  // Semifinais
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 2,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  // Final
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 4,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  return matches;
+}
+
+function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): Match[] {
+  const matches: Match[] = [];
+  let matchId = startMatchId;
+
+  // Primeira rodada - 6 jogos (12 times jogam)
+  for (let i = 0; i < 6; i++) {
     matches.push({
-      id: `match-${matchId}`,
+      id: `match-${matchId++}`,
       round: 1,
       position: i + 1,
-      team1,
-      team2,
+      team1: teams[2 + i],
+      team2: teams[13 - i],
       status: 'pending'
     });
-    matchId++;
   }
 
-  // Gerar rodadas subsequentes
-  let currentRoundMatches = firstRoundMatches;
-  let round = 2;
+  // Quartas de final - 2 times que passaram direto + 6 vencedores
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 1,
+    team1: teams[0],
+    team2: null, // Vencedor match-1
+    status: 'pending'
+  });
 
-  while (currentRoundMatches > 1) {
-    const nextRoundMatches = currentRoundMatches / 2;
-    
-    for (let i = 0; i < nextRoundMatches; i++) {
-      matches.push({
-        id: `match-${matchId}`,
-        round,
-        position: i + 1,
-        team1: null,
-        team2: null,
-        status: 'pending'
-      });
-      matchId++;
-    }
-    
-    currentRoundMatches = nextRoundMatches;
-    round++;
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 2,
+    team1: teams[1],
+    team2: null, // Vencedor match-2
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 3,
+    team1: null, // Vencedor match-3
+    team2: null, // Vencedor match-4
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 2,
+    position: 4,
+    team1: null, // Vencedor match-5
+    team2: null, // Vencedor match-6
+    status: 'pending'
+  });
+
+  // Semifinais
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 3,
+    position: 2,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  // Final
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 4,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
+
+  return matches;
+}
+
+function generateSixteenTeamBracket(teams: GameTeam[], startMatchId: number): Match[] {
+  const matches: Match[] = [];
+  let matchId = startMatchId;
+
+  // Oitavas de final - 8 jogos
+  for (let i = 0; i < 8; i++) {
+    matches.push({
+      id: `match-${matchId++}`,
+      round: 1,
+      position: i + 1,
+      team1: teams[i],
+      team2: teams[15 - i],
+      status: 'pending'
+    });
   }
+
+  // Quartas de final - 4 jogos
+  for (let i = 0; i < 4; i++) {
+    matches.push({
+      id: `match-${matchId++}`,
+      round: 2,
+      position: i + 1,
+      team1: null,
+      team2: null,
+      status: 'pending'
+    });
+  }
+
+  // Semifinais - 2 jogos
+  for (let i = 0; i < 2; i++) {
+    matches.push({
+      id: `match-${matchId++}`,
+      round: 3,
+      position: i + 1,
+      team1: null,
+      team2: null,
+      status: 'pending'
+    });
+  }
+
+  // Final - 1 jogo
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 4,
+    position: 1,
+    team1: null,
+    team2: null,
+    status: 'pending'
+  });
 
   return matches;
 }
@@ -234,10 +737,16 @@ export function generateAutoTeamsFromIndividuals(individuals: Array<IndividualRe
   const shuffledGoalkeepers = [...goalkeepers].sort(() => Math.random() - 0.5);
   const shuffledFieldPlayers = [...fieldPlayers].sort(() => Math.random() - 0.5);
   
-  const numPossibleTeams = Math.min(
+  let numPossibleTeams = Math.min(
     shuffledGoalkeepers.length, 
     Math.floor(shuffledFieldPlayers.length / 6)
   );
+  
+  // Tentar fazer número par de times se possível
+  if (numPossibleTeams > 1 && numPossibleTeams % 2 !== 0) {
+    // Se o número é ímpar e maior que 1, reduzir em 1 para tornar par
+    numPossibleTeams = numPossibleTeams - 1;
+  }
   
   for (let i = 0; i < numPossibleTeams; i++) {
     const teamPlayers = [];
