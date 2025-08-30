@@ -47,7 +47,8 @@ import {
   Play,
   Pause,
   Settings,
-  Database
+  Database,
+  Trash2
 } from "lucide-react"
 
 const bebasNeue = Bebas_Neue({
@@ -242,6 +243,77 @@ export default function AdminDashboardPage() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const deleteRecord = async (id: string, type: string, name?: string) => {
+    const confirmMessage = `Tem certeza que deseja deletar ${name ? `"${name}"` : 'este registro'}? Esta ação não pode ser desfeita.`
+    
+    if (!window.confirm(confirmMessage)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`https://challange-passabola-default-rtdb.firebaseio.com/${getFirebasePath(type)}/${id}.json`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        alert('Registro deletado com sucesso!')
+        loadDashboardData() // Recarregar dados
+      } else {
+        alert('Erro ao deletar registro. Tente novamente.')
+      }
+    } catch (error) {
+      console.error('Error deleting record:', error)
+      alert('Erro ao deletar registro. Tente novamente.')
+    }
+  }
+
+  const deleteAllRecords = async (type: string) => {
+    const typeNames = {
+      'tournaments': 'todos os torneios',
+      'teams': 'todas as equipes',
+      'individuals': 'todas as jogadoras individuais', 
+      'volunteers': 'todas as voluntárias',
+      'donations': 'todas as doações',
+      'purchases': 'todas as compras'
+    }
+
+    const confirmMessage = `Tem certeza que deseja deletar ${typeNames[type as keyof typeof typeNames]}?\n\nEsta ação é IRREVERSÍVEL e todos os dados serão perdidos permanentemente.\n\nDigite "CONFIRMAR" para prosseguir:`
+    
+    const userInput = window.prompt(confirmMessage)
+    
+    if (userInput !== 'CONFIRMAR') {
+      return
+    }
+
+    try {
+      const response = await fetch(`https://challange-passabola-default-rtdb.firebaseio.com/${getFirebasePath(type)}.json`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        alert(`✅ Todos os registros de ${typeNames[type as keyof typeof typeNames]} foram deletados com sucesso!`)
+        loadDashboardData() // Recarregar dados
+      } else {
+        alert('Erro ao deletar registros. Tente novamente.')
+      }
+    } catch (error) {
+      console.error('Error deleting all records:', error)
+      alert('Erro ao deletar registros. Tente novamente.')
+    }
+  }
+
+  const getFirebasePath = (type: string) => {
+    switch (type) {
+      case 'tournaments': return 'tournaments'
+      case 'teams': return 'Teams'
+      case 'individuals': return 'Individuals'
+      case 'volunteers': return 'volunteers'
+      case 'donations': return 'donors'
+      case 'purchases': return 'purchases'
+      default: return ''
+    }
   }
 
   if (loading || !isAuthenticated) {
@@ -487,16 +559,27 @@ export default function AdminDashboardPage() {
                               )}
                             </TableCell>
                             <TableCell>
-                              <TournamentDetailsModal
-                                tournament={tournament}
-                                onTournamentUpdated={loadDashboardData}
-                                trigger={
-                                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
-                                    Ver Detalhes
-                                  </Button>
-                                }
-                              />
+                              <div className="flex items-center gap-2">
+                                <TournamentDetailsModal
+                                  tournament={tournament}
+                                  onTournamentUpdated={loadDashboardData}
+                                  trigger={
+                                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                      <Eye className="h-4 w-4" />
+                                      Ver Detalhes
+                                    </Button>
+                                  }
+                                />
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => deleteRecord(tournament.id, 'tournaments', tournament.name)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Deletar
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -518,14 +601,26 @@ export default function AdminDashboardPage() {
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     EQUIPES REGISTRADAS ({teams.length})
                   </h2>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2"
-                    onClick={() => exportToCSV(teams, 'equipes', 'teams')}
-                  >
-                    <Download className="h-4 w-4" />
-                    Exportar
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => exportToCSV(teams, 'equipes', 'teams')}
+                    >
+                      <Download className="h-4 w-4" />
+                      Exportar
+                    </Button>
+                    {teams.length > 0 && (
+                      <Button 
+                        variant="destructive"
+                        className="flex items-center gap-2"
+                        onClick={() => deleteAllRecords('teams')}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Deletar Todos
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <Card>
@@ -565,17 +660,28 @@ export default function AdminDashboardPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <DetailModal
-                                trigger={
-                                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
-                                    Ver Detalhes
-                                  </Button>
-                                }
-                                title={`Equipe: ${team.teamData.nomeTime}`}
-                                data={team}
-                                type="team"
-                              />
+                              <div className="flex items-center gap-2">
+                                <DetailModal
+                                  trigger={
+                                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                      <Eye className="h-4 w-4" />
+                                      Ver Detalhes
+                                    </Button>
+                                  }
+                                  title={`Equipe: ${team.teamData.nomeTime}`}
+                                  data={team}
+                                  type="team"
+                                />
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => deleteRecord(team.id, 'teams', team.teamData.nomeTime)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Deletar
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -597,14 +703,26 @@ export default function AdminDashboardPage() {
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     JOGADORAS INDIVIDUAIS ({individuals.length})
                   </h2>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2"
-                    onClick={() => exportToCSV(individuals, 'jogadoras_individuais', 'individuals')}
-                  >
-                    <Download className="h-4 w-4" />
-                    Exportar
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => exportToCSV(individuals, 'jogadoras_individuais', 'individuals')}
+                    >
+                      <Download className="h-4 w-4" />
+                      Exportar
+                    </Button>
+                    {individuals.length > 0 && (
+                      <Button 
+                        variant="destructive"
+                        className="flex items-center gap-2"
+                        onClick={() => deleteAllRecords('individuals')}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Deletar Todos
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <Card>
@@ -646,17 +764,28 @@ export default function AdminDashboardPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <DetailModal
-                                trigger={
-                                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
-                                    Ver Detalhes
-                                  </Button>
-                                }
-                                title={`Jogadora: ${individual.captainData.nomeCompleto}`}
-                                data={individual}
-                                type="individual"
-                              />
+                              <div className="flex items-center gap-2">
+                                <DetailModal
+                                  trigger={
+                                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                      <Eye className="h-4 w-4" />
+                                      Ver Detalhes
+                                    </Button>
+                                  }
+                                  title={`Jogadora: ${individual.captainData.nomeCompleto}`}
+                                  data={individual}
+                                  type="individual"
+                                />
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => deleteRecord(individual.id, 'individuals', individual.captainData.nomeCompleto)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Deletar
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -678,14 +807,26 @@ export default function AdminDashboardPage() {
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     VOLUNTÁRIAS CADASTRADAS ({volunteers.length})
                   </h2>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2"
-                    onClick={() => exportToCSV(volunteers, 'voluntarias', 'volunteers')}
-                  >
-                    <Download className="h-4 w-4" />
-                    Exportar
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => exportToCSV(volunteers, 'voluntarias', 'volunteers')}
+                    >
+                      <Download className="h-4 w-4" />
+                      Exportar
+                    </Button>
+                    {volunteers.length > 0 && (
+                      <Button 
+                        variant="destructive"
+                        className="flex items-center gap-2"
+                        onClick={() => deleteAllRecords('volunteers')}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Deletar Todos
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <Card>
@@ -724,17 +865,28 @@ export default function AdminDashboardPage() {
                               {formatDate(volunteer.registrationDate)}
                             </TableCell>
                             <TableCell>
-                              <DetailModal
-                                trigger={
-                                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
-                                    Ver Detalhes
-                                  </Button>
-                                }
-                                title={`Voluntária: ${volunteer.formData.nomeCompleto}`}
-                                data={volunteer}
-                                type="volunteer"
-                              />
+                              <div className="flex items-center gap-2">
+                                <DetailModal
+                                  trigger={
+                                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                      <Eye className="h-4 w-4" />
+                                      Ver Detalhes
+                                    </Button>
+                                  }
+                                  title={`Voluntária: ${volunteer.formData.nomeCompleto}`}
+                                  data={volunteer}
+                                  type="volunteer"
+                                />
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => deleteRecord(volunteer.id, 'volunteers', volunteer.formData.nomeCompleto)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Deletar
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -763,14 +915,26 @@ export default function AdminDashboardPage() {
                         {formatCurrency(stats?.totalDonationAmount || 0)}
                       </p>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => exportToCSV(donations, 'doacoes', 'donations')}
-                    >
-                      <Download className="h-4 w-4" />
-                      Exportar
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2"
+                        onClick={() => exportToCSV(donations, 'doacoes', 'donations')}
+                      >
+                        <Download className="h-4 w-4" />
+                        Exportar
+                      </Button>
+                      {donations.length > 0 && (
+                        <Button 
+                          variant="destructive"
+                          className="flex items-center gap-2"
+                          onClick={() => deleteAllRecords('donations')}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Deletar Todos
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -819,17 +983,28 @@ export default function AdminDashboardPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <DetailModal
-                                trigger={
-                                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
-                                    Ver Detalhes
-                                  </Button>
-                                }
-                                title={`Doação: ${formatCurrency(donation.amount)}`}
-                                data={donation}
-                                type="donation"
-                              />
+                              <div className="flex items-center gap-2">
+                                <DetailModal
+                                  trigger={
+                                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                      <Eye className="h-4 w-4" />
+                                      Ver Detalhes
+                                    </Button>
+                                  }
+                                  title={`Doação: ${formatCurrency(donation.amount)}`}
+                                  data={donation}
+                                  type="donation"
+                                />
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => deleteRecord(donation.id, 'donations', `Doação de ${formatCurrency(donation.amount)}`)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Deletar
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -858,14 +1033,26 @@ export default function AdminDashboardPage() {
                         {formatCurrency(stats?.totalRevenue || 0)}
                       </p>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => exportToCSV(purchases, 'compras', 'purchases')}
-                    >
-                      <Download className="h-4 w-4" />
-                      Exportar
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2"
+                        onClick={() => exportToCSV(purchases, 'compras', 'purchases')}
+                      >
+                        <Download className="h-4 w-4" />
+                        Exportar
+                      </Button>
+                      {purchases.length > 0 && (
+                        <Button 
+                          variant="destructive"
+                          className="flex items-center gap-2"
+                          onClick={() => deleteAllRecords('purchases')}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Deletar Todos
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -916,17 +1103,28 @@ export default function AdminDashboardPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <DetailModal
-                                trigger={
-                                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
-                                    Ver Detalhes
-                                  </Button>
-                                }
-                                title={`Pedido: #${purchase.orderId}`}
-                                data={purchase}
-                                type="purchase"
-                              />
+                              <div className="flex items-center gap-2">
+                                <DetailModal
+                                  trigger={
+                                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                      <Eye className="h-4 w-4" />
+                                      Ver Detalhes
+                                    </Button>
+                                  }
+                                  title={`Pedido: #${purchase.orderId}`}
+                                  data={purchase}
+                                  type="purchase"
+                                />
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => deleteRecord(purchase.id, 'purchases', `Pedido #${purchase.orderId}`)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Deletar
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
