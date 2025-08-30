@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
 import { Bebas_Neue } from "next/font/google"
 import { useAdminAuth } from "@/contexts/admin-auth-context"
 import { 
@@ -45,7 +46,8 @@ import {
   Eye,
   Play,
   Pause,
-  Settings
+  Settings,
+  Database
 } from "lucide-react"
 
 const bebasNeue = Bebas_Neue({
@@ -294,6 +296,12 @@ export default function AdminDashboardPage() {
                   </h2>
                   <div className="flex items-center gap-4">
                     <TournamentCreateModal onTournamentCreated={loadDashboardData} />
+                    <Link href="/admin/populate">
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <Database className="h-4 w-4" />
+                        Popular Dados
+                      </Button>
+                    </Link>
                     <Button variant="outline" className="flex items-center gap-2">
                       <Download className="h-4 w-4" />
                       Exportar
