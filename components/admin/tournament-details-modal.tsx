@@ -36,7 +36,8 @@ import {
   getAllIndividuals, 
   generateAutomaticBracket, 
   generateAutoTeamsFromIndividuals,
-  updateTournamentBracket 
+  updateTournamentBracket,
+  advanceWinnersToNextRound
 } from "@/lib/admin-service"
 import { TeamRegistration, IndividualRegistration } from "@/lib/database-service"
 import { toast } from "sonner"
@@ -174,10 +175,10 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
     try {
       setLoading(true)
 
-      const result = await updateTournamentBracket(tournament.id, bracket)
+      const result = await updateTournamentBracket(tournament.id, bracket, tournamentTeams)
 
       if (result.success) {
-        toast.success("Chaveamento salvo com sucesso!")
+        toast.success("Chaveamento salvo com sucesso! Status do torneio atualizado.")
         onTournamentUpdated()
       } else {
         toast.error("Erro ao salvar chaveamento")
@@ -190,19 +191,37 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
     }
   }
 
-  const updateMatchScore = (matchId: string, team1Score: number, team2Score: number) => {
-    setBracket(prev => prev.map(match => {
-      if (match.id === matchId) {
-        const winner = team1Score > team2Score ? match.team1?.id : match.team2?.id
-        return {
-          ...match,
-          score: { team1: team1Score, team2: team2Score },
-          winner,
-          status: 'completed' as const
+  const updateMatchScore = async (matchId: string, team1Score: number, team2Score: number) => {
+    try {
+      const updatedBracket = bracket.map(match => {
+        if (match.id === matchId) {
+          const winner = team1Score > team2Score ? match.team1?.id : match.team2?.id
+          return {
+            ...match,
+            score: { team1: team1Score, team2: team2Score },
+            winner,
+            status: 'completed' as const
+          }
         }
+        return match
+      })
+      
+      setBracket(updatedBracket)
+      
+      // Automaticamente avançar os vencedores para a próxima rodada
+      const advanceResult = await advanceWinnersToNextRound(tournament.id, updatedBracket)
+      
+      if (advanceResult.success) {
+        setBracket(advanceResult.bracket)
+        toast.success("Resultado salvo! Vencedores avançaram automaticamente.")
+        onTournamentUpdated()
+      } else {
+        toast.error("Resultado salvo, mas houve erro ao avançar vencedores")
       }
-      return match
-    }))
+    } catch (error) {
+      console.error("Error updating match score:", error)
+      toast.error("Erro ao salvar resultado da partida")
+    }
   }
 
   const getRoundName = (round: number) => {
@@ -463,7 +482,7 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
                                       updateMatchScore(match.id, team1Score, team2Score)
                                     }}
                                   >
-                                    Salvar
+                                    Salvar Resultado
                                   </Button>
                                 </div>
                               )}
