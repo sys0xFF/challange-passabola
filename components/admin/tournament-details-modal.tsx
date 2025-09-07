@@ -40,6 +40,8 @@ import {
   advanceWinnersToNextRound
 } from "@/lib/admin-service"
 import { TeamRegistration, IndividualRegistration } from "@/lib/database-service"
+import { TeamDetailsModal } from "@/components/admin/team-details-modal"
+import { TeamHoverCard } from "@/components/admin/team-hover-card"
 import { toast } from "sonner"
 
 interface TournamentDetailsModalProps {
@@ -440,9 +442,34 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <span className="font-medium">
-                                    {match.team1?.name || "TBD"}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    {match.team1 ? (
+                                      <TeamHoverCard team={match.team1}>
+                                        <div className="flex items-center gap-1 cursor-pointer">
+                                          <span className="font-medium hover:text-primary transition-colors">
+                                            {match.team1.name}
+                                          </span>
+                                        </div>
+                                      </TeamHoverCard>
+                                    ) : (
+                                      <span className="font-medium text-muted-foreground">TBD</span>
+                                    )}
+                                    {match.team1 && (
+                                      <TeamDetailsModal 
+                                        team={match.team1}
+                                        trigger={
+                                          <Button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            className="h-6 w-6 p-0 hover:bg-primary/10"
+                                            title="Ver detalhes completos do time"
+                                          >
+                                            <Eye className="h-3 w-3" />
+                                          </Button>
+                                        }
+                                      />
+                                    )}
+                                  </div>
                                   {match.score && (
                                     <span className="text-sm bg-muted px-2 py-1 rounded">
                                       {match.score.team1}
@@ -450,9 +477,34 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
                                   )}
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-medium">
-                                    {match.team2?.name || "TBD"}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    {match.team2 ? (
+                                      <TeamHoverCard team={match.team2}>
+                                        <div className="flex items-center gap-1 cursor-pointer">
+                                          <span className="font-medium hover:text-primary transition-colors">
+                                            {match.team2.name}
+                                          </span>
+                                        </div>
+                                      </TeamHoverCard>
+                                    ) : (
+                                      <span className="font-medium text-muted-foreground">TBD</span>
+                                    )}
+                                    {match.team2 && (
+                                      <TeamDetailsModal 
+                                        team={match.team2}
+                                        trigger={
+                                          <Button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            className="h-6 w-6 p-0 hover:bg-primary/10"
+                                            title="Ver detalhes completos do time"
+                                          >
+                                            <Eye className="h-3 w-3" />
+                                          </Button>
+                                        }
+                                      />
+                                    )}
+                                  </div>
                                   {match.score && (
                                     <span className="text-sm bg-muted px-2 py-1 rounded">
                                       {match.score.team2}
