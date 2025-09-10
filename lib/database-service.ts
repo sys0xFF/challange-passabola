@@ -3,6 +3,7 @@ import { ref, push, set } from 'firebase/database';
 
 export interface TeamRegistration {
   type: 'team';
+  userId?: string; // ID do usuário autenticado
   teamData: {
     nomeTime: string;
     nomeCapitao: string;
@@ -35,6 +36,7 @@ export interface TeamRegistration {
 
 export interface IndividualRegistration {
   type: 'individual';
+  userId?: string; // ID do usuário autenticado
   captainData: {
     nomeCompleto: string;
     idade: string;
@@ -93,6 +95,7 @@ export async function saveIndividualRegistration(registrationData: Omit<Individu
 
 export interface VolunteerRegistration {
   type: 'volunteer';
+  userId?: string; // ID do usuário autenticado
   formData: {
     nomeCompleto: string;
     idade: string;
@@ -139,6 +142,7 @@ export async function saveVolunteerRegistration(registrationData: Omit<Volunteer
 
 export interface DonationData {
   type: 'donation';
+  userId?: string; // ID do usuário autenticado
   donationType: 'anonymous' | 'identified';
   amount: number;
   paymentMethod: 'pix' | 'card';
@@ -181,6 +185,7 @@ export async function saveDonation(donationData: Omit<DonationData, 'donationDat
 
 export interface PurchaseData {
   type: 'purchase';
+  userId?: string; // ID do usuário autenticado
   customerData: {
     nomeCompleto: string;
     email: string;
