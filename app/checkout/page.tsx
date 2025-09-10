@@ -5,6 +5,7 @@ import { Shield } from "lucide-react" // Import Shield component
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
 import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { savePurchase } from "@/lib/database-service"
 import { Button } from "@/components/ui/button"
@@ -13,8 +14,9 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { MobileMenu } from "@/components/ui/mobile-menu"
+import { useAuth } from "@/contexts/auth-context"
 import { useCart } from "@/contexts/cart-context"
 import {
   CreditCard,
@@ -47,7 +49,9 @@ export default function CheckoutPage() {
   // Hook de desenvolvimento
   useDevAutoFill();
   
+  const { user, loading } = useAuth()
   const { state, clearCart } = useCart()
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -70,6 +74,25 @@ export default function CheckoutPage() {
     estado: "",
     receberNoticias: false,
   })
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/carrinho')
+    }
+  }, [user, loading, router])
+
+  // Auto-fill user data when user is loaded
+  useEffect(() => {
+    if (user) {
+      setCustomerData(prev => ({
+        ...prev,
+        nomeCompleto: user.name || prev.nomeCompleto,
+        email: user.email || prev.email,
+        telefone: user.telefone || prev.telefone,
+      }))
+    }
+  }, [user])
 
   // Card data
   const [cardData, setCardData] = useState({
@@ -107,6 +130,7 @@ export default function CheckoutPage() {
     
     try {
       const purchaseData = {
+        userId: user?.id, // Incluindo o ID do usuário
         type: "purchase" as const,
         customerData,
         items: state.items,
@@ -174,6 +198,18 @@ export default function CheckoutPage() {
   const shipping = subtotal >= 100 ? 0 : 15.9
   const total = subtotal + shipping
 
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8e44ad] mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Verificando autenticação...</p>
+        </div>
+      </div>
+    )
+  }
+
   // Redirect if cart is empty
   if (state.items.length === 0 && !isSuccess) {
     return (
@@ -208,7 +244,7 @@ export default function CheckoutPage() {
                 <Badge className="bg-green-500 text-white">COMPRA REALIZADA</Badge>
               </div>
               <div className="flex justify-end items-center gap-2">
-                <ThemeToggleButton />
+                <AuthButton />
                 <div className="md:hidden">
                   <MobileMenu />
                 </div>
@@ -408,7 +444,7 @@ export default function CheckoutPage() {
               <Badge className="bg-[#8e44ad] text-white">FINALIZAR COMPRA</Badge>
             </div>
             <div className="flex justify-end items-center gap-2">
-              <ThemeToggleButton />
+              <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
               </div>
