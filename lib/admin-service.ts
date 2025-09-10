@@ -9,19 +9,21 @@ export interface AdminStats {
   totalDonations: number;
   totalPurchases: number;
   totalTournaments: number;
+  totalUsers: number;
   totalRevenue: number;
   totalDonationAmount: number;
 }
 
 export async function getAdminStats(): Promise<AdminStats> {
   try {
-    const [teams, individuals, volunteers, donations, purchases, tournaments] = await Promise.all([
+    const [teams, individuals, volunteers, donations, purchases, tournaments, users] = await Promise.all([
       get(ref(database, 'Teams')),
       get(ref(database, 'Individuals')),
       get(ref(database, 'volunteers')),
       get(ref(database, 'donors')),
       get(ref(database, 'purchases')),
-      get(ref(database, 'tournaments'))
+      get(ref(database, 'tournaments')),
+      get(ref(database, 'users'))
     ]);
 
     const teamsData = teams.val() || {};
@@ -30,6 +32,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     const donationsData = donations.val() || {};
     const purchasesData = purchases.val() || {};
     const tournamentsData = tournaments.val() || {};
+    const usersData = users.val() || {};
 
     // Calcular receita total das compras
     const totalRevenue = Object.values(purchasesData).reduce((acc: number, purchase: any) => {
@@ -48,6 +51,7 @@ export async function getAdminStats(): Promise<AdminStats> {
       totalDonations: Object.keys(donationsData).length,
       totalPurchases: Object.keys(purchasesData).length,
       totalTournaments: Object.keys(tournamentsData).length,
+      totalUsers: Object.keys(usersData).length,
       totalRevenue,
       totalDonationAmount
     };
@@ -875,5 +879,52 @@ export async function advanceWinnersToNextRound(tournamentId: string, bracket: M
   } catch (error) {
     console.error('Error advancing winners:', error);
     return { success: false, bracket, error };
+  }
+}
+
+// Função para buscar todos os usuários
+export async function getAllUsers(): Promise<any[]> {
+  try {
+    const usersSnapshot = await get(ref(database, 'users'));
+    
+    if (!usersSnapshot.exists()) {
+      return [];
+    }
+
+    const usersData = usersSnapshot.val();
+    return Object.entries(usersData).map(([id, user]: [string, any]) => ({
+      id,
+      ...user
+    }));
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+}
+
+// Função para deletar usuário
+export async function deleteUser(userId: string): Promise<{ success: boolean; error?: any }> {
+  try {
+    await set(ref(database, `users/${userId}`), null);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return { success: false, error };
+  }
+}
+
+// Função para buscar usuário por ID
+export async function getUserById(userId: string): Promise<any | null> {
+  try {
+    const userSnapshot = await get(ref(database, `users/${userId}`));
+    
+    if (!userSnapshot.exists()) {
+      return null;
+    }
+
+    return { id: userId, ...userSnapshot.val() };
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    return null;
   }
 }
