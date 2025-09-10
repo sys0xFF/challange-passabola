@@ -89,6 +89,14 @@ export function AuthButton() {
     e.preventDefault()
     setAuthLoading(true)
 
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(registerData.email)) {
+      toast.error('Por favor, insira um email válido')
+      setAuthLoading(false)
+      return
+    }
+
     // Validações
     if (registerData.password !== registerData.confirmPassword) {
       setAuthLoading(false)
@@ -151,8 +159,14 @@ export function AuthButton() {
       }
 
       if (field === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!settingsData.email.trim()) {
           toast.error('Email não pode estar vazio')
+          setSettingsLoading(false)
+          return
+        }
+        if (!emailRegex.test(settingsData.email.trim())) {
+          toast.error('Por favor, insira um email válido')
           setSettingsLoading(false)
           return
         }
@@ -362,7 +376,7 @@ export function AuthButton() {
   return (
     <Dialog open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen}>
       <DialogTrigger asChild>
-        <button className="hidden md:flex items-center gap-1 text-gray-700 dark:text-gray-300 transition-colors border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5">
+        <button className="hidden md:flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md px-3 py-1.5">
           <LogIn className="h-4 w-4" />
           <span className="text-sm font-medium">Entrar</span>
         </button>
