@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollAnimation } from "@/components/animations/ScrollAnimation"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { MobileMenu } from "@/components/ui/mobile-menu"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
   ChevronRight,
@@ -113,8 +113,8 @@ export default function Home() {
                 <span className="text-sm font-medium">Loja</span>
               </Link>
 
-              {/* Theme Toggle Button */}
-              <ThemeToggleButton />
+              {/* Auth Button */}
+              <AuthButton />
 
               {/* Mobile Menu Trigger - positioned at the far right */}
               <div className="md:hidden flex items-center">
