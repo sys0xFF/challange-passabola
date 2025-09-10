@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollAnimation } from "@/components/animations/ScrollAnimation"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { MobileMenu } from "@/components/ui/mobile-menu"
 import {
   ChevronRight,
@@ -64,7 +64,7 @@ export default function HistoriaPage() {
                 <ShoppingBag className="h-5 w-5" />
                 <span className="text-sm font-medium">Loja</span>
               </Link>
-              <ThemeToggleButton />
+              <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
               </div>
