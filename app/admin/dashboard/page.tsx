@@ -15,6 +15,9 @@ import {
   getAllDonations, 
   getAllPurchases,
   getAllTournaments,
+  getAllUsers,
+  deleteUser,
+  getUserById,
   AdminStats 
 } from "@/lib/admin-service"
 import { TeamRegistration, IndividualRegistration, VolunteerRegistration, DonationData, PurchaseData, Tournament } from "@/lib/database-service"
@@ -22,6 +25,7 @@ import { DetailModal } from "@/components/admin/detail-modal"
 import { StatsCards } from "@/components/admin/stats-cards"
 import { TournamentCreateModal } from "@/components/admin/tournament-create-modal"
 import { TournamentDetailsModal } from "@/components/admin/tournament-details-modal"
+import { UserCreateModal } from "@/components/admin/user-create-modal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -48,7 +52,9 @@ import {
   Pause,
   Settings,
   Database,
-  Trash2
+  Trash2,
+  User,
+  UserPlus
 } from "lucide-react"
 
 const bebasNeue = Bebas_Neue({
@@ -68,8 +74,14 @@ export default function AdminDashboardPage() {
   const [donations, setDonations] = useState<Array<DonationData & { id: string }>>([])
   const [purchases, setPurchases] = useState<Array<PurchaseData & { id: string }>>([])
   const [tournaments, setTournaments] = useState<Array<Tournament & { id: string }>>([])
+  const [users, setUsers] = useState<Array<any & { id: string }>>([])
   const [dataLoading, setDataLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
+  
+  // Estados para modais e seleções
+  const [selectedUser, setSelectedUser] = useState<any | null>(null)
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<any | null>(null)
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -86,14 +98,15 @@ export default function AdminDashboardPage() {
   const loadDashboardData = async () => {
     try {
       setDataLoading(true)
-      const [statsData, teamsData, individualsData, volunteersData, donationsData, purchasesData, tournamentsData] = await Promise.all([
+      const [statsData, teamsData, individualsData, volunteersData, donationsData, purchasesData, tournamentsData, usersData] = await Promise.all([
         getAdminStats(),
         getAllTeams(),
         getAllIndividuals(),
         getAllVolunteers(),
         getAllDonations(),
         getAllPurchases(),
-        getAllTournaments()
+        getAllTournaments(),
+        getAllUsers()
       ])
 
       setStats(statsData)
@@ -103,6 +116,7 @@ export default function AdminDashboardPage() {
       setDonations(donationsData)
       setPurchases(purchasesData)
       setTournaments(tournamentsData)
+      setUsers(usersData)
     } catch (error) {
       console.error('Error loading dashboard data:', error)
     } finally {
@@ -113,6 +127,41 @@ export default function AdminDashboardPage() {
   const handleLogout = () => {
     logout()
     router.push("/admin")
+  }
+
+  // Funções para gerenciar usuários
+  const handleViewUser = async (userId: string) => {
+    try {
+      const userData = await getUserById(userId)
+      setSelectedUser(userData)
+      setIsUserModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching user details:', error)
+      alert('Erro ao buscar detalhes do usuário')
+    }
+  }
+
+  const handleDeleteUser = async (user: any) => {
+    if (window.confirm(`Tem certeza que deseja deletar o usuário ${user.name}?`)) {
+      try {
+        const result = await deleteUser(user.id)
+        if (result.success) {
+          // Recarregar dados
+          await loadDashboardData()
+          alert('Usuário deletado com sucesso!')
+        } else {
+          alert('Erro ao deletar usuário')
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error)
+        alert('Erro ao deletar usuário')
+      }
+    }
+  }
+
+  // Função para encontrar usuário por ID (para exibir nos detalhes de outras abas)
+  const findUserById = (userId: string) => {
+    return users.find(user => user.id === userId) || { name: 'Usuário não encontrado', email: 'N/A' }
   }
 
   const formatCurrency = (value: number) => {
@@ -231,6 +280,21 @@ export default function AdminDashboardPage() {
           ].join(',') + '\n'
         })
         break
+
+      case 'users':
+        headers = ['Nome', 'Email', 'Telefone', 'Cidade', 'Estado Civil', 'Data de Cadastro']
+        csvContent = headers.join(',') + '\n'
+        data.forEach(item => {
+          csvContent += [
+            `"${item.name || 'N/A'}"`,
+            `"${item.email || 'N/A'}"`,
+            `"${item.telefone || 'N/A'}"`,
+            `"${item.cidade || 'N/A'}"`,
+            `"${item.estadoCivil || 'N/A'}"`,
+            `"${item.createdAt ? formatDate(item.createdAt) : 'N/A'}"`
+          ].join(',') + '\n'
+        })
+        break
     }
 
     // Create and download file
@@ -312,6 +376,7 @@ export default function AdminDashboardPage() {
       case 'volunteers': return 'volunteers'
       case 'donations': return 'donors'
       case 'purchases': return 'purchases'
+      case 'users': return 'users'
       default: return ''
     }
   }
@@ -356,10 +421,14 @@ export default function AdminDashboardPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:grid-cols-8">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               <span className="hidden sm:inline">Visão Geral</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Usuários</span>
             </TabsTrigger>
             <TabsTrigger value="tournaments" className="flex items-center gap-2">
               <Trophy className="h-4 w-4" />
@@ -632,6 +701,7 @@ export default function AdminDashboardPage() {
                           <TableHead>Capitão</TableHead>
                           <TableHead>Email</TableHead>
                           <TableHead>Telefone</TableHead>
+                          <TableHead>Usuário</TableHead>
                           <TableHead>Data de Registro</TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
@@ -652,6 +722,21 @@ export default function AdminDashboardPage() {
                                 <Phone className="h-4 w-4 text-muted-foreground" />
                                 {team.captainData.telefone}
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              {team.userId ? (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                                  onClick={() => team.userId && handleViewUser(team.userId)}
+                                >
+                                  <User className="h-4 w-4" />
+                                  {findUserById(team.userId).name}
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground">N/A</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
@@ -687,7 +772,7 @@ export default function AdminDashboardPage() {
                         ))}
                         {teams.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               Nenhuma equipe registrada ainda
                             </TableCell>
                           </TableRow>
@@ -735,6 +820,7 @@ export default function AdminDashboardPage() {
                           <TableHead>Email</TableHead>
                           <TableHead>Posição</TableHead>
                           <TableHead>Cidade/Bairro</TableHead>
+                          <TableHead>Usuário</TableHead>
                           <TableHead>Data de Registro</TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
@@ -756,6 +842,21 @@ export default function AdminDashboardPage() {
                                 <MapPin className="h-4 w-4 text-muted-foreground" />
                                 {individual.captainData.cidadeBairro}
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              {individual.userId ? (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                                  onClick={() => individual.userId && handleViewUser(individual.userId)}
+                                >
+                                  <User className="h-4 w-4" />
+                                  {findUserById(individual.userId).name}
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground">N/A</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
@@ -791,7 +892,7 @@ export default function AdminDashboardPage() {
                         ))}
                         {individuals.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                            <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                               Nenhuma jogadora individual registrada ainda
                             </TableCell>
                           </TableRow>
@@ -838,6 +939,7 @@ export default function AdminDashboardPage() {
                           <TableHead>Email</TableHead>
                           <TableHead>Áreas de Interesse</TableHead>
                           <TableHead>Profissão</TableHead>
+                          <TableHead>Usuário</TableHead>
                           <TableHead>Data de Registro</TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
@@ -846,9 +948,11 @@ export default function AdminDashboardPage() {
                         {volunteers.map((volunteer) => (
                           <TableRow key={volunteer.id}>
                             <TableCell className="font-medium">{volunteer.formData.nomeCompleto}</TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Mail className="h-4 w-4 text-muted-foreground" />
-                              {volunteer.formData.email}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                {volunteer.formData.email}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-wrap gap-1">
@@ -860,9 +964,26 @@ export default function AdminDashboardPage() {
                               </div>
                             </TableCell>
                             <TableCell>{volunteer.formData.profissao}</TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {formatDate(volunteer.registrationDate)}
+                            <TableCell>
+                              {volunteer.userId ? (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                                  onClick={() => volunteer.userId && handleViewUser(volunteer.userId)}
+                                >
+                                  <User className="h-4 w-4" />
+                                  {findUserById(volunteer.userId).name}
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground">N/A</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                {formatDate(volunteer.registrationDate)}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
@@ -892,7 +1013,7 @@ export default function AdminDashboardPage() {
                         ))}
                         {volunteers.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               Nenhuma voluntária cadastrada ainda
                             </TableCell>
                           </TableRow>
@@ -947,6 +1068,7 @@ export default function AdminDashboardPage() {
                           <TableHead>Doador</TableHead>
                           <TableHead>Valor</TableHead>
                           <TableHead>Método de Pagamento</TableHead>
+                          <TableHead>Usuário</TableHead>
                           <TableHead>Data</TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
@@ -975,6 +1097,21 @@ export default function AdminDashboardPage() {
                                 <CreditCard className="h-4 w-4 text-muted-foreground" />
                                 {donation.paymentMethod.toUpperCase()}
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              {donation.userId ? (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                                  onClick={() => donation.userId && handleViewUser(donation.userId)}
+                                >
+                                  <User className="h-4 w-4" />
+                                  {findUserById(donation.userId).name}
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground">N/A</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
@@ -1010,7 +1147,7 @@ export default function AdminDashboardPage() {
                         ))}
                         {donations.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               Nenhuma doação recebida ainda
                             </TableCell>
                           </TableRow>
@@ -1066,6 +1203,7 @@ export default function AdminDashboardPage() {
                           <TableHead>Itens</TableHead>
                           <TableHead>Total</TableHead>
                           <TableHead>Pagamento</TableHead>
+                          <TableHead>Usuário</TableHead>
                           <TableHead>Data</TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
@@ -1095,6 +1233,21 @@ export default function AdminDashboardPage() {
                                 <CreditCard className="h-4 w-4 text-muted-foreground" />
                                 {purchase.paymentMethod.toUpperCase()}
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              {purchase.userId ? (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                                  onClick={() => purchase.userId && handleViewUser(purchase.userId)}
+                                >
+                                  <User className="h-4 w-4" />
+                                  {findUserById(purchase.userId).name}
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground">N/A</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
@@ -1130,8 +1283,85 @@ export default function AdminDashboardPage() {
                         ))}
                         {purchases.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                            <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                               Nenhuma compra registrada ainda
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Aba Usuários */}
+              <TabsContent value="users" className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
+                    USUÁRIOS CADASTRADOS ({users.length})
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <UserCreateModal onUserCreated={loadDashboardData} />
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => exportToCSV(users, 'usuarios', 'users')}
+                    >
+                      <Download className="h-4 w-4" />
+                      Exportar
+                    </Button>
+                  </div>
+                </div>
+
+                <Card>
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Telefone</TableHead>
+                          <TableHead>Cidade</TableHead>
+                          <TableHead>Data de Cadastro</TableHead>
+                          <TableHead>Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {users.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell className="font-medium">{user.name || 'N/A'}</TableCell>
+                            <TableCell>{user.email || 'N/A'}</TableCell>
+                            <TableCell>{user.telefone || 'N/A'}</TableCell>
+                            <TableCell>{user.cidade || 'N/A'}</TableCell>
+                            <TableCell>{user.createdAt ? formatDate(user.createdAt) : 'N/A'}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => handleViewUser(user.id)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  Ver Detalhes
+                                </Button>
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => handleDeleteUser(user)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Deletar
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {users.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                              Nenhum usuário cadastrado ainda
                             </TableCell>
                           </TableRow>
                         )}
@@ -1143,6 +1373,20 @@ export default function AdminDashboardPage() {
             </>
           )}
         </Tabs>
+
+        {/* Modal para exibir detalhes do usuário */}
+        {selectedUser && (
+          <DetailModal
+            isOpen={isUserModalOpen}
+            onClose={() => {
+              setIsUserModalOpen(false)
+              setSelectedUser(null)
+            }}
+            title={`Usuário: ${selectedUser.name}`}
+            data={selectedUser}
+            type="user"
+          />
+        )}
       </main>
     </div>
   )
