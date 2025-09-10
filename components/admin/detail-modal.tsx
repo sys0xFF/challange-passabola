@@ -25,13 +25,15 @@ import {
 } from "lucide-react"
 
 interface DetailModalProps {
-  trigger: React.ReactNode
+  isOpen?: boolean
+  onClose?: () => void
+  trigger?: React.ReactNode
   title: string
   data: any
-  type: 'team' | 'individual' | 'volunteer' | 'donation' | 'purchase'
+  type: 'team' | 'individual' | 'volunteer' | 'donation' | 'purchase' | 'user'
 }
 
-export function DetailModal({ trigger, title, data, type }: DetailModalProps) {
+export function DetailModal({ isOpen, onClose, trigger, title, data, type }: DetailModalProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('pt-BR')
   }
@@ -600,26 +602,119 @@ export function DetailModal({ trigger, title, data, type }: DetailModalProps) {
     </div>
   )
 
+  const renderUserDetails = (user: any) => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Informações Pessoais
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Nome Completo</p>
+              <p className="font-medium">{user.name || 'Não informado'}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Email</p>
+              <div className="flex items-center gap-1">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span>{user.email || 'Não informado'}</span>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Telefone</p>
+              <div className="flex items-center gap-1">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span>{user.telefone || 'Não informado'}</span>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Data de Cadastro</p>
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>{user.createdAt ? formatDate(user.createdAt) : 'Não disponível'}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Localização
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Cidade</p>
+              <p>{user.cidade || 'Não informado'}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Estado Civil</p>
+              <p>{user.estadoCivil || 'Não informado'}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">ID do Usuário</p>
+              <p className="font-mono text-sm">{user.id}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Eye className="h-5 w-5" />
-            {title}
-          </DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="max-h-[60vh] pr-4">
-          {type === 'team' && renderTeamDetails(data)}
-          {type === 'individual' && renderIndividualDetails(data)}
-          {type === 'volunteer' && renderVolunteerDetails(data)}
-          {type === 'donation' && renderDonationDetails(data)}
-          {type === 'purchase' && renderPurchaseDetails(data)}
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+    <>
+      {/* Modal controlado externamente */}
+      {isOpen && (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="max-w-4xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                {title}
+              </DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] pr-4">
+              {type === 'team' && renderTeamDetails(data)}
+              {type === 'individual' && renderIndividualDetails(data)}
+              {type === 'volunteer' && renderVolunteerDetails(data)}
+              {type === 'donation' && renderDonationDetails(data)}
+              {type === 'purchase' && renderPurchaseDetails(data)}
+              {type === 'user' && renderUserDetails(data)}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Modal com trigger (modo antigo) */}
+      {trigger && (
+        <Dialog>
+          <DialogTrigger asChild>
+            {trigger}
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                {title}
+              </DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] pr-4">
+              {type === 'team' && renderTeamDetails(data)}
+              {type === 'individual' && renderIndividualDetails(data)}
+              {type === 'volunteer' && renderVolunteerDetails(data)}
+              {type === 'donation' && renderDonationDetails(data)}
+              {type === 'purchase' && renderPurchaseDetails(data)}
+              {type === 'user' && renderUserDetails(data)}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   )
 }
