@@ -1,9 +1,11 @@
 "use client"
 import Link from "next/link"
 import type React from "react"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { saveTeamRegistration, saveIndividualRegistration } from "@/lib/database-service"
@@ -15,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { MobileMenu } from "@/components/ui/mobile-menu"
 import { ChevronRight, Upload, X, User, Users, FileText, CheckCircle, ArrowLeft, ShoppingBag } from "lucide-react"
 import { Bebas_Neue } from "next/font/google"
@@ -39,6 +41,8 @@ type Player = {
 }
 
 export default function CadastroPage() {
+  const { user, loading, openLoginModal } = useAuth()
+  const router = useRouter()
   const [registrationType, setRegistrationType] = useState<RegistrationType>(null)
   const [currentStep, setCurrentStep] = useState(1)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
@@ -47,6 +51,66 @@ export default function CadastroPage() {
   const [wantNotifications, setWantNotifications] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Verificar se o usuário está logado
+  useEffect(() => {
+    // Removido o redirecionamento automático
+    // if (!loading && !user) {
+    //   router.push('/')
+    // }
+  }, [user, loading, router])
+
+  // Mostrar loading enquanto verifica autenticação
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar mensagem de login necessário se não estiver logado
+  if (!user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-lg shadow-xl border">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="h-8 w-8 text-white" />
+            </div>
+            <h1 className={`${bebasNeue.className} text-3xl font-bold mb-3 text-gray-800`}>
+              Login Necessário
+            </h1>
+            <p className="text-gray-600 leading-relaxed">
+              Você precisa estar logado para acessar a página de cadastro de times. 
+              Crie sua conta ou faça login para continuar.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <Button 
+              onClick={() => {
+                router.push('/')
+                setTimeout(() => openLoginModal(), 100)
+              }} 
+              className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+            >
+              Fazer Login / Criar Conta
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => router.back()} 
+              className="w-full border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+            >
+              Voltar
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Hook de autofill para desenvolvimento
   useDevAutoFill()
@@ -133,6 +197,7 @@ export default function CadastroPage() {
     try {
       if (registrationType === "team") {
         const teamRegistrationData = {
+          userId: user?.id, // Incluindo o ID do usuário
           type: "team" as const,
           teamData,
           captainData,
@@ -154,6 +219,7 @@ export default function CadastroPage() {
         }
       } else if (registrationType === "individual") {
         const individualRegistrationData = {
+          userId: user?.id, // Incluindo o ID do usuário
           type: "individual" as const,
           captainData,
           preferences: {
@@ -236,7 +302,7 @@ export default function CadastroPage() {
                 <Badge className="bg-green-500 text-white">CADASTRO REALIZADO</Badge>
               </div>
               <div className="flex justify-end items-center gap-2">
-                <ThemeToggleButton />
+                <AuthButton />
                 <div className="md:hidden">
                   <MobileMenu />
                 </div>
@@ -325,7 +391,7 @@ export default function CadastroPage() {
                 <ShoppingBag className="h-5 w-5" />
                 <span className="text-sm font-medium">Loja</span>
               </Link>
-              <ThemeToggleButton />
+              <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
               </div>
