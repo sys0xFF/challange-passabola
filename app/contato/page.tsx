@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { MobileMenu } from "@/components/ui/mobile-menu"
 import {
   Send,
@@ -108,7 +108,7 @@ export default function ContatoPage() {
                 <Badge className="bg-green-500 text-white">MENSAGEM ENVIADA</Badge>
               </div>
               <div className="flex justify-end items-center gap-2">
-                <ThemeToggleButton />
+                <AuthButton />
                 <div className="md:hidden">
                   <MobileMenu />
                 </div>
@@ -311,7 +311,7 @@ export default function ContatoPage() {
                 <ShoppingBag className="h-5 w-5" />
                 <span className="text-sm font-medium">Loja</span>
               </Link>
-              <ThemeToggleButton />
+              <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
               </div>
