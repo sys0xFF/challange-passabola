@@ -13,8 +13,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { MobileMenu } from "@/components/ui/mobile-menu"
+import { useAuth } from "@/contexts/auth-context"
 import { useCart, type Product } from "@/contexts/cart-context"
 import { ShoppingCart, Plus, Search, Filter, ArrowLeft, Star, Heart, Truck, Shield, RotateCcw } from "lucide-react"
 import { Bebas_Neue } from "next/font/google"
@@ -170,7 +171,7 @@ export default function LojaPage() {
                   )}
                 </Button>
               </Link>
-              <ThemeToggleButton />
+              <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
               </div>
