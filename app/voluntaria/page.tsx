@@ -3,7 +3,7 @@ import Link from "next/link"
 import type React from "react"
 
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useDevAutoFill } from "@/hooks/use-dev-autofill"
 import { saveVolunteerRegistration } from "@/lib/database-service"
@@ -15,8 +15,10 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { MobileMenu } from "@/components/ui/mobile-menu"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 import {
   ChevronRight,
   Upload,
@@ -97,6 +99,9 @@ const volunteerAreas: VolunteerArea[] = [
 ]
 
 export default function VoluntariaPage() {
+  const { user, loading, openLoginModal } = useAuth()
+  const router = useRouter()
+  
   // Hook de desenvolvimento
   useDevAutoFill();
   
@@ -108,6 +113,66 @@ export default function VoluntariaPage() {
   const [wantNotifications, setWantNotifications] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Verificar se o usuário está logado
+  useEffect(() => {
+    // Removido o redirecionamento automático
+    // if (!loading && !user) {
+    //   router.push('/')
+    // }
+  }, [user, loading, router])
+
+  // Mostrar loading enquanto verifica autenticação
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar mensagem de login necessário se não estiver logado
+  if (!user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-lg shadow-xl border">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Heart className="h-8 w-8 text-white" />
+            </div>
+            <h1 className={`${bebasNeue.className} text-3xl font-bold mb-3 text-gray-800`}>
+              Login Necessário
+            </h1>
+            <p className="text-gray-600 leading-relaxed">
+              Você precisa estar logado para se cadastrar como voluntária. 
+              Crie sua conta ou faça login para contribuir com nosso movimento.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <Button 
+              onClick={() => {
+                router.push('/')
+                setTimeout(() => openLoginModal(), 100)
+              }} 
+              className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+            >
+              Fazer Login / Criar Conta
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => router.back()} 
+              className="w-full border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+            >
+              Voltar
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Form data
   const [formData, setFormData] = useState({
@@ -185,6 +250,7 @@ export default function VoluntariaPage() {
     
     try {
       const volunteerRegistrationData = {
+        userId: user?.id, // Incluindo o ID do usuário
         type: "volunteer" as const,
         formData,
         selectedAreas,
@@ -254,7 +320,7 @@ export default function VoluntariaPage() {
                 <Badge className="bg-green-500 text-white">CADASTRO REALIZADO</Badge>
               </div>
               <div className="flex justify-end items-center gap-2">
-                <ThemeToggleButton />
+                <AuthButton />
                 <div className="md:hidden">
                   <MobileMenu />
                 </div>
@@ -343,7 +409,7 @@ export default function VoluntariaPage() {
                 <ShoppingBag className="h-5 w-5" />
                 <span className="text-sm font-medium">Loja</span>
               </Link>
-              <ThemeToggleButton />
+              <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
               </div>
