@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import type React from "react"
+import { useRouter } from "next/navigation"
 
 import Image from "next/image"
 import { useState } from "react"
@@ -11,8 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { AuthButton } from "@/components/ui/auth-button"
 import { MobileMenu } from "@/components/ui/mobile-menu"
+import { useAuth } from "@/contexts/auth-context"
 import { useCart } from "@/contexts/cart-context"
 import {
   ShoppingCart,
@@ -35,6 +37,9 @@ const bebasNeue = Bebas_Neue({
 })
 
 export default function CarrinhoPage() {
+  const { user, openLoginModal } = useAuth()
+  const router = useRouter()
+  
   // Hook de desenvolvimento
   useDevAutoFill();
   
@@ -45,6 +50,10 @@ export default function CarrinhoPage() {
     days: number
     type: string
   } | null>(null)
+
+  const handleGoToLogin = () => {
+    openLoginModal()
+  }
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
@@ -111,7 +120,7 @@ export default function CarrinhoPage() {
                 <Badge className="bg-gray-500 text-white">CARRINHO VAZIO</Badge>
               </div>
               <div className="flex justify-end items-center gap-2">
-                <ThemeToggleButton />
+                <AuthButton />
                 <div className="md:hidden">
                   <MobileMenu />
                 </div>
@@ -180,7 +189,7 @@ export default function CarrinhoPage() {
               </Badge>
             </div>
             <div className="flex justify-end items-center gap-2">
-              <ThemeToggleButton />
+              <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
               </div>
@@ -360,12 +369,22 @@ export default function CarrinhoPage() {
                       </div>
                     </div>
 
-                    <Button asChild className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white">
-                      <Link href="/checkout">
+                    {user ? (
+                      <Button asChild className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white">
+                        <Link href="/checkout">
+                          FINALIZAR COMPRA
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => openLoginModal()}
+                        className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+                      >
                         FINALIZAR COMPRA
                         <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                      </Button>
+                    )}
 
                     <Button
                       asChild
