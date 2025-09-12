@@ -81,75 +81,90 @@ const FilterAndSortControls = ({
   onSort 
 }: { 
   tab: string
-  sortOptions: { key: string, label: string }[]
+  sortOptions: { key: string, label: string, type?: 'text' | 'number' | 'date' }[]
   filters: { [key: string]: string }
   sortConfig: { key: string; direction: 'asc' | 'desc'; tab: string }
   onFilter: (value: string, tab: string) => void
   onSort: (key: string, direction: 'asc' | 'desc', tab: string) => void
-}) => (
-  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-    <div className="flex items-center gap-2">
-      <Search className="h-4 w-4 text-muted-foreground" />
-      <Input
-        placeholder="Filtrar..."
-        value={filters[tab] || ''}
-        onChange={(e) => onFilter(e.target.value, tab)}
-        className="w-64"
-      />
-      {filters[tab] && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFilter('', tab)}
-          className="h-8 w-8 p-0"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      )}
+}) => {
+  const getSortText = (option: { key: string, label: string, type?: 'text' | 'number' | 'date' }, direction: 'asc' | 'desc') => {
+    switch (option.type) {
+      case 'date':
+        return direction === 'asc' ? `${option.label} (Mais Antigo)` : `${option.label} (Mais Recente)`
+      case 'number':
+        return direction === 'asc' ? `${option.label} (Menor)` : `${option.label} (Maior)`
+      default:
+        return direction === 'asc' ? `${option.label} (A → Z)` : `${option.label} (Z → A)`
+    }
+  }
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="flex items-center gap-2">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Filtrar..."
+            value={filters[tab] || ''}
+            onChange={(e) => onFilter(e.target.value, tab)}
+            className="w-64"
+          />
+          {filters[tab] && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFilter('', tab)}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Ordenar por:</span>
+          <Select 
+            value={sortConfig.tab === tab ? `${sortConfig.key}-${sortConfig.direction}` : ''} 
+            onValueChange={(value) => {
+              if (value) {
+                const [key, direction] = value.split('-')
+                onSort(key, direction as 'asc' | 'desc', tab)
+              }
+            }}
+          >
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="Selecione..." />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map(option => (
+                <div key={option.key}>
+                  <SelectItem value={`${option.key}-asc`}>
+                    {getSortText(option, 'asc')}
+                  </SelectItem>
+                  <SelectItem value={`${option.key}-desc`}>
+                    {getSortText(option, 'desc')}
+                  </SelectItem>
+                </div>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          {sortConfig.tab === tab && sortConfig.key && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onSort('', 'asc', '')}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
-    
-    <div className="flex items-center gap-2">
-      <Filter className="h-4 w-4 text-muted-foreground" />
-      <span className="text-sm font-medium">Ordenar por:</span>
-      <Select 
-        value={sortConfig.tab === tab ? `${sortConfig.key}-${sortConfig.direction}` : ''} 
-        onValueChange={(value) => {
-          if (value) {
-            const [key, direction] = value.split('-')
-            onSort(key, direction as 'asc' | 'desc', tab)
-          }
-        }}
-      >
-        <SelectTrigger className="w-48">
-          <SelectValue placeholder="Selecione..." />
-        </SelectTrigger>
-        <SelectContent>
-          {sortOptions.map(option => (
-            <div key={option.key}>
-              <SelectItem value={`${option.key}-asc`}>
-                {option.label} (A → Z)
-              </SelectItem>
-              <SelectItem value={`${option.key}-desc`}>
-                {option.label} (Z → A)
-              </SelectItem>
-            </div>
-          ))}
-        </SelectContent>
-      </Select>
-      
-      {sortConfig.tab === tab && sortConfig.key && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onSort('', 'asc', '')}
-          className="h-8 w-8 p-0"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      )}
-    </div>
-  </div>
-)
+  )
+}
 
 export default function AdminDashboardPage() {
   const { isAuthenticated, logout, loading } = useAdminAuth()
@@ -409,6 +424,10 @@ export default function AdminDashboardPage() {
                 aValue = a.captainData?.posicao || ''
                 bValue = b.captainData?.posicao || ''
                 break
+              case 'location':
+                aValue = a.captainData?.bairro || ''
+                bValue = b.captainData?.bairro || ''
+                break
               case 'date':
                 aValue = new Date(a.registrationDate || 0)
                 bValue = new Date(b.registrationDate || 0)
@@ -424,9 +443,17 @@ export default function AdminDashboardPage() {
                 aValue = a.formData?.nomeCompleto || ''
                 bValue = b.formData?.nomeCompleto || ''
                 break
-              case 'profession':
-                aValue = a.formData?.profissao || ''
-                bValue = b.formData?.profissao || ''
+              case 'email':
+                aValue = a.formData?.email || ''
+                bValue = b.formData?.email || ''
+                break
+              case 'areas':
+                aValue = a.formData?.areasInteresse?.join(', ') || ''
+                bValue = b.formData?.areasInteresse?.join(', ') || ''
+                break
+              case 'disponibilidade':
+                aValue = a.formData?.disponibilidade || ''
+                bValue = b.formData?.disponibilidade || ''
                 break
               case 'date':
                 aValue = new Date(a.registrationDate || 0)
@@ -439,6 +466,14 @@ export default function AdminDashboardPage() {
 
           case 'donations':
             switch (sortConfig.key) {
+              case 'name':
+                aValue = a.donationType === 'identified' && a.donorData?.nomeCompleto 
+                  ? a.donorData.nomeCompleto 
+                  : 'Anônimo'
+                bValue = b.donationType === 'identified' && b.donorData?.nomeCompleto 
+                  ? b.donorData.nomeCompleto 
+                  : 'Anônimo'
+                break
               case 'amount':
                 aValue = a.amount || 0
                 bValue = b.amount || 0
@@ -458,17 +493,21 @@ export default function AdminDashboardPage() {
 
           case 'purchases':
             switch (sortConfig.key) {
-              case 'order':
-                aValue = a.orderId || ''
-                bValue = b.orderId || ''
-                break
-              case 'customer':
+              case 'customerName':
                 aValue = a.customerData?.nomeCompleto || ''
                 bValue = b.customerData?.nomeCompleto || ''
                 break
               case 'total':
                 aValue = a.pricing?.total || 0
                 bValue = b.pricing?.total || 0
+                break
+              case 'status':
+                aValue = a.status || ''
+                bValue = b.status || ''
+                break
+              case 'items':
+                aValue = a.items?.length || 0
+                bValue = b.items?.length || 0
                 break
               case 'date':
                 aValue = new Date(a.purchaseDate || 0)
@@ -897,36 +936,39 @@ export default function AdminDashboardPage() {
               </TabsContent>
 
               <TabsContent value="tournaments" className="space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="space-y-4">
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     JOGOS E TORNEIOS ({tournaments.length})
                   </h2>
-                  <div className="flex items-center gap-4">
-                    <TournamentCreateModal onTournamentCreated={loadDashboardData} />
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => exportToCSV(tournaments, 'torneios', 'tournaments')}
-                    >
-                      <Download className="h-4 w-4" />
-                      Exportar
-                    </Button>
+                  
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <FilterAndSortControls 
+                      tab="tournaments"
+                      sortOptions={[
+                        { key: 'name', label: 'Nome', type: 'text' },
+                        { key: 'status', label: 'Status', type: 'text' },
+                        { key: 'teams', label: 'Número de Equipes', type: 'number' },
+                        { key: 'date', label: 'Data de Início', type: 'date' }
+                      ]}
+                      filters={filters}
+                      sortConfig={sortConfig}
+                      onFilter={handleFilter}
+                      onSort={handleSort}
+                    />
+                    
+                    <div className="flex items-center gap-4">
+                      <TournamentCreateModal onTournamentCreated={loadDashboardData} />
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2"
+                        onClick={() => exportToCSV(tournaments, 'torneios', 'tournaments')}
+                      >
+                        <Download className="h-4 w-4" />
+                        Exportar
+                      </Button>
+                    </div>
                   </div>
                 </div>
-
-                <FilterAndSortControls 
-                  tab="tournaments"
-                  sortOptions={[
-                    { key: 'name', label: 'Nome' },
-                    { key: 'status', label: 'Status' },
-                    { key: 'teams', label: 'Número de Equipes' },
-                    { key: 'date', label: 'Data de Início' }
-                  ]}
-                  filters={filters}
-                  sortConfig={sortConfig}
-                  onFilter={handleFilter}
-                  onSort={handleSort}
-                />
 
                 <Card>
                   <CardContent className="p-0">
@@ -1059,44 +1101,47 @@ export default function AdminDashboardPage() {
               </TabsContent>
 
               <TabsContent value="teams" className="space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="space-y-4">
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     EQUIPES REGISTRADAS ({teams.length})
                   </h2>
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => exportToCSV(teams, 'equipes', 'teams')}
-                    >
-                      <Download className="h-4 w-4" />
-                      Exportar
-                    </Button>
-                    {teams.length > 0 && (
+                  
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <FilterAndSortControls 
+                      tab="teams"
+                      sortOptions={[
+                        { key: 'name', label: 'Nome da Equipe', type: 'text' },
+                        { key: 'captain', label: 'Capitão', type: 'text' },
+                        { key: 'date', label: 'Data de Registro', type: 'date' }
+                      ]}
+                      filters={filters}
+                      sortConfig={sortConfig}
+                      onFilter={handleFilter}
+                      onSort={handleSort}
+                    />
+                    
+                    <div className="flex items-center gap-2">
                       <Button 
-                        variant="destructive"
+                        variant="outline" 
                         className="flex items-center gap-2"
-                        onClick={() => deleteAllRecords('teams')}
+                        onClick={() => exportToCSV(teams, 'equipes', 'teams')}
                       >
-                        <Trash2 className="h-4 w-4" />
-                        Deletar Todos
+                        <Download className="h-4 w-4" />
+                        Exportar
                       </Button>
-                    )}
+                      {teams.length > 0 && (
+                        <Button 
+                          variant="destructive"
+                          className="flex items-center gap-2"
+                          onClick={() => deleteAllRecords('teams')}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Deletar Todos
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                <FilterAndSortControls 
-                  tab="teams"
-                  sortOptions={[
-                    { key: 'name', label: 'Nome da Equipe' },
-                    { key: 'captain', label: 'Capitão' },
-                    { key: 'date', label: 'Data de Registro' }
-                  ]}
-                  filters={filters}
-                  sortConfig={sortConfig}
-                  onFilter={handleFilter}
-                  onSort={handleSort}
-                />
 
                 <Card>
                   <CardContent className="p-0">
@@ -1113,7 +1158,7 @@ export default function AdminDashboardPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {teams.map((team) => (
+                        {getSortedAndFilteredData(teams, 'teams').map((team) => (
                           <TableRow key={team.id}>
                             <TableCell className="font-medium">{team.teamData.nomeTime}</TableCell>
                             <TableCell>{team.captainData.nomeCompleto}</TableCell>
@@ -1176,7 +1221,7 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {teams.length === 0 && (
+                        {getSortedAndFilteredData(teams, 'teams').length === 0 && (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               Nenhuma equipe registrada ainda
@@ -1190,29 +1235,47 @@ export default function AdminDashboardPage() {
               </TabsContent>
 
               <TabsContent value="individuals" className="space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="space-y-4">
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     JOGADORAS INDIVIDUAIS ({individuals.length})
                   </h2>
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => exportToCSV(individuals, 'jogadoras_individuais', 'individuals')}
-                    >
-                      <Download className="h-4 w-4" />
-                      Exportar
-                    </Button>
-                    {individuals.length > 0 && (
+                  
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <FilterAndSortControls 
+                      tab="individuals"
+                      sortOptions={[
+                        { key: 'name', label: 'Nome', type: 'text' },
+                        { key: 'age', label: 'Idade', type: 'number' },
+                        { key: 'position', label: 'Posição', type: 'text' },
+                        { key: 'location', label: 'Cidade/Bairro', type: 'text' },
+                        { key: 'date', label: 'Data de Registro', type: 'date' }
+                      ]}
+                      filters={filters}
+                      sortConfig={sortConfig}
+                      onFilter={handleFilter}
+                      onSort={handleSort}
+                    />
+                    
+                    <div className="flex items-center gap-2">
                       <Button 
-                        variant="destructive"
+                        variant="outline" 
                         className="flex items-center gap-2"
-                        onClick={() => deleteAllRecords('individuals')}
+                        onClick={() => exportToCSV(individuals, 'jogadoras_individuais', 'individuals')}
                       >
-                        <Trash2 className="h-4 w-4" />
-                        Deletar Todos
+                        <Download className="h-4 w-4" />
+                        Exportar
                       </Button>
-                    )}
+                      {individuals.length > 0 && (
+                        <Button 
+                          variant="destructive"
+                          className="flex items-center gap-2"
+                          onClick={() => deleteAllRecords('individuals')}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Deletar Todos
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -1221,18 +1284,43 @@ export default function AdminDashboardPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Nome</TableHead>
-                          <TableHead>Idade</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('name', 'individuals')}
+                          >
+                            Nome {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('age', 'individuals')}
+                          >
+                            Idade {sortConfig.key === 'age' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Email</TableHead>
-                          <TableHead>Posição</TableHead>
-                          <TableHead>Cidade/Bairro</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('position', 'individuals')}
+                          >
+                            Posição {sortConfig.key === 'position' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('location', 'individuals')}
+                          >
+                            Cidade/Bairro {sortConfig.key === 'location' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Usuário</TableHead>
-                          <TableHead>Data de Registro</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('date', 'individuals')}
+                          >
+                            Data de Registro {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {individuals.map((individual) => (
+                        {getSortedAndFilteredData(individuals, 'individuals').map((individual) => (
                           <TableRow key={individual.id}>
                             <TableCell className="font-medium">{individual.captainData.nomeCompleto}</TableCell>
                             <TableCell>{individual.captainData.idade} anos</TableCell>
@@ -1296,7 +1384,7 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {individuals.length === 0 && (
+                        {getSortedAndFilteredData(individuals, 'individuals').length === 0 && (
                           <TableRow>
                             <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                               Nenhuma jogadora individual registrada ainda
@@ -1310,29 +1398,47 @@ export default function AdminDashboardPage() {
               </TabsContent>
 
               <TabsContent value="volunteers" className="space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="space-y-4">
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     VOLUNTÁRIAS CADASTRADAS ({volunteers.length})
                   </h2>
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => exportToCSV(volunteers, 'voluntarias', 'volunteers')}
-                    >
-                      <Download className="h-4 w-4" />
-                      Exportar
-                    </Button>
-                    {volunteers.length > 0 && (
+                  
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <FilterAndSortControls 
+                      tab="volunteers"
+                      sortOptions={[
+                        { key: 'name', label: 'Nome', type: 'text' },
+                        { key: 'email', label: 'Email', type: 'text' },
+                        { key: 'areas', label: 'Áreas de Interesse', type: 'text' },
+                        { key: 'disponibilidade', label: 'Disponibilidade', type: 'text' },
+                        { key: 'date', label: 'Data de Registro', type: 'date' }
+                      ]}
+                      filters={filters}
+                      sortConfig={sortConfig}
+                      onFilter={handleFilter}
+                      onSort={handleSort}
+                    />
+                    
+                    <div className="flex items-center gap-2">
                       <Button 
-                        variant="destructive"
+                        variant="outline" 
                         className="flex items-center gap-2"
-                        onClick={() => deleteAllRecords('volunteers')}
+                        onClick={() => exportToCSV(volunteers, 'voluntarias', 'volunteers')}
                       >
-                        <Trash2 className="h-4 w-4" />
-                        Deletar Todos
+                        <Download className="h-4 w-4" />
+                        Exportar
                       </Button>
-                    )}
+                      {volunteers.length > 0 && (
+                        <Button 
+                          variant="destructive"
+                          className="flex items-center gap-2"
+                          onClick={() => deleteAllRecords('volunteers')}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Deletar Todos
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -1341,17 +1447,32 @@ export default function AdminDashboardPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Nome</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('name', 'volunteers')}
+                          >
+                            Nome {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Email</TableHead>
-                          <TableHead>Áreas de Interesse</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('areas', 'volunteers')}
+                          >
+                            Áreas de Interesse {sortConfig.key === 'areas' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Profissão</TableHead>
                           <TableHead>Usuário</TableHead>
-                          <TableHead>Data de Registro</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('date', 'volunteers')}
+                          >
+                            Data de Registro {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {volunteers.map((volunteer) => (
+                        {getSortedAndFilteredData(volunteers, 'volunteers').map((volunteer) => (
                           <TableRow key={volunteer.id}>
                             <TableCell className="font-medium">{volunteer.formData.nomeCompleto}</TableCell>
                             <TableCell>
@@ -1362,7 +1483,7 @@ export default function AdminDashboardPage() {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-wrap gap-1">
-                                {volunteer.selectedAreas.map((area) => (
+                                {volunteer.selectedAreas.map((area: string) => (
                                   <Badge key={area} variant="secondary" className="text-xs">
                                     {area}
                                   </Badge>
@@ -1417,7 +1538,7 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {volunteers.length === 0 && (
+                        {getSortedAndFilteredData(volunteers, 'volunteers').length === 0 && (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               Nenhuma voluntária cadastrada ainda
@@ -1431,36 +1552,53 @@ export default function AdminDashboardPage() {
               </TabsContent>
 
               <TabsContent value="donations" className="space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="space-y-4">
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     DOAÇÕES RECEBIDAS ({donations.length})
                   </h2>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Total arrecadado</p>
-                      <p className="text-2xl font-bold text-[#8e44ad]">
-                        {formatCurrency(stats?.totalDonationAmount || 0)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        className="flex items-center gap-2"
-                        onClick={() => exportToCSV(donations, 'doacoes', 'donations')}
-                      >
-                        <Download className="h-4 w-4" />
-                        Exportar
-                      </Button>
-                      {donations.length > 0 && (
+                  
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <FilterAndSortControls 
+                      tab="donations"
+                      sortOptions={[
+                        { key: 'name', label: 'Nome', type: 'text' },
+                        { key: 'amount', label: 'Valor', type: 'number' },
+                        { key: 'type', label: 'Tipo', type: 'text' },
+                        { key: 'date', label: 'Data da Doação', type: 'date' }
+                      ]}
+                      filters={filters}
+                      sortConfig={sortConfig}
+                      onFilter={handleFilter}
+                      onSort={handleSort}
+                    />
+                    
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Total arrecadado</p>
+                        <p className="text-2xl font-bold text-[#8e44ad]">
+                          {formatCurrency(stats?.totalDonationAmount || 0)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <Button 
-                          variant="destructive"
+                          variant="outline" 
                           className="flex items-center gap-2"
-                          onClick={() => deleteAllRecords('donations')}
+                          onClick={() => exportToCSV(donations, 'doacoes', 'donations')}
                         >
-                          <Trash2 className="h-4 w-4" />
-                          Deletar Todos
+                          <Download className="h-4 w-4" />
+                          Exportar
                         </Button>
-                      )}
+                        {donations.length > 0 && (
+                          <Button 
+                            variant="destructive"
+                            className="flex items-center gap-2"
+                            onClick={() => deleteAllRecords('donations')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Deletar Todos
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1470,17 +1608,37 @@ export default function AdminDashboardPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Tipo</TableHead>
-                          <TableHead>Doador</TableHead>
-                          <TableHead>Valor</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('type', 'donations')}
+                          >
+                            Tipo {sortConfig.key === 'type' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('name', 'donations')}
+                          >
+                            Doador {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('amount', 'donations')}
+                          >
+                            Valor {sortConfig.key === 'amount' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Método de Pagamento</TableHead>
                           <TableHead>Usuário</TableHead>
-                          <TableHead>Data</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('date', 'donations')}
+                          >
+                            Data {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {donations.map((donation) => (
+                        {getSortedAndFilteredData(donations, 'donations').map((donation) => (
                           <TableRow key={donation.id}>
                             <TableCell>
                               <Badge 
@@ -1551,7 +1709,7 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {donations.length === 0 && (
+                        {getSortedAndFilteredData(donations, 'donations').length === 0 && (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               Nenhuma doação recebida ainda
@@ -1565,36 +1723,54 @@ export default function AdminDashboardPage() {
               </TabsContent>
 
               <TabsContent value="purchases" className="space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="space-y-4">
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     COMPRAS DA LOJA ({purchases.length})
                   </h2>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Receita total</p>
-                      <p className="text-2xl font-bold text-[#8e44ad]">
-                        {formatCurrency(stats?.totalRevenue || 0)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        className="flex items-center gap-2"
-                        onClick={() => exportToCSV(purchases, 'compras', 'purchases')}
-                      >
-                        <Download className="h-4 w-4" />
-                        Exportar
-                      </Button>
-                      {purchases.length > 0 && (
+                  
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <FilterAndSortControls 
+                      tab="purchases"
+                      sortOptions={[
+                        { key: 'customerName', label: 'Cliente', type: 'text' },
+                        { key: 'total', label: 'Total', type: 'number' },
+                        { key: 'status', label: 'Status', type: 'text' },
+                        { key: 'items', label: 'Quantidade de Itens', type: 'number' },
+                        { key: 'date', label: 'Data da Compra', type: 'date' }
+                      ]}
+                      filters={filters}
+                      sortConfig={sortConfig}
+                      onFilter={handleFilter}
+                      onSort={handleSort}
+                    />
+                    
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Receita total</p>
+                        <p className="text-2xl font-bold text-[#8e44ad]">
+                          {formatCurrency(stats?.totalRevenue || 0)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <Button 
-                          variant="destructive"
+                          variant="outline" 
                           className="flex items-center gap-2"
-                          onClick={() => deleteAllRecords('purchases')}
+                          onClick={() => exportToCSV(purchases, 'compras', 'purchases')}
                         >
-                          <Trash2 className="h-4 w-4" />
-                          Deletar Todos
+                          <Download className="h-4 w-4" />
+                          Exportar
                         </Button>
-                      )}
+                        {purchases.length > 0 && (
+                          <Button 
+                            variant="destructive"
+                            className="flex items-center gap-2"
+                            onClick={() => deleteAllRecords('purchases')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Deletar Todos
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1605,17 +1781,37 @@ export default function AdminDashboardPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Pedido</TableHead>
-                          <TableHead>Cliente</TableHead>
-                          <TableHead>Itens</TableHead>
-                          <TableHead>Total</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('customerName', 'purchases')}
+                          >
+                            Cliente {sortConfig.key === 'customerName' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('items', 'purchases')}
+                          >
+                            Itens {sortConfig.key === 'items' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('total', 'purchases')}
+                          >
+                            Total {sortConfig.key === 'total' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Pagamento</TableHead>
                           <TableHead>Usuário</TableHead>
-                          <TableHead>Data</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-gray-50" 
+                            onClick={() => handleHeaderSort('date', 'purchases')}
+                          >
+                            Data {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {purchases.map((purchase) => (
+                        {getSortedAndFilteredData(purchases, 'purchases').map((purchase) => (
                           <TableRow key={purchase.id}>
                             <TableCell className="font-mono text-sm">
                               #{purchase.orderId}
@@ -1687,7 +1883,7 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {purchases.length === 0 && (
+                        {getSortedAndFilteredData(purchases, 'purchases').length === 0 && (
                           <TableRow>
                             <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                               Nenhuma compra registrada ainda
@@ -1702,35 +1898,38 @@ export default function AdminDashboardPage() {
 
               {/* Aba Usuários */}
               <TabsContent value="users" className="space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="space-y-4">
                   <h2 className={`${bebasNeue.className} text-3xl tracking-wider`}>
                     USUÁRIOS CADASTRADOS ({users.length})
                   </h2>
-                  <div className="flex items-center gap-2">
-                    <UserCreateModal onUserCreated={loadDashboardData} />
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => exportToCSV(users, 'usuarios', 'users')}
-                    >
-                      <Download className="h-4 w-4" />
-                      Exportar
-                    </Button>
+                  
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <FilterAndSortControls 
+                      tab="users"
+                      sortOptions={[
+                        { key: 'name', label: 'Nome', type: 'text' },
+                        { key: 'email', label: 'Email', type: 'text' },
+                        { key: 'date', label: 'Data de Cadastro', type: 'date' }
+                      ]}
+                      filters={filters}
+                      sortConfig={sortConfig}
+                      onFilter={handleFilter}
+                      onSort={handleSort}
+                    />
+                    
+                    <div className="flex items-center gap-2">
+                      <UserCreateModal onUserCreated={loadDashboardData} />
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2"
+                        onClick={() => exportToCSV(users, 'usuarios', 'users')}
+                      >
+                        <Download className="h-4 w-4" />
+                        Exportar
+                      </Button>
+                    </div>
                   </div>
                 </div>
-
-                <FilterAndSortControls 
-                  tab="users"
-                  sortOptions={[
-                    { key: 'name', label: 'Nome' },
-                    { key: 'email', label: 'Email' },
-                    { key: 'date', label: 'Data de Cadastro' }
-                  ]}
-                  filters={filters}
-                  sortConfig={sortConfig}
-                  onFilter={handleFilter}
-                  onSort={handleSort}
-                />
 
                 <Card>
                   <CardContent className="p-0">
