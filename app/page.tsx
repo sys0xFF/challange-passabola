@@ -1273,8 +1273,8 @@ function ProductCarousel() {
                     onClick={() => toggleFavorite(index)}
                     className={`absolute top-3 right-3 rounded-full h-8 w-8 transition-all duration-300 ${
                       favorites.has(index) 
-                        ? 'bg-red-500 hover:bg-red-600 text-white' 
-                        : 'bg-white/80 hover:bg-white text-red-500 dark:bg-slate-700/80 dark:hover:bg-slate-700'
+                        ? 'bg-white/90 hover:bg-white text-[#8e44ad] dark:bg-slate-700/90 dark:hover:bg-slate-700 dark:text-[#8e44ad]' 
+                        : 'bg-white/80 hover:bg-white text-[#8e44ad] dark:bg-slate-700/80 dark:hover:bg-slate-700 dark:text-[#8e44ad]'
                     }`}
                   >
                     <Heart className={`h-4 w-4 transition-all duration-300 ${favorites.has(index) ? 'fill-current' : ''}`} />

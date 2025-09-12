@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -31,6 +31,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   Users, 
   UserCheck, 
@@ -54,7 +56,13 @@ import {
   Database,
   Trash2,
   User,
-  UserPlus
+  UserPlus,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Filter,
+  Search,
+  X
 } from "lucide-react"
 
 const bebasNeue = Bebas_Neue({
@@ -62,6 +70,86 @@ const bebasNeue = Bebas_Neue({
   weight: "400",
   display: "swap",
 })
+
+// Componente de controles de filtro e ordenação
+const FilterAndSortControls = ({ 
+  tab, 
+  sortOptions, 
+  filters, 
+  sortConfig, 
+  onFilter, 
+  onSort 
+}: { 
+  tab: string
+  sortOptions: { key: string, label: string }[]
+  filters: { [key: string]: string }
+  sortConfig: { key: string; direction: 'asc' | 'desc'; tab: string }
+  onFilter: (value: string, tab: string) => void
+  onSort: (key: string, direction: 'asc' | 'desc', tab: string) => void
+}) => (
+  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+    <div className="flex items-center gap-2">
+      <Search className="h-4 w-4 text-muted-foreground" />
+      <Input
+        placeholder="Filtrar..."
+        value={filters[tab] || ''}
+        onChange={(e) => onFilter(e.target.value, tab)}
+        className="w-64"
+      />
+      {filters[tab] && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onFilter('', tab)}
+          className="h-8 w-8 p-0"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+    
+    <div className="flex items-center gap-2">
+      <Filter className="h-4 w-4 text-muted-foreground" />
+      <span className="text-sm font-medium">Ordenar por:</span>
+      <Select 
+        value={sortConfig.tab === tab ? `${sortConfig.key}-${sortConfig.direction}` : ''} 
+        onValueChange={(value) => {
+          if (value) {
+            const [key, direction] = value.split('-')
+            onSort(key, direction as 'asc' | 'desc', tab)
+          }
+        }}
+      >
+        <SelectTrigger className="w-48">
+          <SelectValue placeholder="Selecione..." />
+        </SelectTrigger>
+        <SelectContent>
+          {sortOptions.map(option => (
+            <div key={option.key}>
+              <SelectItem value={`${option.key}-asc`}>
+                {option.label} (A → Z)
+              </SelectItem>
+              <SelectItem value={`${option.key}-desc`}>
+                {option.label} (Z → A)
+              </SelectItem>
+            </div>
+          ))}
+        </SelectContent>
+      </Select>
+      
+      {sortConfig.tab === tab && sortConfig.key && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onSort('', 'asc', '')}
+          className="h-8 w-8 p-0"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  </div>
+)
 
 export default function AdminDashboardPage() {
   const { isAuthenticated, logout, loading } = useAdminAuth()
@@ -82,6 +170,25 @@ export default function AdminDashboardPage() {
   const [selectedUser, setSelectedUser] = useState<any | null>(null)
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<any | null>(null)
+
+  // Estados para ordenação e filtros
+  const [sortConfig, setSortConfig] = useState<{
+    key: string
+    direction: 'asc' | 'desc'
+    tab: string
+  }>({ key: '', direction: 'asc', tab: '' })
+  
+  const [filters, setFilters] = useState<{
+    [key: string]: string
+  }>({
+    users: '',
+    tournaments: '',
+    teams: '',
+    individuals: '',
+    volunteers: '',
+    donations: '',
+    purchases: ''
+  })
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -163,6 +270,246 @@ export default function AdminDashboardPage() {
   const findUserById = (userId: string) => {
     return users.find(user => user.id === userId) || { name: 'Usuário não encontrado', email: 'N/A' }
   }
+
+  // Funções de ordenação e filtro
+  const handleSort = useCallback((key: string, direction: 'asc' | 'desc', tab: string) => {
+    setSortConfig({ key, direction, tab })
+  }, [])
+
+  const handleFilter = useCallback((value: string, tab: string) => {
+    setFilters(prev => ({ ...prev, [tab]: value }))
+  }, [])
+
+  const getSortedAndFilteredData = (data: any[], tab: string) => {
+    let filteredData = [...data]
+
+    // Aplicar filtro
+    const filterValue = filters[tab]?.toLowerCase() || ''
+    if (filterValue) {
+      filteredData = data.filter(item => {
+        switch (tab) {
+          case 'users':
+            return (item.name?.toLowerCase().includes(filterValue) ||
+                   item.email?.toLowerCase().includes(filterValue) ||
+                   item.cidade?.toLowerCase().includes(filterValue))
+          
+          case 'tournaments':
+            return (item.name?.toLowerCase().includes(filterValue) ||
+                   item.status?.toLowerCase().includes(filterValue))
+          
+          case 'teams':
+            return (item.teamData?.nomeTime?.toLowerCase().includes(filterValue) ||
+                   item.captainData?.nomeCompleto?.toLowerCase().includes(filterValue) ||
+                   item.captainData?.email?.toLowerCase().includes(filterValue))
+          
+          case 'individuals':
+            return (item.captainData?.nomeCompleto?.toLowerCase().includes(filterValue) ||
+                   item.captainData?.email?.toLowerCase().includes(filterValue) ||
+                   item.captainData?.posicao?.toLowerCase().includes(filterValue))
+          
+          case 'volunteers':
+            return (item.formData?.nomeCompleto?.toLowerCase().includes(filterValue) ||
+                   item.formData?.email?.toLowerCase().includes(filterValue) ||
+                   item.formData?.profissao?.toLowerCase().includes(filterValue))
+          
+          case 'donations':
+            return (item.donorData?.nomeCompleto?.toLowerCase().includes(filterValue) ||
+                   item.paymentMethod?.toLowerCase().includes(filterValue) ||
+                   item.donationType?.toLowerCase().includes(filterValue))
+          
+          case 'purchases':
+            return (item.customerData?.nomeCompleto?.toLowerCase().includes(filterValue) ||
+                   item.customerData?.email?.toLowerCase().includes(filterValue) ||
+                   item.orderId?.toLowerCase().includes(filterValue))
+          
+          default:
+            return true
+        }
+      })
+    }
+
+    // Aplicar ordenação
+    if (sortConfig.key && sortConfig.tab === tab) {
+      filteredData.sort((a, b) => {
+        let aValue, bValue
+
+        switch (tab) {
+          case 'users':
+            switch (sortConfig.key) {
+              case 'name':
+                aValue = a.name || ''
+                bValue = b.name || ''
+                break
+              case 'email':
+                aValue = a.email || ''
+                bValue = b.email || ''
+                break
+              case 'date':
+                aValue = new Date(a.createdAt || 0)
+                bValue = new Date(b.createdAt || 0)
+                break
+              default:
+                return 0
+            }
+            break
+
+          case 'tournaments':
+            switch (sortConfig.key) {
+              case 'name':
+                aValue = a.name || ''
+                bValue = b.name || ''
+                break
+              case 'status':
+                aValue = a.status || ''
+                bValue = b.status || ''
+                break
+              case 'date':
+                aValue = new Date(a.startDate || 0)
+                bValue = new Date(b.startDate || 0)
+                break
+              case 'teams':
+                aValue = a.teams?.length || 0
+                bValue = b.teams?.length || 0
+                break
+              default:
+                return 0
+            }
+            break
+
+          case 'teams':
+            switch (sortConfig.key) {
+              case 'name':
+                aValue = a.teamData?.nomeTime || ''
+                bValue = b.teamData?.nomeTime || ''
+                break
+              case 'captain':
+                aValue = a.captainData?.nomeCompleto || ''
+                bValue = b.captainData?.nomeCompleto || ''
+                break
+              case 'date':
+                aValue = new Date(a.registrationDate || 0)
+                bValue = new Date(b.registrationDate || 0)
+                break
+              default:
+                return 0
+            }
+            break
+
+          case 'individuals':
+            switch (sortConfig.key) {
+              case 'name':
+                aValue = a.captainData?.nomeCompleto || ''
+                bValue = b.captainData?.nomeCompleto || ''
+                break
+              case 'age':
+                aValue = Number(a.captainData?.idade) || 0
+                bValue = Number(b.captainData?.idade) || 0
+                break
+              case 'position':
+                aValue = a.captainData?.posicao || ''
+                bValue = b.captainData?.posicao || ''
+                break
+              case 'date':
+                aValue = new Date(a.registrationDate || 0)
+                bValue = new Date(b.registrationDate || 0)
+                break
+              default:
+                return 0
+            }
+            break
+
+          case 'volunteers':
+            switch (sortConfig.key) {
+              case 'name':
+                aValue = a.formData?.nomeCompleto || ''
+                bValue = b.formData?.nomeCompleto || ''
+                break
+              case 'profession':
+                aValue = a.formData?.profissao || ''
+                bValue = b.formData?.profissao || ''
+                break
+              case 'date':
+                aValue = new Date(a.registrationDate || 0)
+                bValue = new Date(b.registrationDate || 0)
+                break
+              default:
+                return 0
+            }
+            break
+
+          case 'donations':
+            switch (sortConfig.key) {
+              case 'amount':
+                aValue = a.amount || 0
+                bValue = b.amount || 0
+                break
+              case 'type':
+                aValue = a.donationType || ''
+                bValue = b.donationType || ''
+                break
+              case 'date':
+                aValue = new Date(a.donationDate || 0)
+                bValue = new Date(b.donationDate || 0)
+                break
+              default:
+                return 0
+            }
+            break
+
+          case 'purchases':
+            switch (sortConfig.key) {
+              case 'order':
+                aValue = a.orderId || ''
+                bValue = b.orderId || ''
+                break
+              case 'customer':
+                aValue = a.customerData?.nomeCompleto || ''
+                bValue = b.customerData?.nomeCompleto || ''
+                break
+              case 'total':
+                aValue = a.pricing?.total || 0
+                bValue = b.pricing?.total || 0
+                break
+              case 'date':
+                aValue = new Date(a.purchaseDate || 0)
+                bValue = new Date(b.purchaseDate || 0)
+                break
+              default:
+                return 0
+            }
+            break
+
+          default:
+            return 0
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1
+        }
+        return 0
+      })
+    }
+
+    return filteredData
+  }
+
+  const getSortIcon = (key: string, tab: string) => {
+    if (sortConfig.key === key && sortConfig.tab === tab) {
+      return sortConfig.direction === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+    }
+    return <ArrowUpDown className="h-4 w-4" />
+  }
+
+  const handleHeaderSort = useCallback((key: string, tab: string) => {
+    let direction: 'asc' | 'desc' = 'asc'
+    if (sortConfig.key === key && sortConfig.tab === tab && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    handleSort(key, direction, tab)
+  }, [sortConfig.key, sortConfig.tab, sortConfig.direction, handleSort])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -567,22 +914,68 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
+                <FilterAndSortControls 
+                  tab="tournaments"
+                  sortOptions={[
+                    { key: 'name', label: 'Nome' },
+                    { key: 'status', label: 'Status' },
+                    { key: 'teams', label: 'Número de Equipes' },
+                    { key: 'date', label: 'Data de Início' }
+                  ]}
+                  filters={filters}
+                  sortConfig={sortConfig}
+                  onFilter={handleFilter}
+                  onSort={handleSort}
+                />
+
                 <Card>
                   <CardContent className="p-0">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Nome do Torneio</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Equipes</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => handleHeaderSort('name', 'tournaments')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Nome do Torneio
+                              {getSortIcon('name', 'tournaments')}
+                            </div>
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => handleHeaderSort('status', 'tournaments')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Status
+                              {getSortIcon('status', 'tournaments')}
+                            </div>
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => handleHeaderSort('teams', 'tournaments')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Equipes
+                              {getSortIcon('teams', 'tournaments')}
+                            </div>
+                          </TableHead>
                           <TableHead>Tipo</TableHead>
-                          <TableHead>Data de Início</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => handleHeaderSort('date', 'tournaments')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Data de Início
+                              {getSortIcon('date', 'tournaments')}
+                            </div>
+                          </TableHead>
                           <TableHead>Inscrição</TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {tournaments.map((tournament) => (
+                        {getSortedAndFilteredData(tournaments, 'tournaments').map((tournament) => (
                           <TableRow key={tournament.id}>
                             <TableCell className="font-medium">{tournament.name}</TableCell>
                             <TableCell>
@@ -652,10 +1045,10 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {tournaments.length === 0 && (
+                        {getSortedAndFilteredData(tournaments, 'tournaments').length === 0 && (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                              Nenhum torneio criado ainda
+                              {filters.tournaments ? 'Nenhum torneio encontrado com os filtros aplicados' : 'Nenhum torneio criado ainda'}
                             </TableCell>
                           </TableRow>
                         )}
@@ -691,6 +1084,19 @@ export default function AdminDashboardPage() {
                     )}
                   </div>
                 </div>
+
+                <FilterAndSortControls 
+                  tab="teams"
+                  sortOptions={[
+                    { key: 'name', label: 'Nome da Equipe' },
+                    { key: 'captain', label: 'Capitão' },
+                    { key: 'date', label: 'Data de Registro' }
+                  ]}
+                  filters={filters}
+                  sortConfig={sortConfig}
+                  onFilter={handleFilter}
+                  onSort={handleSort}
+                />
 
                 <Card>
                   <CardContent className="p-0">
@@ -1313,21 +1719,58 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
+                <FilterAndSortControls 
+                  tab="users"
+                  sortOptions={[
+                    { key: 'name', label: 'Nome' },
+                    { key: 'email', label: 'Email' },
+                    { key: 'date', label: 'Data de Cadastro' }
+                  ]}
+                  filters={filters}
+                  sortConfig={sortConfig}
+                  onFilter={handleFilter}
+                  onSort={handleSort}
+                />
+
                 <Card>
                   <CardContent className="p-0">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Nome</TableHead>
-                          <TableHead>Email</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => handleHeaderSort('name', 'users')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Nome
+                              {getSortIcon('name', 'users')}
+                            </div>
+                          </TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => handleHeaderSort('email', 'users')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Email
+                              {getSortIcon('email', 'users')}
+                            </div>
+                          </TableHead>
                           <TableHead>Telefone</TableHead>
                           <TableHead>Cidade</TableHead>
-                          <TableHead>Data de Cadastro</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => handleHeaderSort('date', 'users')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Data de Cadastro
+                              {getSortIcon('date', 'users')}
+                            </div>
+                          </TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {users.map((user) => (
+                        {getSortedAndFilteredData(users, 'users').map((user) => (
                           <TableRow key={user.id}>
                             <TableCell className="font-medium">{user.name || 'N/A'}</TableCell>
                             <TableCell>{user.email || 'N/A'}</TableCell>
@@ -1358,10 +1801,10 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {users.length === 0 && (
+                        {getSortedAndFilteredData(users, 'users').length === 0 && (
                           <TableRow>
                             <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                              Nenhum usuário cadastrado ainda
+                              {filters.users ? 'Nenhum usuário encontrado com os filtros aplicados' : 'Nenhum usuário cadastrado ainda'}
                             </TableCell>
                           </TableRow>
                         )}
