@@ -3,7 +3,8 @@ import Link from "next/link"
 import type React from "react"
 import Image from "next/image"
 import { motion, useInView } from "framer-motion"
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Autoplay from "embla-carousel-autoplay"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -13,6 +14,8 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { MobileMenu } from "@/components/ui/mobile-menu"
 import { AuthButton } from "@/components/ui/auth-button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useCart } from "@/contexts/cart-context"
+import { toast } from "@/components/ui/use-toast"
 import {
   ChevronRight,
   ShoppingBag,
@@ -33,6 +36,99 @@ const bebasNeue = Bebas_Neue({
 })
 
 export default function Home() {
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  })
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false)
+  const [newsletter, setNewsletter] = useState('')
+  const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false)
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validar campos
+    if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.subject.trim() || !contactForm.message.trim()) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!validateEmail(contactForm.email)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, insira um email válido.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsSubmittingContact(true)
+
+    // Simular envio (aqui você pode integrar com sua API)
+    setTimeout(() => {
+      toast({
+        title: "Mensagem enviada com sucesso!",
+        description: "Obrigado pelo contato. Responderemos em breve.",
+      })
+      
+      // Limpar formulário
+      setContactForm({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      })
+      
+      setIsSubmittingContact(false)
+    }, 2000)
+  }
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!newsletter.trim()) {
+      toast({
+        title: "Campo obrigatório",
+        description: "Por favor, insira seu e-mail.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!validateEmail(newsletter)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, insira um email válido.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsSubmittingNewsletter(true)
+
+    // Simular envio (aqui você pode integrar com sua API)
+    setTimeout(() => {
+      toast({
+        title: "Inscrição realizada com sucesso!",
+        description: "Você receberá nossas novidades em breve.",
+      })
+      
+      setNewsletter('')
+      setIsSubmittingNewsletter(false)
+    }, 2000)
+  }
+
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     const targetId = e.currentTarget.href.split("#")[1]
@@ -736,7 +832,7 @@ export default function Home() {
               <ScrollAnimation delay={0.2}>
                 <div className="bg-white rounded-lg p-6 shadow-lg">
                   <h3 className="text-xl font-bold text-[#8e44ad] mb-6">Envie sua mensagem</h3>
-                  <form className="space-y-4">
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -744,8 +840,11 @@ export default function Home() {
                         </label>
                         <input
                           id="name"
+                          value={contactForm.name}
+                          onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 dark:text-gray-50 dark:bg-slate-800"
                           placeholder="Seu nome"
+                          disabled={isSubmittingContact}
                         />
                       </div>
                       <div className="space-y-2">
@@ -755,8 +854,11 @@ export default function Home() {
                         <input
                           id="email"
                           type="email"
+                          value={contactForm.email}
+                          onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 dark:text-gray-50 dark:bg-slate-800"
                           placeholder="Seu email"
+                          disabled={isSubmittingContact}
                         />
                       </div>
                     </div>
@@ -766,8 +868,11 @@ export default function Home() {
                       </label>
                       <input
                         id="subject"
+                        value={contactForm.subject}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 dark:text-gray-50 dark:bg-slate-800"
                         placeholder="Assunto da mensagem"
+                        disabled={isSubmittingContact}
                       />
                     </div>
                     <div className="space-y-2">
@@ -777,12 +882,30 @@ export default function Home() {
                       <textarea
                         id="message"
                         rows={4}
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 dark:text-gray-50 dark:bg-slate-800"
                         placeholder="Sua mensagem"
+                        disabled={isSubmittingContact}
                       ></textarea>
                     </div>
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-transform hover:scale-105">
-                      ENVIAR MENSAGEM
+                    <Button 
+                      type="submit"
+                      disabled={isSubmittingContact}
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 disabled:opacity-50"
+                    >
+                      {isSubmittingContact ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                          />
+                          ENVIANDO...
+                        </>
+                      ) : (
+                        'ENVIAR MENSAGEM'
+                      )}
                     </Button>
                   </form>
                 </div>
@@ -967,16 +1090,31 @@ export default function Home() {
               <p className="text-primary-foreground/80 dark:text-gray-300 mb-4">
                 Inscreva-se para receber novidades, datas de jogos e conteúdos exclusivos.
               </p>
-              <div className="flex">
+              <form onSubmit={handleNewsletterSubmit} className="flex">
                 <input
                   type="email"
                   placeholder="Seu e-mail"
-                  className="flex-1 px-3 py-2 text-black dark:text-white dark:bg-slate-700 dark:border-slate-600 rounded-l-md focus:outline-none focus:ring-2 focus:ring-accent"
+                  value={newsletter}
+                  onChange={(e) => setNewsletter(e.target.value)}
+                  disabled={isSubmittingNewsletter}
+                  className="flex-1 px-3 py-2 text-black dark:text-white dark:bg-slate-700 dark:border-slate-600 rounded-l-md focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50"
                 />
-                <Button className="rounded-l-none bg-accent hover:bg-accent/90 text-primary dark:text-white">
-                  Assinar
+                <Button 
+                  type="submit"
+                  disabled={isSubmittingNewsletter}
+                  className="rounded-l-none bg-accent hover:bg-accent/90 text-primary dark:text-white transition-all duration-300 disabled:opacity-50"
+                >
+                  {isSubmittingNewsletter ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                    />
+                  ) : (
+                    'Assinar'
+                  )}
                 </Button>
-              </div>
+              </form>
             </div>
           </div>
 
@@ -998,12 +1136,61 @@ function ProductCarousel() {
   const plugin = useRef(Autoplay({ delay: 2500, stopOnInteraction: true, stopOnMouseEnter: true }))
   const carouselRef = useRef(null)
   const isInView = useInView(carouselRef, { once: true, amount: 0.4 })
+  const { addItem } = useCart()
+  const router = useRouter()
+  const [favorites, setFavorites] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (isInView) {
       plugin.current.play()
     }
   }, [isInView])
+
+  const toggleFavorite = (index: number) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev)
+      if (newFavorites.has(index)) {
+        newFavorites.delete(index)
+        toast({
+          title: "Removido dos favoritos",
+          description: "Produto removido da sua lista de favoritos.",
+        })
+      } else {
+        newFavorites.add(index)
+        toast({
+          title: "Adicionado aos favoritos",
+          description: "Produto adicionado à sua lista de favoritos.",
+        })
+      }
+      return newFavorites
+    })
+  }
+
+  const handleAddToCart = (product: any, index: number) => {
+    // Converter preço string para número
+    const price = parseFloat(product.price.replace('R$ ', '').replace(',', '.'))
+    
+    const productToAdd = {
+      id: `product-${index}`,
+      name: product.name,
+      price: price,
+      image: product.image,
+      description: product.name,
+      category: "merchandise"
+    }
+
+    addItem(productToAdd)
+    
+    toast({
+      title: "Produto adicionado!",
+      description: `${product.name} foi adicionado ao carrinho. Redirecionando para a loja...`,
+    })
+
+    // Redirecionar para a loja após 1 segundo
+    setTimeout(() => {
+      router.push('/loja')
+    }, 1000)
+  }
 
   return (
     <Carousel
@@ -1083,10 +1270,17 @@ function ProductCarousel() {
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="absolute top-3 right-3 bg-white/80 hover:bg-white text-primary rounded-full h-8 w-8 dark:bg-slate-700/80 dark:hover:bg-slate-700"
+                    onClick={() => toggleFavorite(index)}
+                    className={`absolute top-3 right-3 rounded-full h-8 w-8 transition-all duration-300 ${
+                      favorites.has(index) 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'bg-white/80 hover:bg-white text-red-500 dark:bg-slate-700/80 dark:hover:bg-slate-700'
+                    }`}
                   >
-                    <Heart className="h-4 w-4" />
-                    <span className="sr-only">Adicionar aos favoritos</span>
+                    <Heart className={`h-4 w-4 transition-all duration-300 ${favorites.has(index) ? 'fill-current' : ''}`} />
+                    <span className="sr-only">
+                      {favorites.has(index) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                    </span>
                   </Button>
                 </div>
                 <CardContent className="p-4 flex-grow">
@@ -1097,10 +1291,11 @@ function ProductCarousel() {
                     <span className="font-bold text-primary">{product.price}</span>
                     <Button
                       size="sm"
+                      onClick={() => handleAddToCart(product, index)}
                       className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full h-8 w-8 p-0 transition-transform hover:scale-110"
                     >
                       <ShoppingBag className="h-4 w-4" />
-                      <span className="sr-only">Adicionar ao carrinho</span>
+                      <span className="sr-only">Adicionar ao carrinho e ir para loja</span>
                     </Button>
                   </div>
                 </CardContent>
