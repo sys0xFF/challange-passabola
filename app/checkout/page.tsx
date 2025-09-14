@@ -58,6 +58,8 @@ export default function CheckoutPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [pixTimer, setPixTimer] = useState(600) // 10 minutes
   const [pixExpired, setPixExpired] = useState(false)
+  const [finalPurchaseTotal, setFinalPurchaseTotal] = useState(0)
+  const [finalShipping, setFinalShipping] = useState(0)
 
   // Customer data
   const [customerData, setCustomerData] = useState({
@@ -128,6 +130,11 @@ export default function CheckoutPage() {
   const handlePayment = async () => {
     setIsProcessing(true)
     
+    // Calculate total before clearing cart
+    const currentSubtotal = state.total
+    const currentShipping = currentSubtotal >= 100 ? 0 : 15.9
+    const currentTotal = currentSubtotal + currentShipping
+    
     try {
       const purchaseData = {
         userId: user?.id, // Incluindo o ID do usuário
@@ -137,9 +144,9 @@ export default function CheckoutPage() {
         paymentMethod: paymentMethod!,
         ...(paymentMethod === "card" && { cardData }),
         pricing: {
-          subtotal,
-          shipping,
-          total,
+          subtotal: currentSubtotal,
+          shipping: currentShipping,
+          total: currentTotal,
         },
       };
 
@@ -147,6 +154,8 @@ export default function CheckoutPage() {
       
       if (result.success) {
         console.log("Purchase saved with ID:", result.id);
+        setFinalPurchaseTotal(currentTotal); // Save total before clearing cart
+        setFinalShipping(currentShipping); // Save shipping before clearing cart
         setIsSuccess(true);
         clearCart();
       } else {
@@ -342,7 +351,7 @@ export default function CheckoutPage() {
                       <Package className="h-8 w-8 text-[#8e44ad]" />
                       <div>
                         <p className="text-2xl font-bold text-[#8e44ad] dark:text-primary">
-                          R$ {total.toFixed(2).replace(".", ",")}
+                          R$ {finalPurchaseTotal.toFixed(2).replace(".", ",")}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Pedido #{Math.random().toString(36).substr(2, 9).toUpperCase()}
@@ -372,7 +381,7 @@ export default function CheckoutPage() {
                       <Truck className="h-8 w-8 text-[#8e44ad] mx-auto mb-2" />
                       <p className="font-semibold text-[#8e44ad] dark:text-primary">Entrega</p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {shipping === 0 ? "Frete grátis" : "5-7 dias úteis"}
+                        {finalShipping === 0 ? "Frete grátis" : "5-7 dias úteis"}
                       </p>
                     </motion.div>
                     <motion.div
