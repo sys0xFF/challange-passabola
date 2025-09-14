@@ -125,7 +125,7 @@ const FilterAndSortControls = ({
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Ordenar por:</span>
           <Select 
-            value={sortConfig.tab === tab ? `${sortConfig.key}-${sortConfig.direction}` : ''} 
+            value={sortConfig.tab === tab ? `${sortConfig.key}-${sortConfig.direction}` : 'date-desc'} 
             onValueChange={(value) => {
               if (value) {
                 const [key, direction] = value.split('-')
@@ -191,7 +191,7 @@ export default function AdminDashboardPage() {
     key: string
     direction: 'asc' | 'desc'
     tab: string
-  }>({ key: '', direction: 'asc', tab: '' })
+  }>({ key: 'date', direction: 'desc', tab: 'users' })
   
   const [filters, setFilters] = useState<{
     [key: string]: string
@@ -344,13 +344,14 @@ export default function AdminDashboardPage() {
     }
 
     // Aplicar ordenação
-    if (sortConfig.key && sortConfig.tab === tab) {
+    const currentSortConfig = sortConfig.tab === tab ? sortConfig : { key: 'date', direction: 'desc' as 'desc', tab }
+    if (currentSortConfig.key) {
       filteredData.sort((a, b) => {
         let aValue, bValue
 
         switch (tab) {
           case 'users':
-            switch (sortConfig.key) {
+            switch (currentSortConfig.key) {
               case 'name':
                 aValue = a.name || ''
                 bValue = b.name || ''
@@ -369,7 +370,7 @@ export default function AdminDashboardPage() {
             break
 
           case 'tournaments':
-            switch (sortConfig.key) {
+            switch (currentSortConfig.key) {
               case 'name':
                 aValue = a.name || ''
                 bValue = b.name || ''
@@ -392,7 +393,7 @@ export default function AdminDashboardPage() {
             break
 
           case 'teams':
-            switch (sortConfig.key) {
+            switch (currentSortConfig.key) {
               case 'name':
                 aValue = a.teamData?.nomeTime || ''
                 bValue = b.teamData?.nomeTime || ''
@@ -411,7 +412,7 @@ export default function AdminDashboardPage() {
             break
 
           case 'individuals':
-            switch (sortConfig.key) {
+            switch (currentSortConfig.key) {
               case 'name':
                 aValue = a.captainData?.nomeCompleto || ''
                 bValue = b.captainData?.nomeCompleto || ''
@@ -438,7 +439,7 @@ export default function AdminDashboardPage() {
             break
 
           case 'volunteers':
-            switch (sortConfig.key) {
+            switch (currentSortConfig.key) {
               case 'name':
                 aValue = a.formData?.nomeCompleto || ''
                 bValue = b.formData?.nomeCompleto || ''
@@ -465,7 +466,7 @@ export default function AdminDashboardPage() {
             break
 
           case 'donations':
-            switch (sortConfig.key) {
+            switch (currentSortConfig.key) {
               case 'name':
                 aValue = a.donationType === 'identified' && a.donorData?.nomeCompleto 
                   ? a.donorData.nomeCompleto 
@@ -492,7 +493,7 @@ export default function AdminDashboardPage() {
             break
 
           case 'purchases':
-            switch (sortConfig.key) {
+            switch (currentSortConfig.key) {
               case 'customerName':
                 aValue = a.customerData?.nomeCompleto || ''
                 bValue = b.customerData?.nomeCompleto || ''
@@ -523,10 +524,10 @@ export default function AdminDashboardPage() {
         }
 
         if (aValue < bValue) {
-          return sortConfig.direction === 'asc' ? -1 : 1
+          return currentSortConfig.direction === 'asc' ? -1 : 1
         }
         if (aValue > bValue) {
-          return sortConfig.direction === 'asc' ? 1 : -1
+          return currentSortConfig.direction === 'asc' ? 1 : -1
         }
         return 0
       })
