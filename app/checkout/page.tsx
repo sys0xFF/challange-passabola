@@ -242,17 +242,19 @@ export default function CheckoutPage() {
           <div className="container mx-auto px-4 py-3">
             <div className="grid grid-cols-2 md:grid-cols-3 items-center">
               <div className="flex justify-start">
-                <Link href="/" className="flex items-center gap-2">
-                  <div className="relative h-10 w-10 md:h-12 md:w-12">
+                <Link href="/" className="flex items-center gap-1 sm:gap-2">
+                  <div className="relative h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12">
                     <Image src="/logo.png" alt="Passa Bola Logo" fill className="object-contain" />
                   </div>
-                  <span className="font-bold text-xl text-primary dark:text-white">PASSA BOLA</span>
+                  <span className="font-bold text-sm sm:text-base md:text-xl text-primary dark:text-white">
+                    PASSA BOLA
+                  </span>
                 </Link>
               </div>
               <div className="hidden md:flex justify-center">
-                <Badge className="bg-green-500 text-white">COMPRA REALIZADA</Badge>
+                <Badge className="bg-green-500 text-white text-xs sm:text-sm">COMPRA REALIZADA</Badge>
               </div>
-              <div className="flex justify-end items-center gap-2">
+              <div className="flex justify-end items-center gap-1 sm:gap-2">
                 <AuthButton />
                 <div className="md:hidden">
                   <MobileMenu />
@@ -263,7 +265,7 @@ export default function CheckoutPage() {
         </header>
 
         <main className="flex-1 pt-20">
-          <section className="py-20 bg-gradient-to-b from-green-50 to-white dark:from-green-900/20 dark:to-slate-900 min-h-screen flex items-center">
+          <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-green-50 to-white dark:from-green-900/20 dark:to-slate-900 min-h-screen flex items-center">
             <div className="container mx-auto px-4 text-center">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -276,26 +278,26 @@ export default function CheckoutPage() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="relative mb-8"
+                  className="relative mb-6 sm:mb-8"
                 >
                   <div className="relative">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                      className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#c2ff28] w-32 h-32 mx-auto"
+                      className="absolute inset-0 rounded-full border-2 sm:border-4 border-transparent border-t-[#c2ff28] w-24 h-24 sm:w-32 sm:h-32 mx-auto"
                     />
                     <motion.div
                       animate={{ rotate: -360 }}
                       transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                      className="absolute inset-2 rounded-full border-2 border-transparent border-b-[#8e44ad] w-28 h-28 mx-auto"
+                      className="absolute inset-1 sm:inset-2 rounded-full border-1 sm:border-2 border-transparent border-b-[#8e44ad] w-22 h-22 sm:w-28 sm:h-28 mx-auto"
                     />
-                    <div className="w-32 h-32 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center mx-auto relative">
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center mx-auto relative">
                       <motion.div
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
                         transition={{ delay: 0.5, type: "spring", stiffness: 300 }}
                       >
-                        <CheckCircle className="h-16 w-16 text-white" />
+                        <CheckCircle className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
                       </motion.div>
                     </div>
                   </div>
@@ -335,7 +337,7 @@ export default function CheckoutPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
-                  className={`${bebasNeue.className} text-4xl md:text-6xl font-bold text-[#8e44ad] dark:text-primary mb-6 tracking-wider`}
+                  className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-[#8e44ad] dark:text-primary mb-4 sm:mb-6 tracking-wider text-center`}
                 >
                   COMPRA REALIZADA COM SUCESSO!
                 </motion.h1>
@@ -344,43 +346,43 @@ export default function CheckoutPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.6 }}
-                  className="mb-8"
+                  className="mb-6 sm:mb-8"
                 >
-                  <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-lg mb-6">
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                      <Package className="h-8 w-8 text-[#8e44ad]" />
-                      <div>
-                        <p className="text-2xl font-bold text-[#8e44ad] dark:text-primary">
+                  <div className="bg-white dark:bg-slate-800 rounded-lg p-4 sm:p-6 shadow-lg mb-4 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <Package className="h-6 w-6 sm:h-8 sm:w-8 text-[#8e44ad]" />
+                      <div className="text-center sm:text-left">
+                        <p className="text-xl sm:text-2xl font-bold text-[#8e44ad] dark:text-primary">
                           R$ {finalPurchaseTotal.toFixed(2).replace(".", ",")}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                           Pedido #{Math.random().toString(36).substr(2, 9).toUpperCase()}
                         </p>
                       </div>
                     </div>
 
-                    <p className="text-gray-700 dark:text-gray-300 mb-4">
+                    <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-3 sm:mb-4 text-center sm:text-left">
                       Obrigada por apoiar o futebol feminino! Seu pedido foi confirmado e em breve você receberá os
                       detalhes no seu e-mail.
                     </p>
 
-                    <div className="bg-[#8e44ad]/10 dark:bg-[#8e44ad]/20 p-4 rounded-lg">
-                      <p className="text-sm text-[#8e44ad] dark:text-primary">
+                    <div className="bg-[#8e44ad]/10 dark:bg-[#8e44ad]/20 p-3 sm:p-4 rounded-lg">
+                      <p className="text-xs sm:text-sm text-[#8e44ad] dark:text-primary text-center sm:text-left">
                         📱 Acompanhe seu pedido pelo WhatsApp: {customerData.telefone}
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-3 gap-4 mb-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.8, duration: 0.5 }}
-                      className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow"
+                      className="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-lg shadow text-center"
                     >
-                      <Truck className="h-8 w-8 text-[#8e44ad] mx-auto mb-2" />
-                      <p className="font-semibold text-[#8e44ad] dark:text-primary">Entrega</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <Truck className="h-6 w-6 sm:h-8 sm:w-8 text-[#8e44ad] mx-auto mb-2" />
+                      <p className="text-sm sm:text-base font-semibold text-[#8e44ad] dark:text-primary">Entrega</p>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         {finalShipping === 0 ? "Frete grátis" : "5-7 dias úteis"}
                       </p>
                     </motion.div>
@@ -442,17 +444,19 @@ export default function CheckoutPage() {
         <div className="container mx-auto px-4 py-3">
           <div className="grid grid-cols-2 md:grid-cols-3 items-center">
             <div className="flex justify-start">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="relative h-10 w-10 md:h-12 md:w-12">
+              <Link href="/" className="flex items-center gap-1 sm:gap-2">
+                <div className="relative h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12">
                   <Image src="/logo.png" alt="Passa Bola Logo" fill className="object-contain" />
                 </div>
-                <span className="font-bold text-xl text-primary dark:text-white">PASSA BOLA</span>
+                <span className="font-bold text-sm sm:text-base md:text-xl text-primary dark:text-white">
+                  PASSA BOLA
+                </span>
               </Link>
             </div>
             <div className="hidden md:flex justify-center">
-              <Badge className="bg-[#8e44ad] text-white">FINALIZAR COMPRA</Badge>
+              <Badge className="bg-[#8e44ad] text-white text-xs sm:text-sm">FINALIZAR COMPRA</Badge>
             </div>
-            <div className="flex justify-end items-center gap-2">
+            <div className="flex justify-end items-center gap-1 sm:gap-2">
               <AuthButton />
               <div className="md:hidden">
                 <MobileMenu />
@@ -464,27 +468,27 @@ export default function CheckoutPage() {
 
       <main className="flex-1 pt-20">
         {/* Hero Section */}
-        <section className="py-12 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
+        <section className="py-8 sm:py-12 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
           <div className="container mx-auto px-4 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <h1 className={`${bebasNeue.className} text-4xl md:text-5xl font-bold mb-4 tracking-wider`}>
+              <h1 className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4 tracking-wider`}>
                 FINALIZAR COMPRA
               </h1>
-              <p className="text-lg text-white/90">Etapa {currentStep} de 3 - Estamos quase lá!</p>
+              <p className="text-sm sm:text-base lg:text-lg text-white/90">Etapa {currentStep} de 3 - Estamos quase lá!</p>
             </motion.div>
           </div>
         </section>
 
         {/* Checkout Content */}
-        <section className="py-12 bg-gray-50 dark:bg-slate-800">
+        <section className="py-6 sm:py-8 lg:py-12 bg-gray-50 dark:bg-slate-800">
           <div className="container mx-auto px-4 max-w-4xl">
             {/* Progress indicator */}
-            <div className="mb-8">
-              <div className="flex items-center justify-center space-x-4 mb-4">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex items-center justify-center space-x-2 sm:space-x-4 mb-3 sm:mb-4">
                 {[1, 2, 3].map((step) => (
                   <div key={step} className="flex items-center">
                     <div
-                      className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                      className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold ${
                         currentStep >= step
                           ? "bg-[#8e44ad] text-white"
                           : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
@@ -494,7 +498,7 @@ export default function CheckoutPage() {
                     </div>
                     {step < 3 && (
                       <div
-                        className={`h-1 w-16 mx-2 ${
+                        className={`h-1 w-8 sm:w-16 mx-1 sm:mx-2 ${
                           currentStep > step ? "bg-[#8e44ad]" : "bg-gray-200 dark:bg-gray-700"
                         }`}
                       />
@@ -511,7 +515,7 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2">
                 {currentStep === 1 && (
@@ -521,46 +525,46 @@ export default function CheckoutPage() {
                     transition={{ duration: 0.5 }}
                   >
                     <Card className="dark:bg-slate-900">
-                      <CardHeader>
-                        <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary flex items-center gap-2">
-                          <User className="h-6 w-6" />
+                      <CardHeader className="pb-4 sm:pb-6">
+                        <CardTitle className="text-lg sm:text-xl lg:text-2xl text-[#8e44ad] dark:text-primary flex items-center gap-2">
+                          <User className="h-5 w-5 sm:h-6 sm:w-6" />
                           DADOS PESSOAIS
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="grid md:grid-cols-2 gap-4">
+                      <CardContent className="space-y-4 sm:space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="nomeCompleto">Nome Completo *</Label>
+                            <Label htmlFor="nomeCompleto" className="text-sm font-medium">Nome Completo *</Label>
                             <Input
                               id="nomeCompleto"
                               value={customerData.nomeCompleto}
                               onChange={(e) => setCustomerData((prev) => ({ ...prev, nomeCompleto: e.target.value }))}
                               placeholder="Seu nome completo"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="email">E-mail *</Label>
+                            <Label htmlFor="email" className="text-sm font-medium">E-mail *</Label>
                             <Input
                               id="email"
                               type="email"
                               value={customerData.email}
                               onChange={(e) => setCustomerData((prev) => ({ ...prev, email: e.target.value }))}
                               placeholder="seu@email.com"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="telefone">Telefone / WhatsApp *</Label>
+                            <Label htmlFor="telefone" className="text-sm font-medium">Telefone / WhatsApp *</Label>
                             <Input
                               id="telefone"
                               value={customerData.telefone}
                               onChange={(e) => setCustomerData((prev) => ({ ...prev, telefone: e.target.value }))}
                               placeholder="(11) 99999-9999"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
                           <div className="space-y-2">
@@ -676,14 +680,14 @@ export default function CheckoutPage() {
                           </div>
                         </div>
 
-                        <div className="flex justify-end pt-6">
+                        <div className="flex justify-end pt-4 sm:pt-6">
                           <Button
                             onClick={() => setCurrentStep(2)}
                             disabled={!canProceedToStep2()}
-                            className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                            className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base py-2 sm:py-3"
                           >
                             CONTINUAR
-                            <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
+                            <ArrowLeft className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 rotate-180" />
                           </Button>
                         </div>
                       </CardContent>
@@ -698,11 +702,11 @@ export default function CheckoutPage() {
                     transition={{ duration: 0.5 }}
                   >
                     <Card className="dark:bg-slate-900">
-                      <CardHeader>
-                        <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">MÉTODO DE PAGAMENTO</CardTitle>
+                      <CardHeader className="pb-4 sm:pb-6">
+                        <CardTitle className="text-lg sm:text-xl lg:text-2xl text-[#8e44ad] dark:text-primary">MÉTODO DE PAGAMENTO</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="grid md:grid-cols-2 gap-4">
+                      <CardContent className="space-y-4 sm:space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                           <Card
                             className={`cursor-pointer transition-all duration-300 hover:shadow-lg border-2 ${
                               paymentMethod === "pix"
@@ -711,10 +715,10 @@ export default function CheckoutPage() {
                             }`}
                             onClick={() => setPaymentMethod("pix")}
                           >
-                            <CardContent className="p-4 text-center">
-                              <Smartphone className="h-8 w-8 text-[#8e44ad] mx-auto mb-2" />
-                              <h4 className="font-semibold text-[#8e44ad] dark:text-primary">PIX</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">Pagamento instantâneo</p>
+                            <CardContent className="p-3 sm:p-4 text-center">
+                              <Smartphone className="h-6 w-6 sm:h-8 sm:w-8 text-[#8e44ad] mx-auto mb-2" />
+                              <h4 className="text-sm sm:text-base font-semibold text-[#8e44ad] dark:text-primary">PIX</h4>
+                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Pagamento instantâneo</p>
                               <p className="text-xs text-green-600 dark:text-green-400 mt-1">Aprovação imediata</p>
                             </CardContent>
                           </Card>
@@ -727,31 +731,31 @@ export default function CheckoutPage() {
                             }`}
                             onClick={() => setPaymentMethod("card")}
                           >
-                            <CardContent className="p-4 text-center">
-                              <CreditCard className="h-8 w-8 text-[#8e44ad] mx-auto mb-2" />
-                              <h4 className="font-semibold text-[#8e44ad] dark:text-primary">Cartão de Crédito</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">Visa, Mastercard, Elo</p>
+                            <CardContent className="p-3 sm:p-4 text-center">
+                              <CreditCard className="h-6 w-6 sm:h-8 sm:w-8 text-[#8e44ad] mx-auto mb-2" />
+                              <h4 className="text-sm sm:text-base font-semibold text-[#8e44ad] dark:text-primary">Cartão de Crédito</h4>
+                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Visa, Mastercard, Elo</p>
                               <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Parcelamento disponível</p>
                             </CardContent>
                           </Card>
                         </div>
 
-                        <div className="flex justify-between pt-6">
+                        <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-4 sm:pt-6">
                           <Button
                             variant="outline"
                             onClick={() => setCurrentStep(1)}
-                            className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+                            className="w-full sm:w-auto border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base py-2 sm:py-3"
                           >
-                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                             VOLTAR
                           </Button>
                           <Button
                             onClick={() => setCurrentStep(3)}
                             disabled={!canProceedToStep3()}
-                            className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                            className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base py-2 sm:py-3"
                           >
                             CONTINUAR
-                            <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
+                            <ArrowLeft className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 rotate-180" />
                           </Button>
                         </div>
                       </CardContent>
@@ -766,66 +770,68 @@ export default function CheckoutPage() {
                     transition={{ duration: 0.5 }}
                   >
                     <Card className="dark:bg-slate-900">
-                      <CardHeader>
-                        <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">FINALIZAR PAGAMENTO</CardTitle>
+                      <CardHeader className="pb-4 sm:pb-6">
+                        <CardTitle className="text-lg sm:text-xl lg:text-2xl text-[#8e44ad] dark:text-primary">FINALIZAR PAGAMENTO</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-6">
+                      <CardContent className="space-y-4 sm:space-y-6">
                         {paymentMethod === "pix" && (
-                          <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">
+                          <div className="space-y-3 sm:space-y-4">
+                            <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">
                               Pagamento via PIX
                             </h3>
 
                             {!pixExpired ? (
                               <>
                                 <div className="text-center">
-                                  <div className="bg-white p-4 rounded-lg inline-block shadow-lg">
-                                    <div className="w-64 h-64 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                                  <div className="bg-white p-3 sm:p-4 rounded-lg inline-block shadow-lg">
+                                    <div className="w-48 h-48 sm:w-64 sm:h-64 bg-gray-100 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
                                       <div className="grid grid-cols-8 gap-1">
                                         {Array.from({ length: 64 }, (_, i) => (
                                           <div
                                             key={i}
-                                            className={`w-2 h-2 ${Math.random() > 0.5 ? "bg-black" : "bg-white"}`}
+                                            className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${Math.random() > 0.5 ? "bg-black" : "bg-white"}`}
                                           />
                                         ))}
                                       </div>
                                     </div>
-                                    <p className="text-sm text-gray-600">QR Code PIX</p>
+                                    <p className="text-xs sm:text-sm text-gray-600">QR Code PIX</p>
                                   </div>
                                 </div>
 
                                 <div className="text-center">
                                   <div className="flex items-center justify-center gap-2 mb-2">
-                                    <Clock className="h-5 w-5 text-[#8e44ad]" />
-                                    <span className="font-semibold text-[#8e44ad] dark:text-primary">
+                                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-[#8e44ad]" />
+                                    <span className="text-sm sm:text-base font-semibold text-[#8e44ad] dark:text-primary">
                                       Tempo restante: {formatTime(pixTimer)}
                                     </span>
                                   </div>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                     O QR Code expira em 10 minutos
                                   </p>
                                 </div>
 
-                                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                                  <Label className="text-sm font-medium">Código PIX (Copia e Cola):</Label>
-                                  <div className="flex items-center gap-2 mt-2">
-                                    <Input value={generatePixCode()} readOnly className="text-xs font-mono" />
+                                <div className="bg-gray-50 dark:bg-slate-700 p-3 sm:p-4 rounded-lg">
+                                  <Label className="text-xs sm:text-sm font-medium">Código PIX (Copia e Cola):</Label>
+                                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-2">
+                                    <Input value={generatePixCode()} readOnly className="text-xs font-mono flex-1" />
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => navigator.clipboard.writeText(generatePixCode())}
+                                      className="w-full sm:w-auto"
                                     >
-                                      <Copy className="h-4 w-4" />
+                                      <Copy className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                      <span className="hidden sm:inline">Copiar</span>
                                     </Button>
                                   </div>
                                 </div>
                               </>
                             ) : (
-                              <div className="text-center py-8">
+                              <div className="text-center py-6 sm:py-8">
                                 <div className="text-red-500 mb-4">
-                                  <Clock className="h-16 w-16 mx-auto mb-2" />
-                                  <h3 className="text-xl font-semibold">QR Code Expirado</h3>
-                                  <p className="text-gray-600 dark:text-gray-400">
+                                  <Clock className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-2" />
+                                  <h3 className="text-lg sm:text-xl font-semibold">QR Code Expirado</h3>
+                                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                                     O tempo limite para pagamento foi atingido.
                                   </p>
                                 </div>
@@ -834,9 +840,10 @@ export default function CheckoutPage() {
                                     setPixTimer(600)
                                     setPixExpired(false)
                                   }}
-                                  className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+                                  className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white text-sm sm:text-base py-2 sm:py-3"
                                 >
-                                  GERAR NOVO QR CODE
+                                  <span className="hidden sm:inline">GERAR NOVO QR CODE</span>
+                                  <span className="sm:hidden">NOVO QR CODE</span>
                                 </Button>
                               </div>
                             )}
@@ -844,53 +851,53 @@ export default function CheckoutPage() {
                         )}
 
                         {paymentMethod === "card" && (
-                          <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">
+                          <div className="space-y-3 sm:space-y-4">
+                            <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">
                               Dados do Cartão de Crédito
                             </h3>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                               <div className="space-y-2">
-                                <Label htmlFor="cardNumber">Número do Cartão *</Label>
+                                <Label htmlFor="cardNumber" className="text-sm font-medium">Número do Cartão *</Label>
                                 <Input
                                   id="cardNumber"
                                   value={cardData.numero}
                                   onChange={(e) => setCardData((prev) => ({ ...prev, numero: e.target.value }))}
                                   placeholder="0000 0000 0000 0000"
-                                  className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                                  className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                                 />
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor="cardName">Nome no Cartão *</Label>
+                                <Label htmlFor="cardName" className="text-sm font-medium">Nome no Cartão *</Label>
                                 <Input
                                   id="cardName"
                                   value={cardData.nome}
                                   onChange={(e) => setCardData((prev) => ({ ...prev, nome: e.target.value }))}
                                   placeholder="Nome como está no cartão"
-                                  className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                                  className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                                 />
                               </div>
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
-                                  <Label htmlFor="cardExpiry">Validade *</Label>
+                                  <Label htmlFor="cardExpiry" className="text-sm font-medium">Validade *</Label>
                                   <Input
                                     id="cardExpiry"
                                     value={cardData.validade}
                                     onChange={(e) => setCardData((prev) => ({ ...prev, validade: e.target.value }))}
                                     placeholder="MM/AA"
-                                    className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                                    className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                                   />
                                 </div>
                                 <div className="space-y-2">
-                                  <Label htmlFor="cardCvv">CVV *</Label>
+                                  <Label htmlFor="cardCvv" className="text-sm font-medium">CVV *</Label>
                                   <Input
                                     id="cardCvv"
                                     value={cardData.cvv}
                                     onChange={(e) => setCardData((prev) => ({ ...prev, cvv: e.target.value }))}
                                     placeholder="000"
-                                    className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                                    className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                                   />
                                 </div>
                               </div>
@@ -898,34 +905,36 @@ export default function CheckoutPage() {
                           </div>
                         )}
 
-                        <div className="flex justify-between pt-6">
+                        <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-4 sm:pt-6">
                           <Button
                             variant="outline"
                             onClick={() => setCurrentStep(2)}
                             disabled={isProcessing}
-                            className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+                            className="w-full sm:w-auto border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base py-2 sm:py-3"
                           >
-                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                             VOLTAR
                           </Button>
                           {paymentMethod === "pix" && !pixExpired && (
                             <Button
                               onClick={handlePayment}
                               disabled={isProcessing}
-                              className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+                              className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white text-sm sm:text-base py-2 sm:py-3"
                             >
-                              {isProcessing ? "PROCESSANDO..." : "JÁ FIZ O PAGAMENTO"}
-                              <CheckCircle className="ml-2 h-4 w-4" />
+                              <span className="hidden sm:inline">{isProcessing ? "PROCESSANDO..." : "JÁ FIZ O PAGAMENTO"}</span>
+                              <span className="sm:hidden">{isProcessing ? "PROCESSANDO..." : "FINALIZAR"}</span>
+                              <CheckCircle className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           )}
                           {paymentMethod === "card" && (
                             <Button
                               onClick={handlePayment}
                               disabled={!canProcessPayment() || isProcessing}
-                              className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                              className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base py-2 sm:py-3"
                             >
-                              {isProcessing ? "PROCESSANDO PAGAMENTO..." : "FINALIZAR COMPRA"}
-                              <CheckCircle className="ml-2 h-4 w-4" />
+                              <span className="hidden sm:inline">{isProcessing ? "PROCESSANDO PAGAMENTO..." : "FINALIZAR COMPRA"}</span>
+                              <span className="sm:hidden">{isProcessing ? "PROCESSANDO..." : "FINALIZAR"}</span>
+                              <CheckCircle className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           )}
                         </div>
@@ -936,16 +945,16 @@ export default function CheckoutPage() {
               </div>
 
               {/* Order Summary Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card className="dark:bg-slate-900">
-                  <CardHeader>
-                    <CardTitle className="text-lg text-[#8e44ad] dark:text-primary">RESUMO DO PEDIDO</CardTitle>
+                  <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-base sm:text-lg text-[#8e44ad] dark:text-primary">RESUMO DO PEDIDO</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-3">
+                  <CardContent className="space-y-3 sm:space-y-4">
+                    <div className="space-y-2 sm:space-y-3">
                       {state.items.map((item) => (
-                        <div key={`${item.id}-${item.selectedSize || "default"}`} className="flex items-center gap-3">
-                          <div className="relative w-12 h-12 flex-shrink-0">
+                        <div key={`${item.id}-${item.selectedSize || "default"}`} className="flex items-center gap-2 sm:gap-3">
+                          <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                             <Image
                               src={item.image || "/placeholder.svg"}
                               alt={item.name}
@@ -953,29 +962,29 @@ export default function CheckoutPage() {
                               className="object-cover rounded"
                             />
                           </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{item.name}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs sm:text-sm font-medium truncate">{item.name}</p>
                             {item.selectedSize && <p className="text-xs text-gray-500">Tamanho: {item.selectedSize}</p>}
                             <p className="text-xs text-gray-500">Qtd: {item.quantity}</p>
                           </div>
-                          <p className="text-sm font-semibold">
+                          <p className="text-xs sm:text-sm font-semibold flex-shrink-0">
                             R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
                           </p>
                         </div>
                       ))}
                     </div>
 
-                    <div className="border-t pt-4 space-y-2">
-                      <div className="flex justify-between">
+                    <div className="border-t pt-3 sm:pt-4 space-y-2">
+                      <div className="flex justify-between text-sm">
                         <span>Subtotal</span>
                         <span>R$ {subtotal.toFixed(2).replace(".", ",")}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-sm">
                         <span>Frete</span>
                         <span>{shipping === 0 ? "GRÁTIS" : `R$ ${shipping.toFixed(2).replace(".", ",")}`}</span>
                       </div>
                       <div className="border-t pt-2">
-                        <div className="flex justify-between text-lg font-bold">
+                        <div className="flex justify-between text-base sm:text-lg font-bold">
                           <span>Total</span>
                           <span className="text-[#8e44ad]">R$ {total.toFixed(2).replace(".", ",")}</span>
                         </div>
@@ -985,10 +994,10 @@ export default function CheckoutPage() {
                 </Card>
 
                 <Card className="dark:bg-slate-900">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3 sm:p-4">
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-2 mb-2">
-                        <Shield className="h-5 w-5 text-green-500" />
+                        <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                         <span className="text-sm font-medium text-green-700 dark:text-green-300">
                           Compra 100% Segura
                         </span>

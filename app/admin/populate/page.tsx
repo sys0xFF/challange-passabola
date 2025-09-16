@@ -282,6 +282,310 @@ export default function PopulatePage() {
         ],
         preferences: { acceptTerms: true, wantNotifications: true },
         type: "team" as const
+      },
+      {
+        teamData: { nomeTime: "Águias Negras", nomeCapitao: "Camila Torres" },
+        captainData: {
+          nomeCompleto: "Camila Torres Ribeiro",
+          idade: "29",
+          email: "camila.torres@email.com",
+          telefone: "(11) 99345-6789",
+          cidadeBairro: "Morumbi, São Paulo",
+          posicao: "Atacante",
+          jaParticipou: "Sim"
+        },
+        players: [
+          {
+            id: 1,
+            nomeCompleto: "Sandra Regina Lima",
+            idade: "26",
+            email: "sandra.lima@email.com",
+            telefone: "(11) 98345-6789",
+            cidadeBairro: "Butantã, São Paulo",
+            posicao: "Goleira",
+            jaParticipou: "Não"
+          },
+          {
+            id: 2,
+            nomeCompleto: "Talita Mendes Costa",
+            idade: "24",
+            email: "talita.costa@email.com",
+            telefone: "(11) 97345-6789",
+            cidadeBairro: "Cidade Jardim, São Paulo",
+            posicao: "Zagueira",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 3,
+            nomeCompleto: "Vanessa Silva Santos",
+            idade: "27",
+            email: "vanessa.santos@email.com",
+            telefone: "(11) 96345-6789",
+            cidadeBairro: "Pinheiros, São Paulo",
+            posicao: "Lateral",
+            jaParticipou: "Não"
+          },
+          {
+            id: 4,
+            nomeCompleto: "Wanessa Oliveira Pereira",
+            idade: "25",
+            email: "wanessa.pereira@email.com",
+            telefone: "(11) 95345-6789",
+            cidadeBairro: "Alto de Pinheiros, São Paulo",
+            posicao: "Meio-campo",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 5,
+            nomeCompleto: "Xiomara Rodrigues Silva",
+            idade: "28",
+            email: "xiomara.silva@email.com",
+            telefone: "(11) 94345-6789",
+            cidadeBairro: "Vila Madalena, São Paulo",
+            posicao: "Meio-campo",
+            jaParticipou: "Não"
+          },
+          {
+            id: 6,
+            nomeCompleto: "Yara Santos Costa",
+            idade: "30",
+            email: "yara.costa@email.com",
+            telefone: "(11) 93345-6789",
+            cidadeBairro: "Jardim América, São Paulo",
+            posicao: "Atacante",
+            jaParticipou: "Sim"
+          }
+        ],
+        preferences: { acceptTerms: true, wantNotifications: true },
+        type: "team" as const
+      },
+      {
+        teamData: { nomeTime: "Leoas do Sul", nomeCapitao: "Brenda Ferreira" },
+        captainData: {
+          nomeCompleto: "Brenda Ferreira Santos",
+          idade: "31",
+          email: "brenda.ferreira@email.com",
+          telefone: "(11) 99456-7890",
+          cidadeBairro: "Vila Olímpia, São Paulo",
+          posicao: "Meio-campo",
+          jaParticipou: "Sim"
+        },
+        players: [
+          {
+            id: 1,
+            nomeCompleto: "Adriana Costa Lima",
+            idade: "23",
+            email: "adriana.lima@email.com",
+            telefone: "(11) 98456-7890",
+            cidadeBairro: "Campo Belo, São Paulo",
+            posicao: "Goleira",
+            jaParticipou: "Não"
+          },
+          {
+            id: 2,
+            nomeCompleto: "Bianca Oliveira Silva",
+            idade: "25",
+            email: "bianca.silva@email.com",
+            telefone: "(11) 97456-7890",
+            cidadeBairro: "Brooklin, São Paulo",
+            posicao: "Zagueira",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 3,
+            nomeCompleto: "Cintia Santos Pereira",
+            idade: "26",
+            email: "cintia.pereira@email.com",
+            telefone: "(11) 96456-7890",
+            cidadeBairro: "Vila Nova Conceição, São Paulo",
+            posicao: "Lateral",
+            jaParticipou: "Não"
+          },
+          {
+            id: 4,
+            nomeCompleto: "Denise Lima Rodrigues",
+            idade: "29",
+            email: "denise.rodrigues@email.com",
+            telefone: "(11) 95456-7890",
+            cidadeBairro: "Itaim Bibi, São Paulo",
+            posicao: "Zagueira",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 5,
+            nomeCompleto: "Ester Pereira Costa",
+            idade: "24",
+            email: "ester.costa@email.com",
+            telefone: "(11) 94456-7890",
+            cidadeBairro: "Moema, São Paulo",
+            posicao: "Atacante",
+            jaParticipou: "Não"
+          },
+          {
+            id: 6,
+            nomeCompleto: "Fabiana Silva Santos",
+            idade: "27",
+            email: "fabiana.santos@email.com",
+            telefone: "(11) 93456-7890",
+            cidadeBairro: "Jardim Paulista, São Paulo",
+            posicao: "Atacante",
+            jaParticipou: "Sim"
+          }
+        ],
+        preferences: { acceptTerms: true, wantNotifications: true },
+        type: "team" as const
+      },
+      {
+        teamData: { nomeTime: "Falcões Vermelhos", nomeCapitao: "Luciana Mendes" },
+        captainData: {
+          nomeCompleto: "Luciana Mendes Oliveira",
+          idade: "33",
+          email: "luciana.mendes@email.com",
+          telefone: "(11) 99567-8901",
+          cidadeBairro: "Perdizes, São Paulo",
+          posicao: "Zagueira",
+          jaParticipou: "Sim"
+        },
+        players: [
+          {
+            id: 1,
+            nomeCompleto: "Gisele Rodrigues Lima",
+            idade: "22",
+            email: "gisele.lima@email.com",
+            telefone: "(11) 98567-8901",
+            cidadeBairro: "Sumaré, São Paulo",
+            posicao: "Goleira",
+            jaParticipou: "Não"
+          },
+          {
+            id: 2,
+            nomeCompleto: "Helena Santos Costa",
+            idade: "28",
+            email: "helena.costa@email.com",
+            telefone: "(11) 97567-8901",
+            cidadeBairro: "Pompeia, São Paulo",
+            posicao: "Lateral",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 3,
+            nomeCompleto: "Ingrid Silva Pereira",
+            idade: "26",
+            email: "ingrid.pereira@email.com",
+            telefone: "(11) 96567-8901",
+            cidadeBairro: "Lapa, São Paulo",
+            posicao: "Meio-campo",
+            jaParticipou: "Não"
+          },
+          {
+            id: 4,
+            nomeCompleto: "Juliana Costa Santos",
+            idade: "25",
+            email: "juliana.santos@email.com",
+            telefone: "(11) 95567-8901",
+            cidadeBairro: "Barra Funda, São Paulo",
+            posicao: "Meio-campo",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 5,
+            nomeCompleto: "Karina Oliveira Lima",
+            idade: "29",
+            email: "karina.lima@email.com",
+            telefone: "(11) 94567-8901",
+            cidadeBairro: "Água Branca, São Paulo",
+            posicao: "Atacante",
+            jaParticipou: "Não"
+          },
+          {
+            id: 6,
+            nomeCompleto: "Leticia Pereira Silva",
+            idade: "24",
+            email: "leticia.silva@email.com",
+            telefone: "(11) 93567-8901",
+            cidadeBairro: "Alto da Lapa, São Paulo",
+            posicao: "Atacante",
+            jaParticipou: "Sim"
+          }
+        ],
+        preferences: { acceptTerms: true, wantNotifications: true },
+        type: "team" as const
+      },
+      {
+        teamData: { nomeTime: "Dragões Azuis", nomeCapitao: "Patricia Andrade" },
+        captainData: {
+          nomeCompleto: "Patricia Andrade Silva",
+          idade: "30",
+          email: "patricia.andrade@email.com",
+          telefone: "(11) 99678-9012",
+          cidadeBairro: "Vila Leopoldina, São Paulo",
+          posicao: "Lateral",
+          jaParticipou: "Sim"
+        },
+        players: [
+          {
+            id: 1,
+            nomeCompleto: "Monica Santos Rodrigues",
+            idade: "27",
+            email: "monica.rodrigues@email.com",
+            telefone: "(11) 98678-9012",
+            cidadeBairro: "Jaguaré, São Paulo",
+            posicao: "Goleira",
+            jaParticipou: "Não"
+          },
+          {
+            id: 2,
+            nomeCompleto: "Natasha Costa Oliveira",
+            idade: "25",
+            email: "natasha.oliveira@email.com",
+            telefone: "(11) 97678-9012",
+            cidadeBairro: "Rio Pequeno, São Paulo",
+            posicao: "Zagueira",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 3,
+            nomeCompleto: "Priscila Lima Santos",
+            idade: "26",
+            email: "priscila.santos@email.com",
+            telefone: "(11) 96678-9012",
+            cidadeBairro: "Raposo Tavares, São Paulo",
+            posicao: "Zagueira",
+            jaParticipou: "Não"
+          },
+          {
+            id: 4,
+            nomeCompleto: "Roberta Silva Costa",
+            idade: "28",
+            email: "roberta.costa@email.com",
+            telefone: "(11) 95678-9012",
+            cidadeBairro: "Vila Sônia, São Paulo",
+            posicao: "Meio-campo",
+            jaParticipou: "Sim"
+          },
+          {
+            id: 5,
+            nomeCompleto: "Simone Pereira Lima",
+            idade: "24",
+            email: "simone.lima@email.com",
+            telefone: "(11) 94678-9012",
+            cidadeBairro: "Morumbi, São Paulo",
+            posicao: "Meio-campo",
+            jaParticipou: "Não"
+          },
+          {
+            id: 6,
+            nomeCompleto: "Viviane Oliveira Santos",
+            idade: "31",
+            email: "viviane.santos@email.com",
+            telefone: "(11) 93678-9012",
+            cidadeBairro: "Real Parque, São Paulo",
+            posicao: "Atacante",
+            jaParticipou: "Sim"
+          }
+        ],
+        preferences: { acceptTerms: true, wantNotifications: true },
+        type: "team" as const
       }
     ]
 
@@ -870,7 +1174,7 @@ export default function PopulatePage() {
                         {getStatusIcon(progress.teams)}
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">
-                        3 equipes completas com jogadoras
+                        7 equipes completas com jogadoras
                       </p>
                       <Button 
                         onClick={generateTeamsData} 

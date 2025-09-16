@@ -67,38 +67,38 @@ export default function AdminLoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#8e44ad] to-[#9b59b6]">
-      <main className="flex-1 flex items-center justify-center p-4">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
+          className="w-full max-w-sm sm:max-w-md"
         >
           <Card className="shadow-2xl">
-            <CardHeader className="text-center space-y-4">
+            <CardHeader className="text-center space-y-3 sm:space-y-4">
               <div className="flex justify-center">
-                <div className="relative h-16 w-16">
+                <div className="relative h-12 w-12 sm:h-16 sm:w-16">
                   <Image src="/logo.png" alt="Passa Bola Logo" fill className="object-contain" />
                 </div>
               </div>
               
               <div>
-                <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4">ÁREA RESTRITA</Badge>
-                <CardTitle className={`${bebasNeue.className} text-3xl text-[#8e44ad] tracking-wider`}>
+                <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-3 sm:mb-4 text-xs sm:text-sm">ÁREA RESTRITA</Badge>
+                <CardTitle className={`${bebasNeue.className} text-2xl sm:text-3xl text-[#8e44ad] tracking-wider`}>
                   PAINEL ADMINISTRATIVO
                 </CardTitle>
-                <p className="text-muted-foreground mt-2">
+                <p className="text-muted-foreground mt-2 text-sm sm:text-base">
                   Faça login para acessar o dashboard
                 </p>
               </div>
             </CardHeader>
 
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
+            <CardContent className="px-4 sm:px-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="username" className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
+                    <Label htmlFor="username" className="flex items-center gap-2 text-sm sm:text-base">
+                      <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
                       Usuário
                     </Label>
                     <Input
@@ -108,13 +108,13 @@ export default function AdminLoginPage() {
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Digite seu usuário"
                       required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-[#8e44ad]"
+                      className="transition-all duration-200 focus:ring-2 focus:ring-[#8e44ad] text-sm sm:text-base"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="flex items-center gap-2">
-                      <Lock className="h-4 w-4" />
+                    <Label htmlFor="password" className="flex items-center gap-2 text-sm sm:text-base">
+                      <Lock className="h-3 w-3 sm:h-4 sm:w-4" />
                       Senha
                     </Label>
                     <div className="relative">
@@ -125,7 +125,7 @@ export default function AdminLoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Digite sua senha"
                         required
-                        className="pr-10 transition-all duration-200 focus:ring-2 focus:ring-[#8e44ad]"
+                        className="pr-10 transition-all duration-200 focus:ring-2 focus:ring-[#8e44ad] text-sm sm:text-base"
                       />
                       <Button
                         type="button"
@@ -135,9 +135,9 @@ export default function AdminLoginPage() {
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-gray-400" />
+                          <EyeOff className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                         ) : (
-                          <Eye className="h-4 w-4 text-gray-400" />
+                          <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                         )}
                       </Button>
                     </div>
@@ -148,7 +148,7 @@ export default function AdminLoginPage() {
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm"
+                    className="bg-red-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded-md text-xs sm:text-sm"
                   >
                     {loginError}
                   </motion.div>
@@ -157,23 +157,24 @@ export default function AdminLoginPage() {
                 <Button
                   type="submit"
                   disabled={isLoading || !username || !password}
-                  className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white transition-all duration-200 disabled:opacity-50"
+                  className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white transition-all duration-200 disabled:opacity-50 text-sm sm:text-base py-2 sm:py-3"
                 >
                   {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Autenticando...
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
+                      <span className="hidden sm:inline">Autenticando...</span>
+                      <span className="sm:hidden">Entrando...</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
+                    <div className="flex items-center justify-center gap-2">
+                      <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
                       Fazer Login
                     </div>
                   )}
                 </Button>
               </form>
 
-              <div className="mt-6 pt-4 border-t text-center">
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t text-center">
                 <p className="text-xs text-muted-foreground">
                   Sistema de administração Copa Passa Bola 2025
                 </p>

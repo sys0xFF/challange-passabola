@@ -1,6 +1,6 @@
 import { database } from './firebase';
-import { ref, get, orderByChild, query, set } from 'firebase/database';
-import { TeamRegistration, IndividualRegistration, VolunteerRegistration, DonationData, PurchaseData, Tournament, GameTeam, Match } from './database-service';
+import { ref, get, orderByChild, query, set, remove } from 'firebase/database';
+import { TeamRegistration, IndividualRegistration, VolunteerRegistration, DonationData, PurchaseData, Tournament, GameTeam, Match, Game, TicketPurchase, UserProfile } from './database-service';
 
 export interface AdminStats {
   totalTeams: number;
@@ -9,21 +9,25 @@ export interface AdminStats {
   totalDonations: number;
   totalPurchases: number;
   totalTournaments: number;
+  totalGames: number;
+  totalTicketsSold: number;
   totalUsers: number;
   totalRevenue: number;
   totalDonationAmount: number;
+  totalTicketRevenue: number;
 }
-
 export async function getAdminStats(): Promise<AdminStats> {
   try {
-    const [teams, individuals, volunteers, donations, purchases, tournaments, users] = await Promise.all([
+    const [teams, individuals, volunteers, donations, purchases, tournaments, users, games, tickets] = await Promise.all([
       get(ref(database, 'Teams')),
       get(ref(database, 'Individuals')),
       get(ref(database, 'volunteers')),
       get(ref(database, 'donors')),
       get(ref(database, 'purchases')),
       get(ref(database, 'tournaments')),
-      get(ref(database, 'users'))
+      get(ref(database, 'users')),
+      get(ref(database, 'games')),
+      get(ref(database, 'ticketPurchases'))
     ]);
 
     const teamsData = teams.val() || {};
@@ -33,6 +37,8 @@ export async function getAdminStats(): Promise<AdminStats> {
     const purchasesData = purchases.val() || {};
     const tournamentsData = tournaments.val() || {};
     const usersData = users.val() || {};
+    const gamesData = games.val() || {};
+    const ticketsData = tickets.val() || {};
 
     // Calcular receita total das compras
     const totalRevenue = Object.values(purchasesData).reduce((acc: number, purchase: any) => {
@@ -44,6 +50,16 @@ export async function getAdminStats(): Promise<AdminStats> {
       return acc + (donation.amount || 0);
     }, 0);
 
+    // Calcular receita total dos ingressos
+    const totalTicketRevenue = Object.values(ticketsData).reduce((acc: number, ticket: any) => {
+      return acc + (ticket.totalPrice || 0);
+    }, 0);
+
+    // Calcular total de ingressos vendidos
+    const totalTicketsSold = Object.values(ticketsData).reduce((acc: number, ticket: any) => {
+      return acc + (ticket.quantity || 0);
+    }, 0);
+
     return {
       totalTeams: Object.keys(teamsData).length,
       totalIndividuals: Object.keys(individualsData).length,
@@ -51,9 +67,12 @@ export async function getAdminStats(): Promise<AdminStats> {
       totalDonations: Object.keys(donationsData).length,
       totalPurchases: Object.keys(purchasesData).length,
       totalTournaments: Object.keys(tournamentsData).length,
+      totalGames: Object.keys(gamesData).length,
+      totalTicketsSold,
       totalUsers: Object.keys(usersData).length,
       totalRevenue,
-      totalDonationAmount
+      totalDonationAmount,
+      totalTicketRevenue
     };
   } catch (error) {
     console.error('Error fetching admin stats:', error);
@@ -926,5 +945,160 @@ export async function getUserById(userId: string): Promise<any | null> {
   } catch (error) {
     console.error('Error fetching user by ID:', error);
     return null;
+  }
+}
+
+// Novas funções para Jogos e Ingressos
+
+export async function getAllGames(): Promise<Array<Game & { id: string }>> {
+  try {
+    const gamesRef = ref(database, 'games');
+    const snapshot = await get(gamesRef);
+    const gamesData = snapshot.val() || {};
+    
+    return Object.keys(gamesData).map(id => ({
+      id,
+      ...gamesData[id]
+    }));
+  } catch (error) {
+    console.error('Error fetching games:', error);
+    return [];
+  }
+}
+
+export async function getAllTickets(): Promise<Array<TicketPurchase & { id: string }>> {
+  try {
+    const ticketsRef = ref(database, 'ticketPurchases');
+    const snapshot = await get(ticketsRef);
+    const ticketsData = snapshot.val() || {};
+
+    return Object.keys(ticketsData).map(id => ({
+      id,
+      ...ticketsData[id]
+    }));
+  } catch (error) {
+    console.error('Error fetching tickets:', error);
+    return [];
+  }
+}export async function getGamesByTournament(tournamentId: string): Promise<Array<Game & { id: string }>> {
+  try {
+    const gamesRef = ref(database, 'games');
+    const snapshot = await get(gamesRef);
+    const gamesData = snapshot.val() || {};
+    
+    return Object.keys(gamesData)
+      .filter(id => gamesData[id].tournamentId === tournamentId)
+      .map(id => ({
+        id,
+        ...gamesData[id]
+      }));
+  } catch (error) {
+    console.error('Error fetching games by tournament:', error);
+    return [];
+  }
+}
+
+export async function updateGame(gameId: string, updates: Partial<Game>): Promise<{ success: boolean; error?: any }> {
+  try {
+    const gameRef = ref(database, `games/${gameId}`);
+    const snapshot = await get(gameRef);
+    const existingData = snapshot.val();
+    
+    if (!existingData) {
+      throw new Error('Game not found');
+    }
+    
+    const updatedGame = {
+      ...existingData,
+      ...updates
+    };
+    
+    await set(gameRef, updatedGame);
+    
+    console.log('Game updated successfully!');
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating game:', error);
+    return { success: false, error };
+  }
+}
+
+export async function deleteGame(gameId: string): Promise<{ success: boolean; error?: any }> {
+  try {
+    await set(ref(database, `games/${gameId}`), null);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting game:', error);
+    return { success: false, error };
+  }
+}
+
+export async function getUserTickets(userId: string): Promise<Array<TicketPurchase & { id: string }>> {
+  try {
+    const ticketsRef = ref(database, 'ticketPurchases');
+    const snapshot = await get(ticketsRef);
+    const ticketsData = snapshot.val() || {};
+
+    return Object.keys(ticketsData)
+      .filter(id => ticketsData[id].userId === userId)
+      .map(id => ({
+        id,
+        ...ticketsData[id]
+      }));
+  } catch (error) {
+    console.error('Error fetching user tickets:', error);
+    return [];
+  }
+}export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  try {
+    const userSnapshot = await get(ref(database, `users/${userId}`));
+    
+    if (!userSnapshot.exists()) {
+      return null;
+    }
+
+    const userData = userSnapshot.val();
+    const userTickets = await getUserTickets(userId);
+
+    return {
+      id: userId,
+      ...userData,
+      tickets: userTickets
+    };
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    return null;
+  }
+}
+
+export async function updateUserPoints(userId: string, newPoints: number): Promise<{ success: boolean; error?: any }> {
+  try {
+    const userRef = ref(database, `users/${userId}/points`)
+    await set(userRef, newPoints)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating user points:', error)
+    return { success: false, error }
+  }
+}
+
+export async function deductUserPoints(userId: string, pointsToDeduct: number): Promise<{ success: boolean; error?: any }> {
+  try {
+    const userRef = ref(database, `users/${userId}`)
+    const snapshot = await get(userRef)
+    const userData = snapshot.val()
+    
+    if (!userData) {
+      return { success: false, error: 'User not found' }
+    }
+    
+    const currentPoints = userData.points || 0
+    const newPoints = Math.max(0, currentPoints - pointsToDeduct)
+    
+    await set(ref(database, `users/${userId}/points`), newPoints)
+    return { success: true }
+  } catch (error) {
+    console.error('Error deducting user points:', error)
+    return { success: false, error }
   }
 }

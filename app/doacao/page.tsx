@@ -247,17 +247,20 @@ export default function DoacaoPage() {
           <div className="container mx-auto px-4 py-3">
             <div className="grid grid-cols-2 md:grid-cols-3 items-center">
               <div className="flex justify-start">
-                <Link href="/" className="flex items-center gap-2">
-                  <div className="relative h-10 w-10 md:h-12 md:w-12">
+                <Link href="/" className="flex items-center gap-1 sm:gap-2">
+                  <div className="relative h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12">
                     <Image src="/logo.png" alt="Passa Bola Logo" fill className="object-contain" />
                   </div>
-                  <span className="font-bold text-xl text-primary dark:text-white">PASSA BOLA</span>
+                  <span className="font-bold text-sm sm:text-xl text-primary dark:text-white">
+                    <span className="hidden sm:inline">PASSA BOLA</span>
+                    <span className="sm:hidden">PB</span>
+                  </span>
                 </Link>
               </div>
               <div className="hidden md:flex justify-center">
-                <Badge className="bg-green-500 text-white">DOAÇÃO REALIZADA</Badge>
+                <Badge className="bg-green-500 text-white text-xs sm:text-sm">DOAÇÃO REALIZADA</Badge>
               </div>
-              <div className="flex justify-end items-center gap-2">
+              <div className="flex justify-end items-center gap-1 sm:gap-2">
                 <AuthButton />
                 <div className="md:hidden">
                   <MobileMenu />
@@ -399,10 +402,14 @@ export default function DoacaoPage() {
                   transition={{ delay: 0.8, duration: 0.6 }}
                   className="flex flex-col sm:flex-row gap-4 justify-center"
                 >
-                  <Button asChild className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white">
+                  <Button 
+                    asChild 
+                    className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white text-sm sm:text-base px-6 py-2 sm:py-3"
+                  >
                     <Link href="/">
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      VOLTAR AO INÍCIO
+                      <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">VOLTAR AO INÍCIO</span>
+                      <span className="sm:hidden">INÍCIO</span>
                     </Link>
                   </Button>
                 </motion.div>
@@ -421,24 +428,27 @@ export default function DoacaoPage() {
         <div className="container mx-auto px-4 py-3">
           <div className="grid grid-cols-2 md:grid-cols-3 items-center">
             <div className="flex justify-start">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="relative h-10 w-10 md:h-12 md:w-12">
+              <Link href="/" className="flex items-center gap-1 sm:gap-2">
+                <div className="relative h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12">
                   <Image src="/logo.png" alt="Passa Bola Logo" fill className="object-contain" />
                 </div>
-                <span className="font-bold text-xl text-primary dark:text-white">PASSA BOLA</span>
+                <span className="font-bold text-sm sm:text-xl text-primary dark:text-white">
+                  <span className="hidden sm:inline">PASSA BOLA</span>
+                  <span className="sm:hidden">PB</span>
+                </span>
               </Link>
             </div>
             <div className="hidden md:flex justify-center">
-              <Badge className="bg-pink-500 text-white">FAÇA SUA DOAÇÃO</Badge>
+              <Badge className="bg-pink-500 text-white text-xs sm:text-sm">FAÇA SUA DOAÇÃO</Badge>
             </div>
-            <div className="flex justify-end items-center gap-2">
+            <div className="flex justify-end items-center gap-1 sm:gap-2">
               <Link
                 onClick={handleSmoothScroll}
                 href="/#loja"
                 className="hidden md:flex items-center gap-1 text-primary dark:text-primary-foreground hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
               >
-                <ShoppingBag className="h-5 w-5" />
-                <span className="text-sm font-medium">Loja</span>
+                <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-xs sm:text-sm font-medium">Loja</span>
               </Link>
               <AuthButton />
               <div className="md:hidden">
@@ -451,28 +461,30 @@ export default function DoacaoPage() {
 
       <main className="flex-1 pt-20">
         {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
+        <section className="py-16 sm:py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
           <div className="container mx-auto px-4 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28]">DOAÇÃO</Badge>
-              <h1 className={`${bebasNeue.className} text-4xl md:text-6xl font-bold mb-6 tracking-wider`}>
+              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-3 sm:mb-4 hover:bg-[#c2ff28] text-xs sm:text-sm">
+                DOAÇÃO
+              </Badge>
+              <h1 className={`${bebasNeue.className} text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 tracking-wider`}>
                 AJUDE A TRANSFORMAR VIDAS
               </h1>
-              <p className="text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-white/90 max-w-3xl mx-auto px-4">
                 Ajude a transformar vidas por meio do esporte. Contribua com qualquer valor e fortaleça o futebol
                 feminino de base.
               </p>
-              <div className="flex items-center justify-center gap-6 text-white/80">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-white/80 text-sm sm:text-base">
                 <div className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-[#c2ff28]" />
+                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28]" />
                   <span>100% Transparente</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-[#c2ff28]" />
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28]" />
                   <span>Impacto Direto</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-[#c2ff28]" />
+                  <Target className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28]" />
                   <span>Recibo Fiscal</span>
                 </div>
               </div>
@@ -481,15 +493,15 @@ export default function DoacaoPage() {
         </section>
 
         {/* Donation Form */}
-        <section className="py-20 bg-white dark:bg-slate-900">
+        <section className="py-16 sm:py-20 bg-white dark:bg-slate-900">
           <div className="container mx-auto px-4 max-w-4xl">
             {/* Progress indicator */}
-            <div className="mb-8">
-              <div className="flex items-center justify-center space-x-4 mb-4">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex items-center justify-center space-x-2 sm:space-x-4 mb-3 sm:mb-4">
                 {[1, 2, 3].map((step) => (
                   <div key={step} className="flex items-center">
                     <div
-                      className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                      className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold ${
                         currentStep >= step
                           ? "bg-[#8e44ad] text-white"
                           : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
@@ -499,7 +511,7 @@ export default function DoacaoPage() {
                     </div>
                     {step < 3 && (
                       <div
-                        className={`h-1 w-16 mx-2 ${
+                        className={`h-1 w-8 sm:w-16 mx-1 sm:mx-2 ${
                           currentStep > step ? "bg-[#8e44ad]" : "bg-gray-200 dark:bg-gray-700"
                         }`}
                       />
@@ -507,8 +519,8 @@ export default function DoacaoPage() {
                   </div>
                 ))}
               </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-center px-4">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   {currentStep === 1 && "Escolha o valor e tipo de doação"}
                   {currentStep === 2 && "Seus dados e método de pagamento"}
                   {currentStep === 3 && "Finalizar pagamento"}
@@ -519,15 +531,17 @@ export default function DoacaoPage() {
             {currentStep === 1 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                 <Card className="dark:bg-slate-800">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">VALOR DA DOAÇÃO</CardTitle>
-                    <p className="text-gray-600 dark:text-gray-400">
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl text-[#8e44ad] dark:text-primary">
+                      VALOR DA DOAÇÃO
+                    </CardTitle>
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                       Escolha um valor sugerido ou digite o valor que deseja doar.
                     </p>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
                     {/* Suggested amounts */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                       {donationAmounts.map((amount) => (
                         <Card
                           key={amount.value}
@@ -541,11 +555,13 @@ export default function DoacaoPage() {
                             setCustomAmount("")
                           }}
                         >
-                          <CardContent className="p-4 text-center">
-                            <div className="text-2xl font-bold text-[#8e44ad] dark:text-primary mb-1">
+                          <CardContent className="p-3 sm:p-4 text-center">
+                            <div className="text-xl sm:text-2xl font-bold text-[#8e44ad] dark:text-primary mb-1">
                               {amount.label}
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">{amount.description}</div>
+                            <div className="text-xs sm:text-xs text-gray-600 dark:text-gray-400">
+                              {amount.description}
+                            </div>
                           </CardContent>
                         </Card>
                       ))}
@@ -553,9 +569,13 @@ export default function DoacaoPage() {
 
                     {/* Custom amount */}
                     <div className="space-y-2">
-                      <Label htmlFor="customAmount">Ou digite outro valor:</Label>
+                      <Label htmlFor="customAmount" className="text-sm sm:text-base">
+                        Ou digite outro valor:
+                      </Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm sm:text-base">
+                          R$
+                        </span>
                         <Input
                           id="customAmount"
                           type="number"
@@ -567,38 +587,38 @@ export default function DoacaoPage() {
                             setSelectedAmount(null)
                           }}
                           placeholder="0,00"
-                          className="pl-10 focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                          className="pl-10 focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                         />
                       </div>
                     </div>
 
                     {/* Donation type */}
-                    <div className="space-y-4 border-t pt-6">
-                      <Label>Tipo de doação:</Label>
+                    <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
+                      <Label className="text-sm sm:text-base">Tipo de doação:</Label>
                       <RadioGroup
                         value={donationType || ""}
                         onValueChange={(value) => setDonationType(value as DonationType)}
                         className="space-y-3"
                       >
-                        <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                        <div className="flex items-start space-x-3 p-3 sm:p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50">
                           <RadioGroupItem value="identified" id="identified" className="mt-1" />
                           <div className="flex-1">
-                            <Label htmlFor="identified" className="font-medium">
+                            <Label htmlFor="identified" className="font-medium text-sm sm:text-base">
                               Doação Identificada
                             </Label>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                               Receba recibo fiscal e acompanhe o impacto da sua doação. Seus dados serão utilizados
                               apenas para emissão do recibo.
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                        <div className="flex items-start space-x-3 p-3 sm:p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50">
                           <RadioGroupItem value="anonymous" id="anonymous" className="mt-1" />
                           <div className="flex-1">
-                            <Label htmlFor="anonymous" className="font-medium">
+                            <Label htmlFor="anonymous" className="font-medium text-sm sm:text-base">
                               Doação Anônima
                             </Label>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                               Sua identidade será mantida em sigilo. Não será possível emitir recibo fiscal.
                             </p>
                           </div>
@@ -606,14 +626,14 @@ export default function DoacaoPage() {
                       </RadioGroup>
                     </div>
 
-                    <div className="flex justify-end pt-6">
+                    <div className="flex justify-end pt-4 sm:pt-6">
                       <Button
                         onClick={() => setCurrentStep(2)}
                         disabled={!canProceedToStep2()}
-                        className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                        className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
                         CONTINUAR
-                        <ChevronRight className="ml-2 h-4 w-4" />
+                        <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </CardContent>
@@ -624,60 +644,60 @@ export default function DoacaoPage() {
             {currentStep === 2 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                 <Card className="dark:bg-slate-800">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl text-[#8e44ad] dark:text-primary">
                       {donationType === "identified" ? "SEUS DADOS E PAGAMENTO" : "MÉTODO DE PAGAMENTO"}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
                     {/* Donor information for identified donations */}
                     {donationType === "identified" && (
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">Seus Dados</h3>
+                      <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">Seus Dados</h3>
 
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid gap-4 sm:grid-cols-2">
                           <div className="space-y-2">
-                            <Label htmlFor="nomeCompleto">Nome Completo *</Label>
+                            <Label htmlFor="nomeCompleto" className="text-sm sm:text-base">Nome Completo *</Label>
                             <Input
                               id="nomeCompleto"
                               value={donorData.nomeCompleto}
                               onChange={(e) => setDonorData((prev) => ({ ...prev, nomeCompleto: e.target.value }))}
                               placeholder="Seu nome completo"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="email">E-mail *</Label>
+                            <Label htmlFor="email" className="text-sm sm:text-base">E-mail *</Label>
                             <Input
                               id="email"
                               type="email"
                               value={donorData.email}
                               onChange={(e) => setDonorData((prev) => ({ ...prev, email: e.target.value }))}
                               placeholder="seu@email.com"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid gap-4 sm:grid-cols-2">
                           <div className="space-y-2">
-                            <Label htmlFor="telefone">Telefone</Label>
+                            <Label htmlFor="telefone" className="text-sm sm:text-base">Telefone</Label>
                             <Input
                               id="telefone"
                               value={donorData.telefone}
                               onChange={(e) => setDonorData((prev) => ({ ...prev, telefone: e.target.value }))}
                               placeholder="(11) 99999-9999"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="cpf">CPF</Label>
+                            <Label htmlFor="cpf" className="text-sm sm:text-base">CPF</Label>
                             <Input
                               id="cpf"
                               value={donorData.cpf}
                               onChange={(e) => setDonorData((prev) => ({ ...prev, cpf: e.target.value }))}
                               placeholder="000.000.000-00"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
                         </div>
@@ -692,7 +712,7 @@ export default function DoacaoPage() {
                               }
                               className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                             />
-                            <Label htmlFor="receberRecibo" className="text-sm">
+                            <Label htmlFor="receberRecibo" className="text-xs sm:text-sm">
                               Quero receber o recibo fiscal por e-mail
                             </Label>
                           </div>
@@ -705,7 +725,7 @@ export default function DoacaoPage() {
                               }
                               className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                             />
-                            <Label htmlFor="receberNoticias" className="text-sm">
+                            <Label htmlFor="receberNoticias" className="text-xs sm:text-sm">
                               Quero receber novidades sobre os projetos da Copa Passa Bola
                             </Label>
                           </div>
@@ -714,10 +734,10 @@ export default function DoacaoPage() {
                     )}
 
                     {/* Payment method */}
-                    <div className={`space-y-4 ${donationType === "identified" ? "border-t pt-6" : ""}`}>
-                      <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">Método de Pagamento</h3>
+                    <div className={`space-y-3 sm:space-y-4 ${donationType === "identified" ? "border-t pt-4 sm:pt-6" : ""}`}>
+                      <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">Método de Pagamento</h3>
 
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid gap-4 sm:grid-cols-2">
                         <Card
                           className={`cursor-pointer transition-all duration-300 hover:shadow-lg border-2 ${
                             paymentMethod === "pix"
@@ -726,10 +746,10 @@ export default function DoacaoPage() {
                           }`}
                           onClick={() => setPaymentMethod("pix")}
                         >
-                          <CardContent className="p-4 text-center">
-                            <Smartphone className="h-8 w-8 text-[#8e44ad] mx-auto mb-2" />
-                            <h4 className="font-semibold text-[#8e44ad] dark:text-primary">PIX</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Pagamento instantâneo</p>
+                          <CardContent className="p-3 sm:p-4 text-center">
+                            <Smartphone className="h-6 w-6 sm:h-8 sm:w-8 text-[#8e44ad] mx-auto mb-2" />
+                            <h4 className="font-semibold text-[#8e44ad] dark:text-primary text-sm sm:text-base">PIX</h4>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Pagamento instantâneo</p>
                           </CardContent>
                         </Card>
 
@@ -741,31 +761,31 @@ export default function DoacaoPage() {
                           }`}
                           onClick={() => setPaymentMethod("card")}
                         >
-                          <CardContent className="p-4 text-center">
-                            <CreditCard className="h-8 w-8 text-[#8e44ad] mx-auto mb-2" />
-                            <h4 className="font-semibold text-[#8e44ad] dark:text-primary">Cartão de Crédito</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Visa, Mastercard, Elo</p>
+                          <CardContent className="p-3 sm:p-4 text-center">
+                            <CreditCard className="h-6 w-6 sm:h-8 sm:w-8 text-[#8e44ad] mx-auto mb-2" />
+                            <h4 className="font-semibold text-[#8e44ad] dark:text-primary text-sm sm:text-base">Cartão de Crédito</h4>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Visa, Mastercard, Elo</p>
                           </CardContent>
                         </Card>
                       </div>
                     </div>
 
-                    <div className="flex justify-between pt-6">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 sm:pt-6">
                       <Button
                         variant="outline"
                         onClick={() => setCurrentStep(1)}
-                        className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+                        className="w-full sm:w-auto border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         VOLTAR
                       </Button>
                       <Button
                         onClick={() => setCurrentStep(3)}
                         disabled={!canProceedToStep3()}
-                        className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                        className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
                         CONTINUAR
-                        <ChevronRight className="ml-2 h-4 w-4" />
+                        <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </CardContent>
@@ -776,61 +796,72 @@ export default function DoacaoPage() {
             {currentStep === 3 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                 <Card className="dark:bg-slate-800">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">FINALIZAR PAGAMENTO</CardTitle>
-                    <div className="bg-[#8e44ad]/10 dark:bg-[#8e44ad]/20 p-4 rounded-lg">
-                      <p className="text-[#8e44ad] dark:text-primary font-semibold">
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl text-[#8e44ad] dark:text-primary">
+                      FINALIZAR PAGAMENTO
+                    </CardTitle>
+                    <div className="bg-[#8e44ad]/10 dark:bg-[#8e44ad]/20 p-3 sm:p-4 rounded-lg">
+                      <p className="text-[#8e44ad] dark:text-primary font-semibold text-sm sm:text-base">
                         Valor: R$ {getDonationAmount().toFixed(2).replace(".", ",")}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         {donationType === "anonymous" ? "Doação Anônima" : "Doação Identificada"}
                       </p>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
                     {paymentMethod === "pix" && (
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">Pagamento via PIX</h3>
+                      <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">
+                          Pagamento via PIX
+                        </h3>
 
                         {!pixExpired ? (
                           <>
                             <div className="text-center">
-                              <div className="bg-white p-4 rounded-lg inline-block shadow-lg">
-                                <div className="w-64 h-64 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                              <div className="bg-white p-3 sm:p-4 rounded-lg inline-block shadow-lg">
+                                <div className="w-48 h-48 sm:w-64 sm:h-64 bg-gray-100 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
                                   {/* Fictional QR Code */}
                                   <div className="grid grid-cols-8 gap-1">
                                     {Array.from({ length: 64 }, (_, i) => (
                                       <div
                                         key={i}
-                                        className={`w-2 h-2 ${Math.random() > 0.5 ? "bg-black" : "bg-white"}`}
+                                        className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${Math.random() > 0.5 ? "bg-black" : "bg-white"}`}
                                       />
                                     ))}
                                   </div>
                                 </div>
-                                <p className="text-sm text-gray-600">QR Code PIX</p>
+                                <p className="text-xs sm:text-sm text-gray-600">QR Code PIX</p>
                               </div>
                             </div>
 
                             <div className="text-center">
                               <div className="flex items-center justify-center gap-2 mb-2">
-                                <Clock className="h-5 w-5 text-[#8e44ad]" />
-                                <span className="font-semibold text-[#8e44ad] dark:text-primary">
+                                <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-[#8e44ad]" />
+                                <span className="font-semibold text-[#8e44ad] dark:text-primary text-sm sm:text-base">
                                   Tempo restante: {formatTime(pixTimer)}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">O QR Code expira em 10 minutos</p>
+                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                O QR Code expira em 10 minutos
+                              </p>
                             </div>
 
-                            <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                              <Label className="text-sm font-medium">Código PIX (Copia e Cola):</Label>
+                            <div className="bg-gray-50 dark:bg-slate-700 p-3 sm:p-4 rounded-lg">
+                              <Label className="text-xs sm:text-sm font-medium">Código PIX (Copia e Cola):</Label>
                               <div className="flex items-center gap-2 mt-2">
-                                <Input value={generatePixCode()} readOnly className="text-xs font-mono" />
+                                <Input 
+                                  value={generatePixCode()} 
+                                  readOnly 
+                                  className="text-xs font-mono"
+                                />
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={() => navigator.clipboard.writeText(generatePixCode())}
+                                  className="px-2 sm:px-3"
                                 >
-                                  <Copy className="h-4 w-4" />
+                                  <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </div>
                             </div>
@@ -839,19 +870,24 @@ export default function DoacaoPage() {
                               <Button
                                 onClick={handlePayment}
                                 disabled={isProcessing}
-                                className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+                                className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white text-sm sm:text-base px-4 py-2 sm:py-3"
                               >
-                                {isProcessing ? "PROCESSANDO..." : "JÁ FIZ O PAGAMENTO"}
-                                <CheckCircle className="ml-2 h-4 w-4" />
+                                {isProcessing ? "PROCESSANDO..." : (
+                                  <>
+                                    <span className="hidden sm:inline">JÁ FIZ O PAGAMENTO</span>
+                                    <span className="sm:hidden">CONFIRMAR</span>
+                                  </>
+                                )}
+                                <CheckCircle className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                               </Button>
                             </div>
                           </>
                         ) : (
-                          <div className="text-center py-8">
+                          <div className="text-center py-6 sm:py-8">
                             <div className="text-red-500 mb-4">
-                              <Clock className="h-16 w-16 mx-auto mb-2" />
-                              <h3 className="text-xl font-semibold">QR Code Expirado</h3>
-                              <p className="text-gray-600 dark:text-gray-400">
+                              <Clock className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-2" />
+                              <h3 className="text-lg sm:text-xl font-semibold">QR Code Expirado</h3>
+                              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                                 O tempo limite para pagamento foi atingido.
                               </p>
                             </div>
@@ -860,9 +896,10 @@ export default function DoacaoPage() {
                                 setPixTimer(600)
                                 setPixExpired(false)
                               }}
-                              className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+                              className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white text-sm sm:text-base px-4 py-2 sm:py-3"
                             >
-                              GERAR NOVO QR CODE
+                              <span className="hidden sm:inline">GERAR NOVO QR CODE</span>
+                              <span className="sm:hidden">NOVO QR CODE</span>
                             </Button>
                           </div>
                         )}
@@ -870,66 +907,71 @@ export default function DoacaoPage() {
                     )}
 
                     {paymentMethod === "card" && (
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">
+                      <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">
                           Dados do Cartão de Crédito
                         </h3>
 
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           <div className="space-y-2">
-                            <Label htmlFor="cardNumber">Número do Cartão *</Label>
+                            <Label htmlFor="cardNumber" className="text-sm sm:text-base">Número do Cartão *</Label>
                             <Input
                               id="cardNumber"
                               value={cardData.numero}
                               onChange={(e) => setCardData((prev) => ({ ...prev, numero: e.target.value }))}
                               placeholder="0000 0000 0000 0000"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="cardName">Nome no Cartão *</Label>
+                            <Label htmlFor="cardName" className="text-sm sm:text-base">Nome no Cartão *</Label>
                             <Input
                               id="cardName"
                               value={cardData.nome}
                               onChange={(e) => setCardData((prev) => ({ ...prev, nome: e.target.value }))}
                               placeholder="Nome como está no cartão"
-                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                              className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                             />
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label htmlFor="cardExpiry">Validade *</Label>
+                              <Label htmlFor="cardExpiry" className="text-sm sm:text-base">Validade *</Label>
                               <Input
                                 id="cardExpiry"
                                 value={cardData.validade}
                                 onChange={(e) => setCardData((prev) => ({ ...prev, validade: e.target.value }))}
                                 placeholder="MM/AA"
-                                className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                                className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="cardCvv">CVV *</Label>
+                              <Label htmlFor="cardCvv" className="text-sm sm:text-base">CVV *</Label>
                               <Input
                                 id="cardCvv"
                                 value={cardData.cvv}
                                 onChange={(e) => setCardData((prev) => ({ ...prev, cvv: e.target.value }))}
                                 placeholder="000"
-                                className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                                className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                               />
                             </div>
                           </div>
                         </div>
 
-                        <div className="text-center pt-4">
+                        <div className="text-center pt-3 sm:pt-4">
                           <Button
                             onClick={handlePayment}
                             disabled={!canProcessPayment() || isProcessing}
-                            className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                            className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base px-4 py-2 sm:py-3"
                           >
-                            {isProcessing ? "PROCESSANDO PAGAMENTO..." : "FINALIZAR DOAÇÃO"}
-                            <CheckCircle className="ml-2 h-4 w-4" />
+                            {isProcessing ? "PROCESSANDO PAGAMENTO..." : (
+                              <>
+                                <span className="hidden sm:inline">FINALIZAR DOAÇÃO</span>
+                                <span className="sm:hidden">FINALIZAR</span>
+                              </>
+                            )}
+                            <CheckCircle className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                         </div>
                       </div>
@@ -944,16 +986,16 @@ export default function DoacaoPage() {
                           exit={{ opacity: 0 }}
                           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
                         >
-                          <div className="bg-white dark:bg-slate-800 p-8 rounded-lg text-center">
+                          <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-lg text-center mx-4">
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                              className="w-16 h-16 border-4 border-[#8e44ad] border-t-transparent rounded-full mx-auto mb-4"
+                              className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-[#8e44ad] border-t-transparent rounded-full mx-auto mb-3 sm:mb-4"
                             />
-                            <p className="text-lg font-semibold text-[#8e44ad] dark:text-primary">
+                            <p className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">
                               Processando pagamento...
                             </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                               Aguarde enquanto confirmamos sua doação
                             </p>
                           </div>
@@ -961,14 +1003,14 @@ export default function DoacaoPage() {
                       )}
                     </AnimatePresence>
 
-                    <div className="flex justify-between pt-6">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 sm:pt-6">
                       <Button
                         variant="outline"
                         onClick={() => setCurrentStep(2)}
                         disabled={isProcessing}
-                        className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+                        className="w-full sm:w-auto border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         VOLTAR
                       </Button>
                     </div>

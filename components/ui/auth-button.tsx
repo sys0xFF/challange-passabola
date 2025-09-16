@@ -376,9 +376,12 @@ export function AuthButton() {
   return (
     <Dialog open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen}>
       <DialogTrigger asChild>
-        <button className="hidden md:flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md px-3 py-1.5">
+        <button className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md px-2 sm:px-3 py-1.5">
           <LogIn className="h-4 w-4" />
-          <span className="text-sm font-medium">Entrar</span>
+          <span className="text-xs sm:text-sm font-medium">
+            <span className="hidden sm:inline">Entrar</span>
+            <span className="sm:hidden">Login</span>
+          </span>
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

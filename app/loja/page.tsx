@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AuthButton } from "@/components/ui/auth-button"
-import { MobileMenu } from "@/components/ui/mobile-menu"
 import { useAuth } from "@/contexts/auth-context"
 import { useCart, type Product } from "@/contexts/cart-context"
 import { ShoppingCart, Plus, Search, Filter, ArrowLeft, Star, Heart, Truck, Shield, RotateCcw } from "lucide-react"
@@ -172,9 +171,6 @@ export default function LojaPage() {
                 </Button>
               </Link>
               <AuthButton />
-              <div className="md:hidden">
-                <MobileMenu />
-              </div>
             </div>
           </div>
         </div>

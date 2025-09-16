@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import type React from "react"
+import React from "react"
 
 import Image from "next/image"
 import { useState, useEffect } from "react"
@@ -137,34 +137,34 @@ export default function VoluntariaPage() {
   // Mostrar mensagem de login necessário se não estiver logado
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-lg shadow-xl border">
-          <div className="mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center mx-auto mb-4">
-              <Heart className="h-8 w-8 text-white" />
+      <div className="flex min-h-screen items-center justify-center bg-white p-4">
+        <div className="text-center max-w-md w-full mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-xl border">
+          <div className="mb-4 sm:mb-6">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
-            <h1 className={`${bebasNeue.className} text-3xl font-bold mb-3 text-gray-800`}>
+            <h1 className={`${bebasNeue.className} text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 text-gray-800`}>
               Login Necessário
             </h1>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
               Você precisa estar logado para se cadastrar como voluntária. 
               Crie sua conta ou faça login para contribuir com nosso movimento.
             </p>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <Button 
               onClick={() => {
                 router.push('/')
                 setTimeout(() => openLoginModal(), 100)
               }} 
-              className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white"
+              className="w-full bg-[#8e44ad] hover:bg-[#9b59b6] text-white text-sm sm:text-base px-4 py-2 sm:py-3"
             >
               Fazer Login / Criar Conta
             </Button>
             <Button 
               variant="outline" 
               onClick={() => router.back()} 
-              className="w-full border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+              className="w-full border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base px-4 py-2 sm:py-3"
             >
               Voltar
             </Button>
@@ -391,14 +391,14 @@ export default function VoluntariaPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 items-center">
             <div className="flex justify-start">
               <Link href="/" className="flex items-center gap-2">
-                <div className="relative h-10 w-10 md:h-12 md:w-12">
+                <div className="relative h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12">
                   <Image src="/logo.png" alt="Passa Bola Logo" fill className="object-contain" />
                 </div>
-                <span className="font-bold text-xl text-primary dark:text-white">PASSA BOLA</span>
+                <span className="font-bold text-lg sm:text-xl text-primary dark:text-white">PASSA BOLA</span>
               </Link>
             </div>
             <div className="hidden md:flex justify-center">
-              <Badge className="bg-pink-500 text-white">SEJA VOLUNTÁRIA</Badge>
+              <Badge className="bg-pink-500 text-white text-xs sm:text-sm">SEJA VOLUNTÁRIA</Badge>
             </div>
             <div className="flex justify-end items-center gap-2">
               <Link
@@ -406,8 +406,8 @@ export default function VoluntariaPage() {
                 href="/#loja"
                 className="hidden md:flex items-center gap-1 text-primary dark:text-primary-foreground hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
               >
-                <ShoppingBag className="h-5 w-5" />
-                <span className="text-sm font-medium">Loja</span>
+                <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-xs sm:text-sm font-medium">Loja</span>
               </Link>
               <AuthButton />
               <div className="md:hidden">
@@ -420,28 +420,28 @@ export default function VoluntariaPage() {
 
       <main className="flex-1 pt-20">
         {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
+        <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
           <div className="container mx-auto px-4 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28]">VOLUNTARIADO</Badge>
-              <h1 className={`${bebasNeue.className} text-4xl md:text-6xl font-bold mb-6 tracking-wider`}>
+              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28] text-xs sm:text-sm">VOLUNTARIADO</Badge>
+              <h1 className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 sm:mb-6 tracking-wider`}>
                 SEJA VOLUNTÁRIA DA COPA PASSA BOLA
               </h1>
-              <p className="text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 text-white/90 max-w-3xl mx-auto px-4">
                 Quer ajudar mas não joga? Temos vagas para voluntárias em diversas áreas: organização, comunicação,
                 saúde e muito mais. Faça parte dessa revolução!
               </p>
-              <div className="flex items-center justify-center gap-4 text-white/80">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 text-white/80 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-[#c2ff28]" />
+                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28]" />
                   <span>Impacto Social</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-[#c2ff28]" />
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28]" />
                   <span>Networking</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-[#c2ff28]" />
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28]" />
                   <span>Flexibilidade</span>
                 </div>
               </div>
@@ -450,15 +450,15 @@ export default function VoluntariaPage() {
         </section>
 
         {/* Registration Form */}
-        <section className="py-20 bg-white dark:bg-slate-900">
-          <div className="container mx-auto px-4 max-w-4xl">
+        <section className="py-12 sm:py-16 md:py-20 bg-white dark:bg-slate-900">
+          <div className="container mx-auto px-4 max-w-6xl">
             {/* Progress indicator */}
-            <div className="mb-8">
-              <div className="flex items-center justify-center space-x-4 mb-4">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex items-center justify-center space-x-2 sm:space-x-4 mb-4">
                 {[1, 2, 3].map((step) => (
                   <div key={step} className="flex items-center">
                     <div
-                      className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                      className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold ${
                         currentStep >= step
                           ? "bg-[#8e44ad] text-white"
                           : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
@@ -468,7 +468,7 @@ export default function VoluntariaPage() {
                     </div>
                     {step < 3 && (
                       <div
-                        className={`h-1 w-16 mx-2 ${
+                        className={`h-1 w-8 sm:w-12 md:w-16 mx-1 sm:mx-2 ${
                           currentStep > step ? "bg-[#8e44ad]" : "bg-gray-200 dark:bg-gray-700"
                         }`}
                       />
@@ -477,23 +477,23 @@ export default function VoluntariaPage() {
                 ))}
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Etapa {currentStep} de 3</p>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Etapa {currentStep} de 3</p>
               </div>
             </div>
 
             {currentStep === 1 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                 <Card className="dark:bg-slate-800">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl text-[#8e44ad] dark:text-primary">
                       ESCOLHA SUA ÁREA DE ATUAÇÃO
                     </CardTitle>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                       Selecione uma ou mais áreas onde você gostaria de contribuir como voluntária.
                     </p>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
+                    <div className="grid gap-4 sm:grid-cols-2">
                       {volunteerAreas.map((area) => (
                         <Card
                           key={area.id}
@@ -504,23 +504,25 @@ export default function VoluntariaPage() {
                           }`}
                           onClick={() => toggleArea(area.id)}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-3 mb-3">
+                          <CardContent className="p-3 sm:p-4">
+                            <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
                               <div
-                                className={`p-2 rounded-full ${
+                                className={`p-1.5 sm:p-2 rounded-full ${
                                   selectedAreas.includes(area.id)
                                     ? "bg-[#8e44ad] text-white"
                                     : "bg-gray-100 dark:bg-gray-700 text-[#8e44ad]"
                                 }`}
                               >
-                                {area.icon}
+                                {React.cloneElement(area.icon as React.ReactElement, {
+                                  className: "h-4 w-4 sm:h-6 sm:w-6"
+                                })}
                               </div>
-                              <div className="flex-1">
-                                <h3 className="font-semibold text-[#8e44ad] dark:text-primary mb-1">{area.name}</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{area.description}</p>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-[#8e44ad] dark:text-primary mb-1 text-sm sm:text-base">{area.name}</h3>
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">{area.description}</p>
                               </div>
                               {selectedAreas.includes(area.id) && (
-                                <CheckCircle className="h-5 w-5 text-[#8e44ad] flex-shrink-0" />
+                                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-[#8e44ad] flex-shrink-0" />
                               )}
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -532,22 +534,22 @@ export default function VoluntariaPage() {
                     </div>
 
                     {selectedAreas.length > 0 && (
-                      <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                        <p className="text-green-700 dark:text-green-300 text-sm">
+                      <div className="bg-green-50 dark:bg-green-900/20 p-3 sm:p-4 rounded-lg">
+                        <p className="text-green-700 dark:text-green-300 text-xs sm:text-sm">
                           <strong>Áreas selecionadas:</strong>{" "}
                           {selectedAreas.map((id) => volunteerAreas.find((area) => area.id === id)?.name).join(", ")}
                         </p>
                       </div>
                     )}
 
-                    <div className="flex justify-end pt-6">
+                    <div className="flex justify-end pt-4 sm:pt-6">
                       <Button
                         onClick={() => setCurrentStep(2)}
                         disabled={!canProceedToStep2()}
-                        className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                        className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
                         CONTINUAR
-                        <ChevronRight className="ml-2 h-4 w-4" />
+                        <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </CardContent>
@@ -558,125 +560,125 @@ export default function VoluntariaPage() {
             {currentStep === 2 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                 <Card className="dark:bg-slate-800">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl text-[#8e44ad] dark:text-primary">
                       SEUS DADOS E DISPONIBILIDADE
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
                     {/* Dados Pessoais */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">Dados Pessoais</h3>
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">Dados Pessoais</h3>
 
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="nomeCompleto">Nome Completo *</Label>
+                          <Label htmlFor="nomeCompleto" className="text-sm sm:text-base">Nome Completo *</Label>
                           <Input
                             id="nomeCompleto"
                             value={formData.nomeCompleto}
                             onChange={(e) => setFormData((prev) => ({ ...prev, nomeCompleto: e.target.value }))}
                             placeholder="Seu nome completo"
-                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="idade">Idade *</Label>
+                          <Label htmlFor="idade" className="text-sm sm:text-base">Idade *</Label>
                           <Input
                             id="idade"
                             value={formData.idade}
                             onChange={(e) => setFormData((prev) => ({ ...prev, idade: e.target.value }))}
                             placeholder="Sua idade"
-                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           />
                         </div>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="email">E-mail *</Label>
+                          <Label htmlFor="email" className="text-sm sm:text-base">E-mail *</Label>
                           <Input
                             id="email"
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
                             placeholder="seu@email.com"
-                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="telefone">Telefone / WhatsApp *</Label>
+                          <Label htmlFor="telefone" className="text-sm sm:text-base">Telefone / WhatsApp *</Label>
                           <Input
                             id="telefone"
                             value={formData.telefone}
                             onChange={(e) => setFormData((prev) => ({ ...prev, telefone: e.target.value }))}
                             placeholder="(11) 99999-9999"
-                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           />
                         </div>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="cidadeBairro">Cidade / Bairro *</Label>
+                          <Label htmlFor="cidadeBairro" className="text-sm sm:text-base">Cidade / Bairro *</Label>
                           <Input
                             id="cidadeBairro"
                             value={formData.cidadeBairro}
                             onChange={(e) => setFormData((prev) => ({ ...prev, cidadeBairro: e.target.value }))}
                             placeholder="Sua cidade/bairro"
-                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="profissao">Profissão *</Label>
+                          <Label htmlFor="profissao" className="text-sm sm:text-base">Profissão *</Label>
                           <Input
                             id="profissao"
                             value={formData.profissao}
                             onChange={(e) => setFormData((prev) => ({ ...prev, profissao: e.target.value }))}
                             placeholder="Sua profissão"
-                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                            className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           />
                         </div>
                       </div>
                     </div>
 
                     {/* Experiência e Motivação */}
-                    <div className="space-y-4 border-t pt-6">
-                      <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">
+                    <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">
                         Experiência e Motivação
                       </h3>
 
                       <div className="space-y-2">
-                        <Label htmlFor="experienciaAnterior">Experiência Anterior em Voluntariado</Label>
+                        <Label htmlFor="experienciaAnterior" className="text-sm sm:text-base">Experiência Anterior em Voluntariado</Label>
                         <Textarea
                           id="experienciaAnterior"
                           value={formData.experienciaAnterior}
                           onChange={(e) => setFormData((prev) => ({ ...prev, experienciaAnterior: e.target.value }))}
                           placeholder="Descreva suas experiências anteriores como voluntária (se houver)"
-                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           rows={3}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="motivacao">Por que quer ser voluntária da Copa Passa Bola? *</Label>
+                        <Label htmlFor="motivacao" className="text-sm sm:text-base">Por que quer ser voluntária da Copa Passa Bola? *</Label>
                         <Textarea
                           id="motivacao"
                           value={formData.motivacao}
                           onChange={(e) => setFormData((prev) => ({ ...prev, motivacao: e.target.value }))}
                           placeholder="Conte-nos sua motivação para participar como voluntária"
-                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           rows={3}
                         />
                       </div>
                     </div>
 
                     {/* Disponibilidade */}
-                    <div className="space-y-4 border-t pt-6">
-                      <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">Disponibilidade</h3>
+                    <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">Disponibilidade</h3>
 
                       <div className="space-y-3">
-                        <Label>Dias da semana disponíveis *</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <Label className="text-sm sm:text-base">Dias da semana disponíveis *</Label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                           {["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"].map((dia) => (
                             <div key={dia} className="flex items-center space-x-2">
                               <Checkbox
@@ -685,7 +687,7 @@ export default function VoluntariaPage() {
                                 onCheckedChange={() => toggleAvailability("dias", dia)}
                                 className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                               />
-                              <Label htmlFor={`dia-${dia}`} className="text-sm">
+                              <Label htmlFor={`dia-${dia}`} className="text-xs sm:text-sm">
                                 {dia}
                               </Label>
                             </div>
@@ -694,8 +696,8 @@ export default function VoluntariaPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <Label>Horários disponíveis *</Label>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <Label className="text-sm sm:text-base">Horários disponíveis *</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           {["Manhã (8h-12h)", "Tarde (12h-18h)", "Noite (18h-22h)"].map((horario) => (
                             <div key={horario} className="flex items-center space-x-2">
                               <Checkbox
@@ -704,7 +706,7 @@ export default function VoluntariaPage() {
                                 onCheckedChange={() => toggleAvailability("horarios", horario)}
                                 className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
                               />
-                              <Label htmlFor={`horario-${horario}`} className="text-sm">
+                              <Label htmlFor={`horario-${horario}`} className="text-xs sm:text-sm">
                                 {horario}
                               </Label>
                             </div>
@@ -713,89 +715,89 @@ export default function VoluntariaPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Tem transporte próprio? *</Label>
+                        <Label className="text-sm sm:text-base">Tem transporte próprio? *</Label>
                         <RadioGroup
                           value={formData.temTransporte}
                           onValueChange={(value) => setFormData((prev) => ({ ...prev, temTransporte: value }))}
-                          className="flex space-x-6"
+                          className="flex flex-col sm:flex-row gap-4 sm:gap-6"
                         >
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="sim" id="transporte-sim" />
-                            <Label htmlFor="transporte-sim">Sim</Label>
+                            <Label htmlFor="transporte-sim" className="text-sm sm:text-base">Sim</Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="nao" id="transporte-nao" />
-                            <Label htmlFor="transporte-nao">Não</Label>
+                            <Label htmlFor="transporte-nao" className="text-sm sm:text-base">Não</Label>
                           </div>
                         </RadioGroup>
                       </div>
                     </div>
 
                     {/* Verificação de Integridade */}
-                    <div className="space-y-4 border-t pt-6">
-                      <h3 className="text-lg font-semibold text-[#8e44ad] dark:text-primary">
+                    <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-[#8e44ad] dark:text-primary">
                         Verificação de Integridade
                       </h3>
 
                       <div className="space-y-2">
-                        <Label htmlFor="referencias">Referências Pessoais</Label>
+                        <Label htmlFor="referencias" className="text-sm sm:text-base">Referências Pessoais</Label>
                         <Textarea
                           id="referencias"
                           value={formData.referencias}
                           onChange={(e) => setFormData((prev) => ({ ...prev, referencias: e.target.value }))}
                           placeholder="Nome, telefone e relação de 2 pessoas que possam dar referências sobre você"
-                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           rows={3}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Possui antecedentes criminais? *</Label>
+                        <Label className="text-sm sm:text-base">Possui antecedentes criminais? *</Label>
                         <RadioGroup
                           value={formData.antecedentes}
                           onValueChange={(value) => setFormData((prev) => ({ ...prev, antecedentes: value }))}
-                          className="flex space-x-6"
+                          className="flex flex-col sm:flex-row gap-4 sm:gap-6"
                         >
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="nao" id="antecedentes-nao" />
-                            <Label htmlFor="antecedentes-nao">Não</Label>
+                            <Label htmlFor="antecedentes-nao" className="text-sm sm:text-base">Não</Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="sim" id="antecedentes-sim" />
-                            <Label htmlFor="antecedentes-sim">Sim</Label>
+                            <Label htmlFor="antecedentes-sim" className="text-sm sm:text-base">Sim</Label>
                           </div>
                         </RadioGroup>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="observacoes">Observações Adicionais</Label>
+                        <Label htmlFor="observacoes" className="text-sm sm:text-base">Observações Adicionais</Label>
                         <Textarea
                           id="observacoes"
                           value={formData.observacoes}
                           onChange={(e) => setFormData((prev) => ({ ...prev, observacoes: e.target.value }))}
                           placeholder="Alguma informação adicional que considera importante"
-                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad]"
+                          className="focus:ring-[#8e44ad] focus:border-[#8e44ad] text-sm sm:text-base"
                           rows={2}
                         />
                       </div>
                     </div>
 
-                    <div className="flex justify-between pt-6">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 sm:pt-6">
                       <Button
                         variant="outline"
                         onClick={() => setCurrentStep(1)}
-                        className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+                        className="w-full sm:w-auto border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         VOLTAR
                       </Button>
                       <Button
                         onClick={() => setCurrentStep(3)}
                         disabled={!canProceedToStep3()}
-                        className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                        className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
                         CONTINUAR
-                        <ChevronRight className="ml-2 h-4 w-4" />
+                        <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </CardContent>
@@ -806,20 +808,22 @@ export default function VoluntariaPage() {
             {currentStep === 3 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                 <Card className="dark:bg-slate-800">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-[#8e44ad] dark:text-primary">DOCUMENTAÇÃO E TERMOS</CardTitle>
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl text-[#8e44ad] dark:text-primary">
+                      DOCUMENTAÇÃO E TERMOS
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
                     {/* File Upload */}
-                    <div className="space-y-4">
-                      <Label>Envio de Documentos *</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="space-y-3 sm:space-y-4">
+                      <Label className="text-sm sm:text-base">Envio de Documentos *</Label>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         Envie seus documentos de identificação (RG/CNH frente e verso), comprovante de residência e
                         currículo. Formatos aceitos: JPG, PNG, PDF
                       </p>
 
                       <div
-                        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                        className={`border-2 border-dashed rounded-lg p-4 sm:p-6 md:p-8 text-center transition-colors ${
                           dragActive
                             ? "border-[#8e44ad] bg-[#8e44ad]/5"
                             : "border-gray-300 dark:border-gray-600 hover:border-[#8e44ad]"
@@ -829,11 +833,13 @@ export default function VoluntariaPage() {
                         onDragOver={handleDrag}
                         onDrop={handleDrop}
                       >
-                        <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <Upload className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                        <p className="text-base sm:text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Arraste e solte os arquivos aqui
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">ou clique para selecionar</p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-3 sm:mb-4">
+                          ou clique para selecionar
+                        </p>
                         <input
                           type="file"
                           multiple
@@ -846,26 +852,27 @@ export default function VoluntariaPage() {
                           type="button"
                           variant="outline"
                           onClick={() => document.getElementById("file-upload")?.click()}
-                          className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+                          className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base px-4 py-2 sm:py-3"
                         >
-                          <FileText className="mr-2 h-4 w-4" />
-                          SELECIONAR ARQUIVOS
+                          <FileText className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">SELECIONAR ARQUIVOS</span>
+                          <span className="sm:hidden">SELECIONAR</span>
                         </Button>
                       </div>
 
                       {uploadedFiles.length > 0 && (
                         <div className="space-y-2">
-                          <Label>Arquivos selecionados:</Label>
+                          <Label className="text-sm sm:text-base">Arquivos selecionados:</Label>
                           <div className="space-y-2">
                             {uploadedFiles.map((file, index) => (
                               <div
                                 key={index}
-                                className="flex items-center justify-between bg-gray-50 dark:bg-slate-700 p-3 rounded-lg"
+                                className="flex items-center justify-between bg-gray-50 dark:bg-slate-700 p-2 sm:p-3 rounded-lg"
                               >
-                                <div className="flex items-center space-x-3">
-                                  <FileText className="h-5 w-5 text-[#8e44ad]" />
-                                  <span className="text-sm font-medium">{file.name}</span>
-                                  <span className="text-xs text-gray-500">
+                                <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-[#8e44ad] flex-shrink-0" />
+                                  <span className="text-xs sm:text-sm font-medium truncate">{file.name}</span>
+                                  <span className="text-xs text-gray-500 flex-shrink-0">
                                     ({(file.size / 1024 / 1024).toFixed(2)} MB)
                                   </span>
                                 </div>
@@ -874,9 +881,9 @@ export default function VoluntariaPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => removeFile(index)}
-                                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  className="text-red-500 hover:text-red-700 hover:bg-red-50 ml-2 flex-shrink-0"
                                 >
-                                  <X className="h-4 w-4" />
+                                  <X className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </div>
                             ))}
@@ -886,28 +893,28 @@ export default function VoluntariaPage() {
                     </div>
 
                     {/* Terms and Notifications */}
-                    <div className="space-y-4 border-t pt-6">
-                      <div className="flex items-start space-x-3">
+                    <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
+                      <div className="flex items-start space-x-2 sm:space-x-3">
                         <Checkbox
                           id="notifications"
                           checked={wantNotifications}
                           onCheckedChange={(checked) => setWantNotifications(checked === true)}
-                          className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
+                          className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad] mt-0.5"
                         />
-                        <Label htmlFor="notifications" className="text-sm leading-relaxed">
+                        <Label htmlFor="notifications" className="text-xs sm:text-sm leading-relaxed">
                           Quero receber informações sobre oportunidades de voluntariado e atualizações da Copa Passa
                           Bola
                         </Label>
                       </div>
 
-                      <div className="flex items-start space-x-3">
+                      <div className="flex items-start space-x-2 sm:space-x-3">
                         <Checkbox
                           id="terms"
                           checked={acceptTerms}
                           onCheckedChange={(checked) => setAcceptTerms(checked === true)}
-                          className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad]"
+                          className="data-[state=checked]:bg-[#8e44ad] data-[state=checked]:border-[#8e44ad] mt-0.5"
                         />
-                        <Label htmlFor="terms" className="text-sm leading-relaxed">
+                        <Label htmlFor="terms" className="text-xs sm:text-sm leading-relaxed">
                           Aceito os{" "}
                           <Link href="#" className="text-[#8e44ad] hover:underline">
                             termos e condições
@@ -917,22 +924,27 @@ export default function VoluntariaPage() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between pt-6">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 sm:pt-6">
                       <Button
                         variant="outline"
                         onClick={() => setCurrentStep(2)}
-                        className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+                        className="w-full sm:w-auto border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         VOLTAR
                       </Button>
                       <Button
                         onClick={handleSubmit}
                         disabled={!canSubmit() || isSubmitting}
-                        className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50"
+                        className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white disabled:opacity-50 text-sm sm:text-base px-4 py-2 sm:py-3"
                       >
-                        {isSubmitting ? "ENVIANDO..." : "FINALIZAR CADASTRO"}
-                        <CheckCircle className="ml-2 h-4 w-4" />
+                        {isSubmitting ? "ENVIANDO..." : (
+                          <>
+                            <span className="hidden sm:inline">FINALIZAR CADASTRO</span>
+                            <span className="sm:hidden">FINALIZAR</span>
+                          </>
+                        )}
+                        <CheckCircle className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </CardContent>

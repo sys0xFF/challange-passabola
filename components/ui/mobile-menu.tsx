@@ -3,7 +3,7 @@
 import type React from "react"
 
 import Link from "next/link"
-import { Menu, ShoppingBag } from "lucide-react"
+import { Menu, ShoppingBag, Ticket, Calendar, Zap, Gift } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 
@@ -36,47 +36,84 @@ export function MobileMenu() {
               Home
             </Link>
           </SheetClose>
-          <SheetClose asChild>
-            <Link
-              onClick={handleSmoothScroll}
-              href="/#jogue"
-              className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
-            >
-              Jogue com a gente
-            </Link>
-          </SheetClose>
-          <SheetClose asChild>
-            <Link
-              onClick={handleSmoothScroll}
-              href="/#duvidas"
-              className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
-            >
-              Dúvidas
-            </Link>
-          </SheetClose>
-          <SheetClose asChild>
-            <Link
-              onClick={handleSmoothScroll}
-              href="/#contato"
-              className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
-            >
-              Contato
-            </Link>
-          </SheetClose>
-          <SheetClose asChild>
-            <Link
-              onClick={handleSmoothScroll}
-              href="/#quem-somos"
-              className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
-            >
-              Quem somos
-            </Link>
-          </SheetClose>
+          
+          {/* Novas seções */}
           <div className="border-t pt-4">
+            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">COPA PASSA BOLA</p>
+            <SheetClose asChild>
+              <Link
+                href="/ingressos"
+                className="flex items-center gap-2 text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
+              >
+                <Ticket className="h-5 w-5" />
+                Ingressos
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                href="/jogos"
+                className="flex items-center gap-2 text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
+              >
+                <Calendar className="h-5 w-5" />
+                Jogos
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                href="/recompensas"
+                className="flex items-center gap-2 text-lg font-medium text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors py-2"
+              >
+                <Gift className="h-5 w-5" />
+                Recompensas
+              </Link>
+            </SheetClose>
+          </div>
+
+          {/* Seções originais */}
+          <div className="border-t pt-4">
+            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">NAVEGAÇÃO</p>
             <SheetClose asChild>
               <Link
                 onClick={handleSmoothScroll}
-                href="/#loja"
+                href="/#jogue"
+                className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
+              >
+                Jogue com a gente
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                onClick={handleSmoothScroll}
+                href="/#quem-somos"
+                className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
+              >
+                Quem somos
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                onClick={handleSmoothScroll}
+                href="/#duvidas"
+                className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
+              >
+                Dúvidas
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                onClick={handleSmoothScroll}
+                href="/#contato"
+                className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors py-2"
+              >
+                Contato
+              </Link>
+            </SheetClose>
+          </div>
+
+          <div className="border-t pt-4">
+            <SheetClose asChild>
+              <Link
+                href="/loja"
                 className="flex items-center gap-2 text-lg font-medium text-primary dark:text-primary-foreground hover:text-pink-500 dark:hover:text-pink-400 transition-colors py-2"
               >
                 <ShoppingBag className="h-5 w-5" />

@@ -15,6 +15,7 @@ export interface User {
   telefone?: string
   cidade?: string
   estadoCivil?: string
+  points?: number
   createdAt: string
 }
 
@@ -26,7 +27,9 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<boolean>
   logout: () => void
   updateUserData: (data: Partial<User>) => Promise<boolean>
+  refreshUserData: () => Promise<void>
   openLoginModal: () => void
+  signIn: () => void // Alias para openLoginModal
   isLoginModalOpen: boolean
   setIsLoginModalOpen: (open: boolean) => void
 }
@@ -102,6 +105,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval)
   }, [user])
 
+  // Listener em tempo real para mudanças nos pontos do usuário
+  useEffect(() => {
+    if (!user) return
+
+    const userRef = ref(database, `users/${user.id}`)
+    const unsubscribe = onValue(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val()
+        const updatedUser = {
+          ...user,
+          ...userData,
+          points: userData.points || 0
+        }
+        setUser(updatedUser)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+        }
+      } else {
+        // Usuário foi deletado
+        handleAccountDeleted()
+      }
+    })
+
+    return () => unsubscribe()
+  }, [user?.id]) // Dependência apenas do ID para evitar loops infinitos
+
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true)
@@ -137,7 +166,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Fazer login
       const loggedUser = {
         id: userId,
-        ...(userData as any)
+        ...(userData as any),
+        points: (userData as any).points || 0 // Garantir que points seja pelo menos 0
       }
       
       setUser(loggedUser)
@@ -188,6 +218,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password, // Em um ambiente real, você faria hash da senha
         name,
+        points: 0, // Iniciar com 0 pontos
         createdAt: new Date().toISOString()
       }
       
@@ -221,6 +252,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('currentUser')
     }
     toast.success('Logout realizado com sucesso!')
+  }
+
+  // Função para recarregar os dados do usuário do banco (incluindo pontos)
+  const refreshUserData = async () => {
+    if (!user) return
+
+    try {
+      const userRef = ref(database, `users/${user.id}`)
+      const snapshot = await get(userRef)
+      
+      if (snapshot.exists()) {
+        const userData = snapshot.val()
+        const updatedUser = {
+          ...user,
+          ...userData,
+          points: userData.points || 0 // Garantir que points seja pelo menos 0
+        }
+        setUser(updatedUser)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao recarregar dados do usuário:', error)
+    }
   }
 
   const updateUserData = async (data: Partial<User>): Promise<boolean> => {
@@ -287,7 +343,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     updateUserData,
+    refreshUserData,
     openLoginModal,
+    signIn: openLoginModal, // Alias para openLoginModal
     isLoginModalOpen,
     setIsLoginModalOpen
   }

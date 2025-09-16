@@ -36,8 +36,6 @@ export function TournamentCreateModal({ onTournamentCreated }: TournamentCreateM
     registrationEnd: "",
     isPaid: false,
     entryFee: "",
-    location: "",
-    gameTime: "",
     description: "",
     status: "draft" as const
   })
@@ -89,16 +87,6 @@ export function TournamentCreateModal({ onTournamentCreated }: TournamentCreateM
         return
       }
 
-      if (!formData.location.trim()) {
-        toast.error("Localização é obrigatória")
-        return
-      }
-
-      if (!formData.gameTime.trim()) {
-        toast.error("Horário do jogo é obrigatório")
-        return
-      }
-
       setLoading(true)
 
       const tournamentData = {
@@ -111,8 +99,6 @@ export function TournamentCreateModal({ onTournamentCreated }: TournamentCreateM
         registrationEnd: formData.registrationEnd,
         isPaid: formData.isPaid,
         ...(formData.isPaid && { entryFee: parseFloat(formData.entryFee) }),
-        location: formData.location,
-        gameTime: formData.gameTime,
         description: formData.description,
         status: formData.status,
         createdBy: 'admin' // Em uma implementação real, pegar do contexto de autenticação
@@ -133,8 +119,6 @@ export function TournamentCreateModal({ onTournamentCreated }: TournamentCreateM
           registrationEnd: "",
           isPaid: false,
           entryFee: "",
-          location: "",
-          gameTime: "",
           description: "",
           status: "draft"
         })
@@ -209,26 +193,6 @@ export function TournamentCreateModal({ onTournamentCreated }: TournamentCreateM
                 Suporta: 2, 4, 6, 8, 10, 12, 14, 16 equipes
               </p>
             </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="gameTime">Horário do Jogo *</Label>
-              <Input
-                id="gameTime"
-                type="time"
-                value={formData.gameTime}
-                onChange={(e) => handleInputChange("gameTime", e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="location">Localização *</Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) => handleInputChange("location", e.target.value)}
-              placeholder="Ex: Campo do Centro Esportivo"
-            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

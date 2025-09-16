@@ -15,6 +15,7 @@ import { MobileMenu } from "@/components/ui/mobile-menu"
 import { AuthButton } from "@/components/ui/auth-button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useCart } from "@/contexts/cart-context"
+import { useAuth } from "@/contexts/auth-context"
 import { toast } from "@/components/ui/use-toast"
 import {
   ChevronRight,
@@ -26,6 +27,8 @@ import {
   Instagram,
   Twitter,
   Facebook,
+  Zap,
+  Star,
 } from "lucide-react"
 import { Bebas_Neue } from "next/font/google"
 
@@ -36,6 +39,7 @@ const bebasNeue = Bebas_Neue({
 })
 
 export default function Home() {
+  const { user } = useAuth()
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
@@ -209,7 +213,19 @@ export default function Home() {
                 <span className="text-sm font-medium">Loja</span>
               </Link>
 
-              {/* Auth Button */}
+              {/* Pontos da Pulseira - Desktop */}
+              {user && (
+                <Link 
+                  href="/perfil?tab=tickets"
+                  className="hidden md:flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 py-2 rounded-full text-sm font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>{user.points || 0}</span>
+                  <Star className="h-3 w-3" />
+                </Link>
+              )}
+
+              {/* Auth Button - Always visible */}
               <AuthButton />
 
               {/* Mobile Menu Trigger - positioned at the far right */}
@@ -264,7 +280,7 @@ export default function Home() {
                 className="text-lg md:text-xl mb-8 text-white/90"
               >
                 Um torneio que celebra a força, a resistência e o talento das mulheres no futebol. Venha fazer parte
-                dessa revolução esportiva.
+                dessa revolução esportiva e experimente nossa tecnologia de pulseira inteligente!
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -272,10 +288,11 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.6 }}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <Link href="/cadastro">
-                  <Button className="bg-white text-primary hover:bg-white/90 dark:bg-slate-100 dark:text-primary dark:hover:bg-slate-200 text-base px-8 py-6 transition-transform hover:scale-105">
-                    INSCREVA SEU TIME
-                    <ChevronRight className="ml-2 h-5 w-5" />
+                <Link href="/jogos" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto bg-white text-primary hover:bg-white/90 dark:bg-slate-100 dark:text-primary dark:hover:bg-slate-200 text-sm sm:text-base px-6 sm:px-8 py-4 sm:py-6 transition-transform hover:scale-105 font-medium">
+                    <span className="hidden sm:inline">GARANTA SEU INGRESSO</span>
+                    <span className="sm:hidden">COMPRAR</span>
+                    <ChevronRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                   </Button>
                 </Link>
               </motion.div>
@@ -449,7 +466,7 @@ export default function Home() {
               </p>
             </ScrollAnimation>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 {
                   title: "INSCREVA SEU TIME",
@@ -476,6 +493,33 @@ export default function Home() {
                   ),
                   buttonText: "INSCREVER AGORA",
                   link: "/cadastro",
+                },
+                {
+                  title: "GARANTA SEU INGRESSO",
+                  description:
+                    "Compre ingressos para os jogos e receba uma pulseira inteligente para participar ativamente da torcida!",
+                  icon: (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6"
+                    >
+                      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2Z"/>
+                      <path d="M13 5v2"/>
+                      <path d="M13 17v2"/>
+                      <path d="M13 11v2"/>
+                    </svg>
+                  ),
+                  buttonText: "COMPRAR INGRESSOS",
+                  link: "/jogos",
+                  highlight: true,
                 },
                 {
                   title: "SEJA VOLUNTÁRIA",
@@ -525,26 +569,129 @@ export default function Home() {
                 },
               ].map((card, index) => (
                 <ScrollAnimation key={index} delay={index * 0.1}>
-                  <Card className="overflow-hidden border-none shadow-lg h-full flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 dark:bg-slate-800/80 dark:hover:bg-slate-800">
-                    <div className="h-2 bg-accent"></div>
+                  <Card className={`overflow-hidden border-none shadow-lg h-full flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 dark:bg-slate-800/80 dark:hover:bg-slate-800 ${card.highlight ? 'ring-2 ring-[#c2ff28] bg-gradient-to-b from-purple-50 to-white' : ''}`}>
+                    <div className={`h-2 ${card.highlight ? 'bg-[#c2ff28]' : 'bg-[#8e44ad]'}`}></div>
                     <CardContent className="pt-6 px-6 flex-grow">
-                      <div className="h-14 w-14 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary mb-6">
+                      <div className={`h-14 w-14 rounded-full ${card.highlight ? 'bg-purple-100 text-purple-600' : 'bg-[#8e44ad]/10 text-[#8e44ad]'} flex items-center justify-center mb-6`}>
                         {card.icon}
                       </div>
-                      <h3 className="text-xl font-bold text-primary mb-3">{card.title}</h3>
+                      <h3 className={`text-xl font-bold mb-3 ${card.highlight ? 'text-purple-700' : 'text-[#8e44ad]'}`}>{card.title}</h3>
                       <p className="text-gray-600 dark:text-gray-400 mb-6">{card.description}</p>
                     </CardContent>
                     <CardFooter className="px-6 pb-6 mt-auto">
                       <Link href={card.link} className="w-full">
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-transform hover:scale-105">
-                          {card.buttonText}
-                          <ChevronRight className="ml-2 h-4 w-4" />
+                        <Button className={`w-full transition-transform hover:scale-105 text-xs sm:text-sm md:text-base px-3 sm:px-4 py-2 sm:py-3 font-medium ${card.highlight ? 'bg-[#c2ff28] text-[#8e44ad] hover:bg-[#c2ff28]/90' : 'bg-[#8e44ad] hover:bg-[#8e44ad]/90 text-white'}`}>
+                          <span className="truncate">{card.buttonText}</span>
+                          <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                         </Button>
                       </Link>
                     </CardFooter>
                   </Card>
                 </ScrollAnimation>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pulseira Inteligente */}
+        <section className="py-20 bg-gradient-to-r from-purple-600 to-purple-800 text-white">
+          <div className="container mx-auto px-4">
+            <ScrollAnimation className="text-center mb-12">
+              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4">TECNOLOGIA INOVADORA</Badge>
+              <h2 className={`${bebasNeue.className} text-3xl md:text-5xl font-bold mb-6 tracking-wider`}>
+                PULSEIRA INTELIGENTE
+              </h2>
+              <p className="text-purple-100 text-lg max-w-3xl mx-auto">
+                Revolucione sua experiência como torcedora! Nossa pulseira inteligente transforma cada jogo 
+                em uma aventura interativa repleta de recompensas.
+              </p>
+            </ScrollAnimation>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <ScrollAnimation>
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-[#c2ff28] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Zap className="h-6 w-6 text-[#8e44ad]" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">Interações em Tempo Real</h3>
+                      <p className="text-purple-200">
+                        Participe de olas, coreografias, quiz e desafios durante os jogos. Cada participação gera pontos!
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-[#c2ff28] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Star className="h-6 w-6 text-[#8e44ad]" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">Sistema de Pontos</h3>
+                      <p className="text-purple-200">
+                        Acumule pontos por cada atividade e troque por produtos exclusivos, experiências VIP e muito mais.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-[#c2ff28] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Heart className="h-6 w-6 text-[#8e44ad]" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">Comunidade Conectada</h3>
+                      <p className="text-purple-200">
+                        Conecte-se com outras torcedoras, forme grupos de apoio e suba no ranking das mais participativas.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <Link href="/recompensas">
+                      <Button size="lg" className="bg-[#c2ff28] text-[#8e44ad] hover:bg-[#c2ff28]/90">
+                        <Star className="mr-2 h-5 w-5" />
+                        Ver Recompensas
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </ScrollAnimation>
+
+              <ScrollAnimation delay={0.2}>
+                <div className="relative">
+                  <div className="bg-gradient-to-br from-[#c2ff28] to-yellow-400 rounded-2xl p-8 text-center shadow-2xl">
+                    <div className="bg-white rounded-xl p-6 mb-6">
+                      <Zap className="h-16 w-16 text-purple-600 mx-auto mb-4" />
+                      <h3 className="text-2xl font-bold text-purple-800 mb-2">
+                        {user ? 'Seus Pontos' : 'Sistema de Pontos'}
+                      </h3>
+                      {user ? (
+                        <>
+                          <div className="text-4xl font-bold text-purple-600">{user.points || 0}</div>
+                          <p className="text-purple-600 text-sm">Acumule pontos participando!</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-2xl font-bold text-purple-600 mb-2">🔒</div>
+                          <p className="text-purple-600 text-sm">
+                            Faça login para acumular pontos!
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    
+                    <div className="text-[#8e44ad] space-y-2">
+                      <p className="font-semibold">🏃‍♀️ Participe das atividades durante os jogos</p>
+                      <p className="font-semibold">⚽ Ganhe pontos a cada interação</p>
+                      <p className="font-semibold">🎁 Troque por produtos e experiências</p>
+                    </div>
+                  </div>
+                  
+                  {/* Elementos decorativos */}
+                  <div className="absolute -top-4 -right-4 w-8 h-8 bg-yellow-300 rounded-full animate-pulse"></div>
+                  <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-pink-300 rounded-full animate-bounce"></div>
+                </div>
+              </ScrollAnimation>
             </div>
           </div>
         </section>
@@ -566,10 +713,11 @@ export default function Home() {
             </ScrollAnimation>
             <ProductCarousel />
             <ScrollAnimation className="flex justify-center mt-12" delay={0.4}>
-              <Link href="/loja">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 transition-transform hover:scale-105">
-                  VER TODOS OS PRODUTOS
-                  <ChevronRight className="ml-2 h-4 w-4" />
+              <Link href="/loja" className="w-full sm:w-auto max-w-sm sm:max-w-none">
+                <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 md:px-8 py-3 sm:py-4 transition-transform hover:scale-105 text-sm sm:text-base font-medium">
+                  <span className="hidden sm:inline">VER TODOS OS PRODUTOS</span>
+                  <span className="sm:hidden">VER PRODUTOS</span>
+                  <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                 </Button>
               </Link>
             </ScrollAnimation>
@@ -719,11 +867,12 @@ export default function Home() {
             </div>
 
             <ScrollAnimation className="text-center mt-12" delay={0.5}>
-              <p className="text-gray-700 dark:text-gray-300 mb-4">Não encontrou o que procurava?</p>
-              <Link href="/contato">
-                <Button className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white">
-                  ENTRE EM CONTATO
-                  <MessageCircle className="ml-2 h-4 w-4" />
+              <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm sm:text-base">Não encontrou o que procurava?</p>
+              <Link href="/contato" className="inline-block w-full sm:w-auto max-w-xs sm:max-w-none">
+                <Button className="w-full sm:w-auto bg-[#8e44ad] hover:bg-[#9b59b6] text-white px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium">
+                  <span className="hidden sm:inline">ENTRE EM CONTATO</span>
+                  <span className="sm:hidden">CONTATO</span>
+                  <MessageCircle className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                 </Button>
               </Link>
             </ScrollAnimation>
@@ -892,19 +1041,23 @@ export default function Home() {
                     <Button 
                       type="submit"
                       disabled={isSubmittingContact}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 disabled:opacity-50"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 disabled:opacity-50 px-4 py-3 sm:py-4 text-sm sm:text-base font-medium"
                     >
                       {isSubmittingContact ? (
                         <>
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                            className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full mr-2 flex-shrink-0"
                           />
-                          ENVIANDO...
+                          <span className="hidden sm:inline">ENVIANDO...</span>
+                          <span className="sm:hidden">ENVIANDO</span>
                         </>
                       ) : (
-                        'ENVIAR MENSAGEM'
+                        <>
+                          <span className="hidden sm:inline">ENVIAR MENSAGEM</span>
+                          <span className="sm:hidden">ENVIAR</span>
+                        </>
                       )}
                     </Button>
                   </form>
@@ -923,13 +1076,14 @@ export default function Home() {
               >
                 PRONTA PARA FAZER HISTÓRIA NO CAMPO?
               </h2>
-              <p className="text-primary/80 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+              <p className="text-primary/80 dark:text-gray-300 max-w-2xl mx-auto mb-8 text-sm sm:text-base">
                 Inscreva seu time agora e faça parte da maior revolução do futebol feminino. Juntas somos mais fortes!
               </p>
-              <Link href="/cadastro">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-6 transition-transform hover:scale-105">
-                  INSCREVA-SE NA COPA PASSA BOLA 2025
-                  <ChevronRight className="ml-2 h-5 w-5" />
+              <Link href="/cadastro" className="inline-block w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 transition-transform hover:scale-105 font-medium whitespace-nowrap">
+                  <span className="hidden sm:inline">INSCREVA-SE NA COPA PASSA BOLA 2025</span>
+                  <span className="sm:hidden">INSCREVER TIME</span>
+                  <ChevronRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                 </Button>
               </Link>
             </ScrollAnimation>
@@ -1090,25 +1244,25 @@ export default function Home() {
               <p className="text-primary-foreground/80 dark:text-gray-300 mb-4">
                 Inscreva-se para receber novidades, datas de jogos e conteúdos exclusivos.
               </p>
-              <form onSubmit={handleNewsletterSubmit} className="flex">
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-2 sm:gap-0">
                 <input
                   type="email"
                   placeholder="Seu e-mail"
                   value={newsletter}
                   onChange={(e) => setNewsletter(e.target.value)}
                   disabled={isSubmittingNewsletter}
-                  className="flex-1 px-3 py-2 text-black dark:text-white dark:bg-slate-700 dark:border-slate-600 rounded-l-md focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50"
+                  className="flex-1 px-3 py-2 text-black dark:text-white dark:bg-slate-700 dark:border-slate-600 rounded-md sm:rounded-l-md sm:rounded-r-none focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50"
                 />
                 <Button 
                   type="submit"
                   disabled={isSubmittingNewsletter}
-                  className="rounded-l-none bg-accent hover:bg-accent/90 text-primary dark:text-white transition-all duration-300 disabled:opacity-50"
+                  className="w-full sm:w-auto sm:rounded-l-none bg-accent hover:bg-accent/90 text-primary dark:text-white transition-all duration-300 disabled:opacity-50 px-4 py-2 text-sm sm:text-base font-medium"
                 >
                   {isSubmittingNewsletter ? (
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                      className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-current border-t-transparent rounded-full mx-auto"
                     />
                   ) : (
                     'Assinar'
