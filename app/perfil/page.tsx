@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/contexts/auth-context'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -52,7 +52,7 @@ interface UserActivity {
   tickets: any[]
 }
 
-export default function PerfilPage() {
+function PerfilPageContent() {
   const { user, loading, updateUserData, refreshUserData } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -1082,5 +1082,17 @@ export default function PerfilPage() {
         </section>
       </main>
     </div>
+  )
+}
+
+export default function PerfilPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#8e44ad] to-[#9b59b6]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    }>
+      <PerfilPageContent />
+    </Suspense>
   )
 }
