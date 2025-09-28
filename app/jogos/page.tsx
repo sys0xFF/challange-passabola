@@ -297,58 +297,65 @@ export default function JogosPage() {
                     key={jogo.id} 
                     className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-[#8e44ad]/30"
                   >
-                    <CardContent className="p-6">
-                      <div className="grid md:grid-cols-4 gap-6 items-center">
-                        {/* Times */}
+                    <CardContent className="p-5 md:p-6">
+                      {/* Layout Mobile First - Bem Estruturado */}
+                      <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-12 md:gap-6 md:items-center">
+                        
+                        {/* Seção Times - Destaque Principal */}
+                        <div className="md:col-span-6">
+                          <div className="bg-gradient-to-r from-[#8e44ad]/5 to-purple-100/50 rounded-lg p-4 border border-[#8e44ad]/10">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 text-center">
+                                <h3 className="font-bold text-xl text-gray-800 mb-1">{jogo.team1}</h3>
+                              </div>
+                              
+                              <div className="mx-4 bg-[#8e44ad] text-white px-3 py-1 rounded-full">
+                                <span className="text-sm font-bold">VS</span>
+                              </div>
+                              
+                              <div className="flex-1 text-center">
+                                <h3 className="font-bold text-xl text-gray-800 mb-1">{jogo.team2}</h3>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Informações do Jogo - Organizadas */}
+                        <div className="md:col-span-4">
+                          <div className="space-y-3">
+                            <div className="text-center md:text-left">
+                              <Badge className="bg-[#8e44ad] text-white px-3 py-1 text-sm font-medium">
+                                {jogo.phase}
+                              </Badge>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 gap-2 text-sm">
+                              <div className="flex items-center justify-center md:justify-start gap-2 text-gray-600">
+                                <Calendar className="h-4 w-4 text-[#8e44ad]" />
+                                <span className="font-medium">{formatarData(jogo.date)}</span>
+                              </div>
+                              
+                              <div className="flex items-center justify-center md:justify-start gap-2 text-gray-600">
+                                <Clock className="h-4 w-4 text-[#8e44ad]" />
+                                <span className="font-medium">{jogo.time}</span>
+                              </div>
+                              
+                              <div className="flex items-center justify-center md:justify-start gap-2 text-gray-600">
+                                <MapPin className="h-4 w-4 text-[#8e44ad]" />
+                                <span className="font-medium truncate">{jogo.location}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Botão de Ação - Destaque */}
                         <div className="md:col-span-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-[#8e44ad]/10 rounded-full flex items-center justify-center">
-                                <Users className="h-6 w-6 text-[#8e44ad]" />
-                              </div>
-                              <div>
-                                <h3 className="font-bold text-lg">{jogo.team1}</h3>
-                              </div>
-                            </div>
-                            
-                            <div className="text-2xl font-bold text-[#8e44ad] mx-4">VS</div>
-                            
-                            <div className="flex items-center gap-3">
-                              <div>
-                                <h3 className="font-bold text-lg text-right">{jogo.team2}</h3>
-                              </div>
-                              <div className="w-12 h-12 bg-[#8e44ad]/10 rounded-full flex items-center justify-center">
-                                <Users className="h-6 w-6 text-[#8e44ad]" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Informações do Jogo */}
-                        <div className="space-y-2">
-                          <Badge className="bg-[#8e44ad] text-white">{jogo.phase}</Badge>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar className="h-4 w-4" />
-                            {formatarData(jogo.date)}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="h-4 w-4" />
-                            {jogo.time}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <MapPin className="h-4 w-4" />
-                            {jogo.location}
-                          </div>
-                        </div>
-
-                        {/* Ações */}
-                        <div className="text-center">
                           <Button 
-                            className="w-full bg-[#c2ff28] text-[#8e44ad] hover:bg-[#c2ff28]/90"
+                            className="w-full bg-[#c2ff28] text-[#8e44ad] hover:bg-[#c2ff28]/90 font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border-2 border-[#c2ff28] hover:border-[#c2ff28]/90"
                             onClick={() => handleBuyTickets(jogo)}
                           >
                             <Ticket className="mr-2 h-4 w-4" />
-                            Comprar Ingressos
+                            <span className="text-sm md:text-base">Comprar Ingressos</span>
                           </Button>
                         </div>
                       </div>
