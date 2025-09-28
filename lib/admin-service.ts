@@ -284,13 +284,14 @@ function generateSixTeamBracket(teams: GameTeam[], startMatchId: number): Match[
   const matches: Match[] = [];
   let matchId = startMatchId;
 
-  // Primeira rodada - 2 jogos (4 times jogam, 2 passam direto)
+  // Primeira rodada - 4 equipes jogam, 2 melhores passam direto
+  // Times 2,3,4,5 jogam (times 0,1 passam direto para semifinais)
   matches.push({
     id: `match-${matchId++}`,
     round: 1,
     position: 1,
-    team1: teams[2],
-    team2: teams[5],
+    team1: teams[2], // 3º colocado
+    team2: teams[5], // 6º colocado
     status: 'pending'
   });
 
@@ -298,18 +299,18 @@ function generateSixTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 1,
     position: 2,
-    team1: teams[3],
-    team2: teams[4],
+    team1: teams[3], // 4º colocado
+    team2: teams[4], // 5º colocado
     status: 'pending'
   });
 
-  // Semifinais - times que passaram direto + vencedores
+  // Semifinais - 2 melhores times + 2 vencedores da primeira rodada
   matches.push({
     id: `match-${matchId++}`,
     round: 2,
     position: 1,
-    team1: teams[0], // Passa direto
-    team2: null,     // Vencedor do match-1
+    team1: teams[0], // 1º colocado (passa direto)
+    team2: null,     // Vencedor do match-2 (teams[3] vs teams[4])
     status: 'pending'
   });
 
@@ -317,8 +318,8 @@ function generateSixTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 2,
     position: 2,
-    team1: teams[1], // Passa direto
-    team2: null,     // Vencedor do match-2
+    team1: teams[1], // 2º colocado (passa direto)
+    team2: null,     // Vencedor do match-1 (teams[2] vs teams[5])
     status: 'pending'
   });
 
@@ -327,8 +328,8 @@ function generateSixTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 3,
     position: 1,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor semifinal 1
+    team2: null, // Vencedor semifinal 2
     status: 'pending'
   });
 
@@ -412,13 +413,14 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
   const matches: Match[] = [];
   let matchId = startMatchId;
 
-  // Primeira rodada - 2 jogos (4 times jogam)
+  // Primeira rodada - 4 piores times jogam (6 melhores passam direto)
+  // Times 6,7,8,9 jogam (times 0,1,2,3,4,5 passam direto para quartas)
   matches.push({
     id: `match-${matchId++}`,
     round: 1,
     position: 1,
-    team1: teams[6],
-    team2: teams[9],
+    team1: teams[6], // 7º colocado
+    team2: teams[9], // 10º colocado
     status: 'pending'
   });
 
@@ -426,18 +428,18 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 1,
     position: 2,
-    team1: teams[7],
-    team2: teams[8],
+    team1: teams[7], // 8º colocado
+    team2: teams[8], // 9º colocado
     status: 'pending'
   });
 
-  // Quartas de final - 6 times que passaram direto + 2 vencedores
+  // Quartas de final - 6 melhores times + 2 vencedores da primeira rodada
   matches.push({
     id: `match-${matchId++}`,
     round: 2,
     position: 1,
-    team1: teams[0],
-    team2: null, // Vencedor match-1
+    team1: teams[0], // 1º colocado
+    team2: null,     // Vencedor match-2 (teams[7] vs teams[8])
     status: 'pending'
   });
 
@@ -445,8 +447,8 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 2,
     position: 2,
-    team1: teams[1],
-    team2: null, // Vencedor match-2
+    team1: teams[1], // 2º colocado
+    team2: null,     // Vencedor match-1 (teams[6] vs teams[9])
     status: 'pending'
   });
 
@@ -454,8 +456,8 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 2,
     position: 3,
-    team1: teams[2],
-    team2: teams[5],
+    team1: teams[2], // 3º colocado
+    team2: teams[5], // 6º colocado
     status: 'pending'
   });
 
@@ -463,8 +465,8 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 2,
     position: 4,
-    team1: teams[3],
-    team2: teams[4],
+    team1: teams[3], // 4º colocado
+    team2: teams[4], // 5º colocado
     status: 'pending'
   });
 
@@ -473,8 +475,8 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 3,
     position: 1,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor quartas 1
+    team2: null, // Vencedor quartas 2
     status: 'pending'
   });
 
@@ -482,8 +484,8 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 3,
     position: 2,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor quartas 3
+    team2: null, // Vencedor quartas 4
     status: 'pending'
   });
 
@@ -492,8 +494,8 @@ function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[
     id: `match-${matchId++}`,
     round: 4,
     position: 1,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor semifinal 1
+    team2: null, // Vencedor semifinal 2
     status: 'pending'
   });
 
@@ -504,13 +506,14 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
   const matches: Match[] = [];
   let matchId = startMatchId;
 
-  // Primeira rodada - 4 jogos (8 times jogam)
+  // Primeira rodada - 8 piores times jogam (4 melhores passam direto para quartas)
+  // Times 4,5,6,7,8,9,10,11 jogam (times 0,1,2,3 passam direto)
   matches.push({
     id: `match-${matchId++}`,
     round: 1,
     position: 1,
-    team1: teams[4],
-    team2: teams[11],
+    team1: teams[4],  // 5º colocado
+    team2: teams[11], // 12º colocado
     status: 'pending'
   });
 
@@ -518,8 +521,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 1,
     position: 2,
-    team1: teams[5],
-    team2: teams[10],
+    team1: teams[5],  // 6º colocado
+    team2: teams[10], // 11º colocado
     status: 'pending'
   });
 
@@ -527,8 +530,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 1,
     position: 3,
-    team1: teams[6],
-    team2: teams[9],
+    team1: teams[6], // 7º colocado
+    team2: teams[9], // 10º colocado
     status: 'pending'
   });
 
@@ -536,18 +539,18 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 1,
     position: 4,
-    team1: teams[7],
-    team2: teams[8],
+    team1: teams[7], // 8º colocado
+    team2: teams[8], // 9º colocado
     status: 'pending'
   });
 
-  // Quartas de final - 4 times que passaram direto + 4 vencedores
+  // Quartas de final - 4 melhores times + 4 vencedores da primeira rodada
   matches.push({
     id: `match-${matchId++}`,
     round: 2,
     position: 1,
-    team1: teams[0],
-    team2: null, // Vencedor match-1
+    team1: teams[0], // 1º colocado
+    team2: null,     // Vencedor match-4 (teams[7] vs teams[8])
     status: 'pending'
   });
 
@@ -555,8 +558,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 2,
     position: 2,
-    team1: teams[1],
-    team2: null, // Vencedor match-2
+    team1: teams[1], // 2º colocado
+    team2: null,     // Vencedor match-3 (teams[6] vs teams[9])
     status: 'pending'
   });
 
@@ -564,8 +567,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 2,
     position: 3,
-    team1: teams[2],
-    team2: null, // Vencedor match-3
+    team1: teams[2], // 3º colocado
+    team2: null,     // Vencedor match-2 (teams[5] vs teams[10])
     status: 'pending'
   });
 
@@ -573,8 +576,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 2,
     position: 4,
-    team1: teams[3],
-    team2: null, // Vencedor match-4
+    team1: teams[3], // 4º colocado
+    team2: null,     // Vencedor match-1 (teams[4] vs teams[11])
     status: 'pending'
   });
 
@@ -583,8 +586,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 3,
     position: 1,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor quartas 1
+    team2: null, // Vencedor quartas 2
     status: 'pending'
   });
 
@@ -592,8 +595,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 3,
     position: 2,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor quartas 3
+    team2: null, // Vencedor quartas 4
     status: 'pending'
   });
 
@@ -602,8 +605,8 @@ function generateTwelveTeamBracket(teams: GameTeam[], startMatchId: number): Mat
     id: `match-${matchId++}`,
     round: 4,
     position: 1,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor semifinal 1
+    team2: null, // Vencedor semifinal 2
     status: 'pending'
   });
 
@@ -614,25 +617,69 @@ function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): M
   const matches: Match[] = [];
   let matchId = startMatchId;
 
-  // Primeira rodada - 6 jogos (12 times jogam)
-  for (let i = 0; i < 6; i++) {
-    matches.push({
-      id: `match-${matchId++}`,
-      round: 1,
-      position: i + 1,
-      team1: teams[2 + i],
-      team2: teams[13 - i],
-      status: 'pending'
-    });
-  }
+  // Primeira rodada - 12 piores times jogam (2 melhores passam direto para quartas)
+  // Times 2,3,4,5,6,7,8,9,10,11,12,13 jogam (times 0,1 passam direto)
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 1,
+    team1: teams[2],  // 3º colocado
+    team2: teams[13], // 14º colocado
+    status: 'pending'
+  });
 
-  // Quartas de final - 2 times que passaram direto + 6 vencedores
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 2,
+    team1: teams[3],  // 4º colocado
+    team2: teams[12], // 13º colocado
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 3,
+    team1: teams[4],  // 5º colocado
+    team2: teams[11], // 12º colocado
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 4,
+    team1: teams[5],  // 6º colocado
+    team2: teams[10], // 11º colocado
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 5,
+    team1: teams[6], // 7º colocado
+    team2: teams[9], // 10º colocado
+    status: 'pending'
+  });
+
+  matches.push({
+    id: `match-${matchId++}`,
+    round: 1,
+    position: 6,
+    team1: teams[7], // 8º colocado
+    team2: teams[8], // 9º colocado
+    status: 'pending'
+  });
+
+  // Quartas de final - 2 melhores times + 6 vencedores da primeira rodada
   matches.push({
     id: `match-${matchId++}`,
     round: 2,
     position: 1,
-    team1: teams[0],
-    team2: null, // Vencedor match-1
+    team1: teams[0], // 1º colocado
+    team2: null,     // Vencedor match-6 (teams[7] vs teams[8])
     status: 'pending'
   });
 
@@ -640,8 +687,8 @@ function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): M
     id: `match-${matchId++}`,
     round: 2,
     position: 2,
-    team1: teams[1],
-    team2: null, // Vencedor match-2
+    team1: teams[1], // 2º colocado
+    team2: null,     // Vencedor match-5 (teams[6] vs teams[9])
     status: 'pending'
   });
 
@@ -649,8 +696,8 @@ function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): M
     id: `match-${matchId++}`,
     round: 2,
     position: 3,
-    team1: null, // Vencedor match-3
-    team2: null, // Vencedor match-4
+    team1: null, // Vencedor match-1 (teams[2] vs teams[13])
+    team2: null, // Vencedor match-4 (teams[5] vs teams[10])
     status: 'pending'
   });
 
@@ -658,8 +705,8 @@ function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): M
     id: `match-${matchId++}`,
     round: 2,
     position: 4,
-    team1: null, // Vencedor match-5
-    team2: null, // Vencedor match-6
+    team1: null, // Vencedor match-2 (teams[3] vs teams[12])
+    team2: null, // Vencedor match-3 (teams[4] vs teams[11])
     status: 'pending'
   });
 
@@ -668,8 +715,8 @@ function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): M
     id: `match-${matchId++}`,
     round: 3,
     position: 1,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor quartas 1
+    team2: null, // Vencedor quartas 2
     status: 'pending'
   });
 
@@ -677,8 +724,8 @@ function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): M
     id: `match-${matchId++}`,
     round: 3,
     position: 2,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor quartas 3
+    team2: null, // Vencedor quartas 4
     status: 'pending'
   });
 
@@ -687,8 +734,8 @@ function generateFourteenTeamBracket(teams: GameTeam[], startMatchId: number): M
     id: `match-${matchId++}`,
     round: 4,
     position: 1,
-    team1: null,
-    team2: null,
+    team1: null, // Vencedor semifinal 1
+    team2: null, // Vencedor semifinal 2
     status: 'pending'
   });
 

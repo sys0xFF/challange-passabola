@@ -357,6 +357,24 @@ export function GameCreateModal({ tournaments, onGameCreated }: GameCreateModalP
               </div>
             </div>
 
+            {selectedTournament && (!selectedTournament.teams || selectedTournament.teams.length === 0) && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-amber-600 mt-0.5">⚠️</div>
+                  <div>
+                    <h4 className="font-medium text-amber-800">Chaveamento não gerado</h4>
+                    <p className="text-sm text-amber-700 mt-1">
+                      O torneio "{selectedTournament.name}" ainda não teve seu chaveamento gerado. 
+                      Para ver os times reais, vá até a aba de torneios e gere o chaveamento primeiro.
+                    </p>
+                    <p className="text-xs text-amber-600 mt-2">
+                      Por enquanto, você pode usar opções genéricas como "TBD" ou "Vencedor Jogo X".
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="team1">Equipe 1 *</Label>
@@ -369,11 +387,26 @@ export function GameCreateModal({ tournaments, onGameCreated }: GameCreateModalP
                     <SelectValue placeholder={selectedTournament ? "Selecione a primeira equipe" : "Selecione um torneio primeiro"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {selectedTournament?.teams?.map((team) => (
-                      <SelectItem key={team.id} value={team.name}>
-                        {team.name}
-                      </SelectItem>
-                    ))}
+                    {selectedTournament?.teams && selectedTournament.teams.length > 0 ? (
+                      // Se o torneio tem times (chaveamento já foi gerado)
+                      selectedTournament.teams.map((team) => (
+                        <SelectItem key={team.id} value={team.name}>
+                          {team.name}
+                        </SelectItem>
+                      ))
+                    ) : selectedTournament ? (
+                      // Se não tem times, mostrar opção manual
+                      <>
+                        <SelectItem value="TBD">A ser definido (TBD)</SelectItem>
+                        <SelectItem value="Vencedor Jogo 1">Vencedor Jogo 1</SelectItem>
+                        <SelectItem value="Vencedor Jogo 2">Vencedor Jogo 2</SelectItem>
+                        <SelectItem value="Vencedor Jogo 3">Vencedor Jogo 3</SelectItem>
+                        <SelectItem value="Vencedor Jogo 4">Vencedor Jogo 4</SelectItem>
+                        <SelectItem value="Perdedor Jogo 1">Perdedor Jogo 1</SelectItem>
+                        <SelectItem value="Perdedor Jogo 2">Perdedor Jogo 2</SelectItem>
+                        <SelectItem value="Time Custom">⚠️ Gere o chaveamento primeiro para ver times reais</SelectItem>
+                      </>
+                    ) : null}
                   </SelectContent>
                 </Select>
               </div>
@@ -389,11 +422,26 @@ export function GameCreateModal({ tournaments, onGameCreated }: GameCreateModalP
                     <SelectValue placeholder={selectedTournament ? "Selecione a segunda equipe" : "Selecione um torneio primeiro"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {selectedTournament?.teams?.filter(team => team.name !== selectedTeam1).map((team) => (
-                      <SelectItem key={team.id} value={team.name}>
-                        {team.name}
-                      </SelectItem>
-                    ))}
+                    {selectedTournament?.teams && selectedTournament.teams.length > 0 ? (
+                      // Se o torneio tem times (chaveamento já foi gerado)
+                      selectedTournament.teams.filter(team => team.name !== selectedTeam1).map((team) => (
+                        <SelectItem key={team.id} value={team.name}>
+                          {team.name}
+                        </SelectItem>
+                      ))
+                    ) : selectedTournament ? (
+                      // Se não tem times, mostrar opção manual
+                      <>
+                        <SelectItem value="TBD">A ser definido (TBD)</SelectItem>
+                        <SelectItem value="Vencedor Jogo 1">Vencedor Jogo 1</SelectItem>
+                        <SelectItem value="Vencedor Jogo 2">Vencedor Jogo 2</SelectItem>
+                        <SelectItem value="Vencedor Jogo 3">Vencedor Jogo 3</SelectItem>
+                        <SelectItem value="Vencedor Jogo 4">Vencedor Jogo 4</SelectItem>
+                        <SelectItem value="Perdedor Jogo 1">Perdedor Jogo 1</SelectItem>
+                        <SelectItem value="Perdedor Jogo 2">Perdedor Jogo 2</SelectItem>
+                        <SelectItem value="Time Custom">⚠️ Gere o chaveamento primeiro para ver times reais</SelectItem>
+                      </>
+                    ) : null}
                   </SelectContent>
                 </Select>
               </div>
