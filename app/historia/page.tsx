@@ -75,29 +75,29 @@ export default function HistoriaPage() {
 
       <main className="flex-1 pt-20">
         {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
+        <section className="py-16 sm:py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
           <div className="container mx-auto px-4 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28]">NOSSA HISTÓRIA</Badge>
-              <h1 className={`${bebasNeue.className} text-4xl md:text-6xl font-bold mb-6 tracking-wider`}>
+              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28] text-xs sm:text-sm">NOSSA HISTÓRIA</Badge>
+              <h1 className={`${bebasNeue.className} text-3xl sm:text-4xl md:text-6xl font-bold mb-6 tracking-wide sm:tracking-wider leading-tight`}>
                 A JORNADA QUE NOS TROUXE ATÉ AQUI
               </h1>
-              <p className="text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto px-2">
                 Conheça a história por trás da Copa Passa Bola, um movimento que nasceu do sonho de transformar o 
                 futebol feminino brasileiro e quebrar barreiras no esporte.
               </p>
-              <div className="flex items-center justify-center gap-6 text-white/80">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-white/80">
                 <div className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-[#c2ff28]" />
-                  <span>Paixão pelo Esporte</span>
+                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28] flex-shrink-0" />
+                  <span className="text-sm sm:text-base">Paixão pelo Esporte</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-[#c2ff28]" />
-                  <span>Empoderamento Feminino</span>
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28] flex-shrink-0" />
+                  <span className="text-sm sm:text-base">Empoderamento Feminino</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-[#c2ff28]" />
-                  <span>Transformação Social</span>
+                  <Target className="h-4 w-4 sm:h-5 sm:w-5 text-[#c2ff28] flex-shrink-0" />
+                  <span className="text-sm sm:text-base">Transformação Social</span>
                 </div>
               </div>
             </motion.div>
@@ -105,23 +105,23 @@ export default function HistoriaPage() {
         </section>
 
         {/* Início da Jornada */}
-        <section className="py-20 bg-white dark:bg-slate-900">
+        <section className="py-16 sm:py-20 bg-white dark:bg-slate-900">
           <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
               <ScrollAnimation>
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#8e44ad]/20 to-[#c2ff28]/20 rounded-lg transform rotate-6"></div>
-                  <div className="relative bg-white dark:bg-slate-800 p-8 rounded-lg shadow-lg">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center">
-                        <Calendar className="h-8 w-8 text-white" />
+                <div className="relative order-2 md:order-1">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#8e44ad]/20 to-[#c2ff28]/20 rounded-lg transform rotate-3 sm:rotate-6"></div>
+                  <div className="relative bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-lg shadow-lg">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-[#8e44ad] dark:text-primary">2020</h3>
-                        <p className="text-gray-600 dark:text-gray-400">O Início de Tudo</p>
+                        <h3 className="text-xl sm:text-2xl font-bold text-[#8e44ad] dark:text-primary">2020</h3>
+                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">O Início de Tudo</p>
                       </div>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300">
+                    <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
                       Em plena pandemia, um grupo de mulheres apaixonadas por futebol se reuniu virtualmente 
                       com um sonho: criar um espaço onde as mulheres pudessem jogar, competir e ser reconhecidas 
                       pelo seu talento, independentemente da idade ou nível técnico.
@@ -130,24 +130,24 @@ export default function HistoriaPage() {
                 </div>
               </ScrollAnimation>
               <ScrollAnimation delay={0.2}>
-                <div>
-                  <Badge className="bg-[#8e44ad] text-white mb-4">O COMEÇO</Badge>
-                  <h2 className={`${bebasNeue.className} text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-6 tracking-wider`}>
+                <div className="order-1 md:order-2">
+                  <Badge className="bg-[#8e44ad] text-white mb-4 text-xs sm:text-sm">O COMEÇO</Badge>
+                  <h2 className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-4 sm:mb-6 tracking-wide sm:tracking-wider leading-tight`}>
                     NASCEU UM SONHO
                   </h2>
-                  <p className="text-gray-700 dark:text-gray-300 mb-6">
+                  <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
                     A Copa Passa Bola nasceu da necessidade de criar um movimento que fosse além do futebol. 
                     Queríamos quebrar estereótipos, dar visibilidade ao talento feminino e mostrar que o esporte 
                     pode ser uma ferramenta poderosa de transformação social.
                   </p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-4 bg-gradient-to-br from-[#8e44ad]/10 to-[#c2ff28]/10 rounded-lg">
-                      <div className="text-2xl font-bold text-[#8e44ad]">2</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Fundadoras</div>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="text-center p-3 sm:p-4 bg-gradient-to-br from-[#8e44ad]/10 to-[#c2ff28]/10 rounded-lg">
+                      <div className="text-xl sm:text-2xl font-bold text-[#8e44ad]">2</div>
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Fundadoras</div>
                     </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-[#8e44ad]/10 to-[#c2ff28]/10 rounded-lg">
-                      <div className="text-2xl font-bold text-[#8e44ad]">1</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Grande Sonho</div>
+                    <div className="text-center p-3 sm:p-4 bg-gradient-to-br from-[#8e44ad]/10 to-[#c2ff28]/10 rounded-lg">
+                      <div className="text-xl sm:text-2xl font-bold text-[#8e44ad]">1</div>
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Grande Sonho</div>
                     </div>
                   </div>
                 </div>
@@ -157,25 +157,25 @@ export default function HistoriaPage() {
         </section>
 
         {/* Timeline */}
-        <section className="py-20 bg-gradient-to-b from-white to-transparent dark:from-slate-900 dark:to-transparent aurora">
+        <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-transparent dark:from-slate-900 dark:to-transparent aurora">
           <div className="container mx-auto px-4">
-            <ScrollAnimation className="text-center max-w-3xl mx-auto mb-16">
-              <Badge className="bg-pink-500 text-white mb-4 hover:bg-pink-600">LINHA DO TEMPO</Badge>
-              <h2 className={`${bebasNeue.className} text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-6 tracking-wider`}>
+            <ScrollAnimation className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+              <Badge className="bg-pink-500 text-white mb-4 hover:bg-pink-600 text-xs sm:text-sm">LINHA DO TEMPO</Badge>
+              <h2 className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-4 sm:mb-6 tracking-wide sm:tracking-wider leading-tight`}>
                 MARCOS DA NOSSA JORNADA
               </h2>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 px-2">
                 Cada ano trouxe novos desafios, conquistas e momentos inesquecíveis que moldaram quem somos hoje.
               </p>
             </ScrollAnimation>
 
             <div className="max-w-4xl mx-auto">
               <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[#8e44ad] to-[#c2ff28]"></div>
+                {/* Timeline line - escondida no mobile */}
+                <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[#8e44ad] to-[#c2ff28]"></div>
                 
                 {/* Timeline items */}
-                <div className="space-y-12">
+                <div className="space-y-8 md:space-y-12">
                   {[
                     {
                       year: "2021",
@@ -207,7 +207,28 @@ export default function HistoriaPage() {
                     }
                   ].map((item, index) => (
                     <ScrollAnimation key={index} delay={index * 0.2}>
-                      <div className={`flex items-center ${item.side === 'right' ? 'flex-row-reverse' : ''}`}>
+                      {/* Layout para mobile (empilhado) */}
+                      <div className="md:hidden">
+                        <Card className="dark:bg-slate-800">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-[#8e44ad] to-[#9b59b6] rounded-full flex items-center justify-center flex-shrink-0">
+                                <item.icon className="h-5 w-5 text-white" />
+                              </div>
+                              <div>
+                                <CardTitle className="text-[#8e44ad] dark:text-primary text-lg">{item.year}</CardTitle>
+                                <h3 className="text-base font-bold">{item.title}</h3>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{item.description}</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                      
+                      {/* Layout para desktop (timeline) */}
+                      <div className={`hidden md:flex items-center ${item.side === 'right' ? 'flex-row-reverse' : ''}`}>
                         <div className={`w-1/2 ${item.side === 'right' ? 'pl-8' : 'pr-8'}`}>
                           <Card className="dark:bg-slate-800">
                             <CardHeader>
@@ -241,19 +262,19 @@ export default function HistoriaPage() {
         </section>
 
         {/* Valores */}
-        <section className="py-20 bg-white dark:bg-slate-900">
+        <section className="py-16 sm:py-20 bg-white dark:bg-slate-900">
           <div className="container mx-auto px-4">
-            <ScrollAnimation className="text-center max-w-3xl mx-auto mb-16">
-              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28]">NOSSOS VALORES</Badge>
-              <h2 className={`${bebasNeue.className} text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-6 tracking-wider`}>
+            <ScrollAnimation className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28] text-xs sm:text-sm">NOSSOS VALORES</Badge>
+              <h2 className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-4 sm:mb-6 tracking-wide sm:tracking-wider leading-tight`}>
                 O QUE NOS MOVE
               </h2>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 px-2">
                 Nossos valores são a base de tudo o que fazemos e acreditamos no poder transformador do esporte.
               </p>
             </ScrollAnimation>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
               {[
                 {
                   title: "Inclusão",
@@ -276,12 +297,12 @@ export default function HistoriaPage() {
               ].map((value, index) => (
                 <ScrollAnimation key={index} delay={index * 0.2}>
                   <Card className="h-full dark:bg-slate-800 hover:shadow-lg transition-shadow">
-                    <CardContent className="p-8 text-center">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${value.color} rounded-full flex items-center justify-center mx-auto mb-6`}>
-                        <value.icon className="h-8 w-8 text-white" />
+                    <CardContent className="p-6 sm:p-8 text-center">
+                      <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br ${value.color} rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6`}>
+                        <value.icon className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold mb-4 text-[#8e44ad] dark:text-primary">{value.title}</h3>
-                      <p className="text-gray-700 dark:text-gray-300">{value.description}</p>
+                      <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-[#8e44ad] dark:text-primary">{value.title}</h3>
+                      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">{value.description}</p>
                     </CardContent>
                   </Card>
                 </ScrollAnimation>
@@ -291,19 +312,19 @@ export default function HistoriaPage() {
         </section>
 
         {/* Impacto */}
-        <section className="py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
+        <section className="py-16 sm:py-20 bg-gradient-to-b from-[#8e44ad] to-[#9b59b6] text-white">
           <div className="container mx-auto px-4">
-            <ScrollAnimation className="text-center max-w-3xl mx-auto mb-16">
-              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28]">NOSSO IMPACTO</Badge>
-              <h2 className={`${bebasNeue.className} text-3xl md:text-5xl font-bold mb-6 tracking-wider`}>
+            <ScrollAnimation className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4 hover:bg-[#c2ff28] text-xs sm:text-sm">NOSSO IMPACTO</Badge>
+              <h2 className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-5xl font-bold mb-4 sm:mb-6 tracking-wide sm:tracking-wider leading-tight`}>
                 NÚMEROS QUE TRANSFORMAM
               </h2>
-              <p className="text-white/90">
+              <p className="text-sm sm:text-base text-white/90 px-2">
                 Cada número representa uma vida tocada, um sonho realizado, uma barreira quebrada.
               </p>
             </ScrollAnimation>
 
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
               {[
                 { number: "500+", label: "Atletas Impactadas" },
                 { number: "32", label: "Times Participantes" },
@@ -312,10 +333,10 @@ export default function HistoriaPage() {
               ].map((stat, index) => (
                 <ScrollAnimation key={index} delay={index * 0.1}>
                   <div className="text-center">
-                    <div className={`${bebasNeue.className} text-4xl md:text-5xl font-bold mb-2 text-[#c2ff28]`}>
+                    <div className={`${bebasNeue.className} text-3xl sm:text-4xl md:text-5xl font-bold mb-2 text-[#c2ff28]`}>
                       {stat.number}
                     </div>
-                    <div className="text-white/80">{stat.label}</div>
+                    <div className="text-xs sm:text-sm md:text-base text-white/80 leading-tight">{stat.label}</div>
                   </div>
                 </ScrollAnimation>
               ))}
@@ -324,26 +345,28 @@ export default function HistoriaPage() {
         </section>
 
         {/* CTA Final */}
-        <section className="py-24 bg-accent dark:bg-slate-800">
+        <section className="py-16 sm:py-24 bg-accent dark:bg-slate-800">
           <div className="container mx-auto px-4 text-center">
             <ScrollAnimation>
-              <h2 className={`${bebasNeue.className} text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-6 tracking-wider`}>
+              <h2 className={`${bebasNeue.className} text-2xl sm:text-3xl md:text-5xl font-bold text-[#8e44ad] dark:text-primary mb-4 sm:mb-6 tracking-wide sm:tracking-wider leading-tight`}>
                 FAÇA PARTE DESSA HISTÓRIA
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto px-2 leading-relaxed">
                 Nossa jornada continua e você pode fazer parte dela. Junte-se a nós e ajude a escrever os próximos capítulos
                 dessa história de transformação e empoderamento.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-md sm:max-w-none mx-auto">
+                <Button asChild className="bg-[#8e44ad] hover:bg-[#9b59b6] text-white text-sm sm:text-base py-3 sm:py-4">
                   <Link href="/cadastro">
-                    INSCREVA SEU TIME
+                    <span className="hidden sm:inline">INSCREVA SEU TIME</span>
+                    <span className="sm:hidden">INSCREVER TIME</span>
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white">
+                <Button asChild variant="outline" className="border-[#8e44ad] text-[#8e44ad] hover:bg-[#8e44ad] hover:text-white text-sm sm:text-base py-3 sm:py-4">
                   <Link href="/doacao">
-                    APOIE NOSSA CAUSA
+                    <span className="hidden sm:inline">APOIE NOSSA CAUSA</span>
+                    <span className="sm:hidden">APOIAR</span>
                   </Link>
                 </Button>
               </div>

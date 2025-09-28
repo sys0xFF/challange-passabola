@@ -337,67 +337,67 @@ export default function RecompensasPage() {
               <ArrowLeft className="h-5 w-5" />
               <span className="font-medium">Voltar</span>
             </Link>
-            <h1 className={`${bebasNeue.className} text-2xl font-bold text-[#8e44ad] tracking-wider`}>
+            
+            <h1 className={`${bebasNeue.className} text-2xl font-bold text-[#8e44ad] tracking-wider absolute left-1/2 transform -translate-x-1/2`}>
               RECOMPENSAS
             </h1>
-            <div className="w-20"></div>
+            
+            {user && (
+              <div className="bg-gradient-to-r from-[#8e44ad] to-purple-600 text-white px-4 py-2 rounded-full shadow-lg">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  <span className={`${bebasNeue.className} font-bold tracking-wider`}>
+                    {pontosUsuario.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Status dos Pontos */}
-        <ScrollAnimation>
-          <Card className="mb-8 bg-gradient-to-r from-[#8e44ad] via-purple-600 to-[#9b59b6] text-white shadow-xl border-0 overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
-            <CardContent className="p-8 relative z-10">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div className="space-y-2">
-                  <h2 className={`${bebasNeue.className} text-3xl font-bold mb-2 tracking-wider`}>
-                    SEUS PONTOS
-                  </h2>
-                  <p className="text-purple-100 text-lg">Use seus pontos para resgatar recompensas incríveis!</p>
-                  {!user && (
-                    <p className="text-yellow-200 font-medium">
-                      Faça login para ver seus pontos e resgatar recompensas
-                    </p>
-                  )}
+        {/* Aviso para usuários não logados */}
+        {!user && (
+          <ScrollAnimation>
+            <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xl border-0">
+              <CardContent className="p-4 sm:p-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <User className="h-5 w-5" />
+                  <span className="font-bold text-lg">Login Necessário</span>
                 </div>
-                <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <div className="text-5xl font-bold text-yellow-300 mb-2 font-mono">
-                    {user ? pontosUsuario.toLocaleString() : '---'}
-                  </div>
-                  <div className="flex items-center justify-center gap-2 text-purple-100">
-                    <Sparkles className="h-5 w-5" />
-                    <span className="font-medium">Pontos disponíveis</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </ScrollAnimation>
+                <p className="text-amber-100">
+                  Faça login para ver seus pontos e resgatar recompensas incríveis!
+                </p>
+              </CardContent>
+            </Card>
+          </ScrollAnimation>
+        )}
 
         {/* Navegação por Categorias */}
         <ScrollAnimation delay={0.1}>
-          <Tabs value={categoria} onValueChange={setCategoria} className="mb-8">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="produtos" className="flex items-center gap-2">
-                <ShoppingBag className="h-4 w-4" />
-                Produtos
+          <Tabs value={categoria} onValueChange={setCategoria} className="mb-6 sm:mb-8">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
+              <TabsTrigger value="produtos" className="flex items-center gap-1 sm:gap-2 py-3 text-xs sm:text-sm">
+                <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Produtos</span>
+                <span className="sm:hidden">Itens</span>
               </TabsTrigger>
-              <TabsTrigger value="experiencias" className="flex items-center gap-2">
-                <Star className="h-4 w-4" />
-                Experiências
+              <TabsTrigger value="experiencias" className="flex items-center gap-1 sm:gap-2 py-3 text-xs sm:text-sm">
+                <Star className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Experiências</span>
+                <span className="sm:hidden">Exp.</span>
               </TabsTrigger>
-              <TabsTrigger value="especiais" className="flex items-center gap-2">
-                <Crown className="h-4 w-4" />
-                Especiais
+              <TabsTrigger value="especiais" className="flex items-center gap-1 sm:gap-2 py-3 text-xs sm:text-sm">
+                <Crown className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Especiais</span>
+                <span className="sm:hidden">VIP</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Produtos */}
             <TabsContent value="produtos">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {recompensas.produtos.map((produto) => {
                   const Icone = produto.icone
                   const disponivel = podeResgatar(produto.pontos, produto.disponivel)
@@ -407,10 +407,10 @@ export default function RecompensasPage() {
                       <Card className={`group overflow-hidden transition-all duration-500 hover:shadow-2xl hover:scale-[1.02] border-0 bg-white/80 backdrop-blur-sm ${
                         !produto.disponivel ? "opacity-60" : ""
                       }`}>
-                        <div className={`h-3 bg-gradient-to-r ${produto.cor} group-hover:h-4 transition-all duration-300`}></div>
+                        <div className={`h-2 sm:h-3 bg-gradient-to-r ${produto.cor} group-hover:h-3 sm:group-hover:h-4 transition-all duration-300`}></div>
                         
-                        <CardContent className="p-6">
-                          <div className="relative h-48 mb-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden group-hover:shadow-lg transition-all duration-300">
+                        <CardContent className="p-3 sm:p-6">
+                          <div className="relative h-32 sm:h-48 mb-3 sm:mb-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden group-hover:shadow-lg transition-all duration-300">
                             <Image
                               src={produto.imagem}
                               alt={produto.nome}
@@ -431,11 +431,11 @@ export default function RecompensasPage() {
                             </div>
                           </div>
                           
-                          <div className="space-y-3 mb-4">
-                            <h3 className="font-bold text-xl text-[#8e44ad] mb-2 group-hover:text-purple-700 transition-colors line-clamp-2">
+                          <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
+                            <h3 className="font-bold text-base sm:text-xl text-[#8e44ad] mb-1 sm:mb-2 group-hover:text-purple-700 transition-colors line-clamp-2">
                               {produto.nome}
                             </h3>
-                            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                            <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">
                               {produto.descricao}
                             </p>
                             <Badge variant="outline" className="text-xs border-purple-200 text-purple-700 bg-purple-50">
@@ -443,9 +443,9 @@ export default function RecompensasPage() {
                             </Badge>
                           </div>
                           
-                          <div className="flex items-center justify-between mb-6">
-                            <div className="text-3xl font-bold text-[#8e44ad]">
-                              {produto.pontos} <span className="text-sm font-normal">pontos</span>
+                          <div className="flex items-center justify-between mb-4 sm:mb-6">
+                            <div className="text-xl sm:text-3xl font-bold text-[#8e44ad]">
+                              {produto.pontos} <span className="text-xs sm:text-sm font-normal">pontos</span>
                             </div>
                             {disponivel && (
                               <Badge className="bg-green-500 text-white border-0 px-3 py-1">
@@ -456,7 +456,7 @@ export default function RecompensasPage() {
                           </div>
                           
                           <Button 
-                            className={`w-full h-12 font-semibold transition-all duration-300 ${
+                            className={`w-full h-10 sm:h-12 font-semibold transition-all duration-300 text-xs sm:text-sm ${
                               disponivel 
                                 ? "bg-gradient-to-r from-[#8e44ad] to-purple-700 hover:from-[#8e44ad]/90 hover:to-purple-700/90 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
                                 : "bg-gray-200 text-gray-500 cursor-not-allowed"
@@ -465,9 +465,10 @@ export default function RecompensasPage() {
                             disabled={!disponivel}
                           >
                             {disponivel ? (
-                              <div className="flex items-center gap-2">
-                                <Gift className="w-4 h-4" />
-                                Resgatar Agora
+                              <div className="flex items-center gap-1 sm:gap-2">
+                                <Gift className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Resgatar Agora</span>
+                                <span className="sm:hidden">Resgatar</span>
                               </div>
                             ) : (
                               !produto.disponivel ? "Esgotado" : "Pontos Insuficientes"
@@ -483,7 +484,7 @@ export default function RecompensasPage() {
 
             {/* Experiências */}
             <TabsContent value="experiencias">
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {recompensas.experiencias.map((experiencia) => {
                   const Icone = experiencia.icone
                   const disponivel = podeResgatar(experiencia.pontos, experiencia.disponivel)
@@ -493,16 +494,16 @@ export default function RecompensasPage() {
                       <Card className={`overflow-hidden transition-all duration-300 hover:shadow-xl ${
                         !experiencia.disponivel ? "opacity-60" : ""
                       }`}>
-                        <div className={`h-3 bg-gradient-to-r ${experiencia.cor}`}></div>
+                        <div className={`h-2 sm:h-3 bg-gradient-to-r ${experiencia.cor}`}></div>
                         
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-4 mb-4">
-                            <div className={`p-3 rounded-full bg-gradient-to-r ${experiencia.cor}`}>
-                              <Icone className="h-6 w-6 text-white" />
+                        <CardContent className="p-4 sm:p-6">
+                          <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                            <div className={`p-2 sm:p-3 rounded-full bg-gradient-to-r ${experiencia.cor} flex-shrink-0`}>
+                              <Icone className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                             </div>
-                            <div className="flex-1">
-                              <h3 className="font-bold text-xl text-[#8e44ad] mb-2">{experiencia.nome}</h3>
-                              <p className="text-gray-600 mb-3">{experiencia.descricao}</p>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-base sm:text-xl text-[#8e44ad] mb-1 sm:mb-2">{experiencia.nome}</h3>
+                              <p className="text-sm sm:text-base text-gray-600 mb-2 sm:mb-3">{experiencia.descricao}</p>
                               <div className="flex items-center gap-4 mb-4">
                                 <Badge variant="outline">{experiencia.categoria}</Badge>
                                 {experiencia.vagas && experiencia.vagas > 0 && (
@@ -514,17 +515,17 @@ export default function RecompensasPage() {
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="text-3xl font-bold text-[#8e44ad]">
-                              {experiencia.pontos} <span className="text-sm font-normal">pontos</span>
+                          <div className="flex items-center justify-between mb-3 sm:mb-4">
+                            <div className="text-xl sm:text-3xl font-bold text-[#8e44ad]">
+                              {experiencia.pontos} <span className="text-xs sm:text-sm font-normal">pontos</span>
                             </div>
                             {disponivel && (
-                              <Badge className="bg-green-500 text-white">Disponível</Badge>
+                              <Badge className="bg-green-500 text-white text-xs">Disponível</Badge>
                             )}
                           </div>
                           
                           <Button 
-                            className={`w-full ${
+                            className={`w-full h-10 sm:h-12 text-xs sm:text-sm ${
                               disponivel 
                                 ? "bg-[#8e44ad] hover:bg-[#8e44ad]/90 text-white"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -532,8 +533,14 @@ export default function RecompensasPage() {
                             onClick={() => handleResgatar(experiencia)}
                             disabled={!disponivel}
                           >
-                            {disponivel ? "Resgatar Experiência" : 
-                             !experiencia.disponivel ? "Indisponível" : "Pontos Insuficientes"}
+                            {disponivel ? (
+                              <span>
+                                <span className="hidden sm:inline">Resgatar Experiência</span>
+                                <span className="sm:hidden">Resgatar</span>
+                              </span>
+                            ) : (
+                             !experiencia.disponivel ? "Indisponível" : "Pontos Insuficientes"
+                            )}
                           </Button>
                         </CardContent>
                       </Card>
@@ -545,7 +552,7 @@ export default function RecompensasPage() {
 
             {/* Especiais */}
             <TabsContent value="especiais">
-              <div className="grid gap-6">
+              <div className="grid gap-4 sm:gap-6">
                 {recompensas.especiais.map((especial) => {
                   const Icone = especial.icone
                   const disponivel = podeResgatar(especial.pontos, especial.disponivel)
@@ -553,42 +560,46 @@ export default function RecompensasPage() {
                   return (
                     <ScrollAnimation key={especial.id} delay={0.1}>
                       <Card className="overflow-hidden border-2 border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50">
-                        <div className={`h-4 bg-gradient-to-r ${especial.cor}`}></div>
+                        <div className={`h-3 sm:h-4 bg-gradient-to-r ${especial.cor}`}></div>
                         
-                        <CardContent className="p-8">
-                          <div className="flex items-center gap-6">
-                            <div className={`p-4 rounded-full bg-gradient-to-r ${especial.cor} shadow-lg`}>
-                              <Icone className="h-8 w-8 text-white" />
+                        <CardContent className="p-4 sm:p-6 lg:p-8">
+                          <div className="flex items-start gap-4 mb-4">
+                            <div className={`p-3 sm:p-4 rounded-full bg-gradient-to-r ${especial.cor} shadow-lg flex-shrink-0`}>
+                              <Icone className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                             </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h3 className="font-bold text-2xl text-[#8e44ad]">{especial.nome}</h3>
-                                <Crown className="h-6 w-6 text-yellow-500" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                                <h3 className="font-bold text-lg sm:text-2xl text-[#8e44ad]">{especial.nome}</h3>
+                                <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500" />
                               </div>
-                              <p className="text-gray-700 mb-3 text-lg">{especial.descricao}</p>
-                              <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500 text-white">
+                              <p className="text-gray-700 mb-3 text-sm sm:text-lg">{especial.descricao}</p>
+                              <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-xs sm:text-sm">
                                 {especial.categoria}
                               </Badge>
                             </div>
-                            <div className="text-center">
-                              <div className="text-4xl font-bold text-[#8e44ad] mb-2">
-                                {especial.pontos.toLocaleString()}
-                              </div>
-                              <div className="text-sm text-gray-600 mb-4">pontos</div>
-                              <Button 
-                                size="lg"
-                                className={`${
-                                  disponivel 
-                                    ? "bg-gradient-to-r from-[#8e44ad] to-purple-700 hover:from-[#8e44ad]/90 hover:to-purple-700/90 text-white"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                }`}
-                                onClick={() => handleResgatar(especial)}
-                                disabled={!disponivel}
-                              >
-                                {disponivel ? "Resgatar" : "Pontos Insuficientes"}
-                              </Button>
-                            </div>
                           </div>
+                          
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="text-2xl sm:text-4xl font-bold text-[#8e44ad]">
+                              {especial.pontos.toLocaleString()} <span className="text-xs sm:text-sm font-normal">pontos</span>
+                            </div>
+                            {disponivel && (
+                              <Badge className="bg-green-500 text-white text-xs">Disponível</Badge>
+                            )}
+                          </div>
+                          
+                          <Button 
+                            size="lg"
+                            className={`w-full text-sm ${
+                              disponivel 
+                                ? "bg-gradient-to-r from-[#8e44ad] to-purple-700 hover:from-[#8e44ad]/90 hover:to-purple-700/90 text-white"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                            onClick={() => handleResgatar(especial)}
+                            disabled={!disponivel}
+                          >
+                            {disponivel ? "Resgatar" : "Pontos Insuficientes"}
+                          </Button>
                         </CardContent>
                       </Card>
                     </ScrollAnimation>

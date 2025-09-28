@@ -216,7 +216,7 @@ export default function Home() {
               {/* Pontos da Pulseira - Desktop */}
               {user && (
                 <Link 
-                  href="/perfil?tab=tickets"
+                  href="/recompensas"
                   className="hidden md:flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 py-2 rounded-full text-sm font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   <Zap className="h-4 w-4" />
@@ -593,108 +593,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Pulseira Inteligente */}
-        <section className="py-20 bg-gradient-to-r from-purple-600 to-purple-800 text-white">
-          <div className="container mx-auto px-4">
-            <ScrollAnimation className="text-center mb-12">
-              <Badge className="bg-[#c2ff28] text-[#8e44ad] mb-4">TECNOLOGIA INOVADORA</Badge>
-              <h2 className={`${bebasNeue.className} text-3xl md:text-5xl font-bold mb-6 tracking-wider`}>
-                PULSEIRA INTELIGENTE
-              </h2>
-              <p className="text-purple-100 text-lg max-w-3xl mx-auto">
-                Revolucione sua experiência como torcedora! Nossa pulseira inteligente transforma cada jogo 
-                em uma aventura interativa repleta de recompensas.
-              </p>
-            </ScrollAnimation>
 
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <ScrollAnimation>
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#c2ff28] rounded-full flex items-center justify-center flex-shrink-0">
-                      <Zap className="h-6 w-6 text-[#8e44ad]" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold mb-2">Interações em Tempo Real</h3>
-                      <p className="text-purple-200">
-                        Participe de olas, coreografias, quiz e desafios durante os jogos. Cada participação gera pontos!
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#c2ff28] rounded-full flex items-center justify-center flex-shrink-0">
-                      <Star className="h-6 w-6 text-[#8e44ad]" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold mb-2">Sistema de Pontos</h3>
-                      <p className="text-purple-200">
-                        Acumule pontos por cada atividade e troque por produtos exclusivos, experiências VIP e muito mais.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#c2ff28] rounded-full flex items-center justify-center flex-shrink-0">
-                      <Heart className="h-6 w-6 text-[#8e44ad]" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold mb-2">Comunidade Conectada</h3>
-                      <p className="text-purple-200">
-                        Conecte-se com outras torcedoras, forme grupos de apoio e suba no ranking das mais participativas.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4 pt-4">
-                    <Link href="/recompensas">
-                      <Button size="lg" className="bg-[#c2ff28] text-[#8e44ad] hover:bg-[#c2ff28]/90">
-                        <Star className="mr-2 h-5 w-5" />
-                        Ver Recompensas
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </ScrollAnimation>
-
-              <ScrollAnimation delay={0.2}>
-                <div className="relative">
-                  <div className="bg-gradient-to-br from-[#c2ff28] to-yellow-400 rounded-2xl p-8 text-center shadow-2xl">
-                    <div className="bg-white rounded-xl p-6 mb-6">
-                      <Zap className="h-16 w-16 text-purple-600 mx-auto mb-4" />
-                      <h3 className="text-2xl font-bold text-purple-800 mb-2">
-                        {user ? 'Seus Pontos' : 'Sistema de Pontos'}
-                      </h3>
-                      {user ? (
-                        <>
-                          <div className="text-4xl font-bold text-purple-600">{user.points || 0}</div>
-                          <p className="text-purple-600 text-sm">Acumule pontos participando!</p>
-                        </>
-                      ) : (
-                        <>
-                          <div className="text-2xl font-bold text-purple-600 mb-2">🔒</div>
-                          <p className="text-purple-600 text-sm">
-                            Faça login para acumular pontos!
-                          </p>
-                        </>
-                      )}
-                    </div>
-                    
-                    <div className="text-[#8e44ad] space-y-2">
-                      <p className="font-semibold">🏃‍♀️ Participe das atividades durante os jogos</p>
-                      <p className="font-semibold">⚽ Ganhe pontos a cada interação</p>
-                      <p className="font-semibold">🎁 Troque por produtos e experiências</p>
-                    </div>
-                  </div>
-                  
-                  {/* Elementos decorativos */}
-                  <div className="absolute -top-4 -right-4 w-8 h-8 bg-yellow-300 rounded-full animate-pulse"></div>
-                  <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-pink-300 rounded-full animate-bounce"></div>
-                </div>
-              </ScrollAnimation>
-            </div>
-          </div>
-        </section>
 
         {/* Merchandise/Loja */}
         <section id="loja" className="py-20 bg-white dark:bg-slate-900">

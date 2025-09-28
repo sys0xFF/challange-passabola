@@ -7,41 +7,105 @@ export const useDevAutoFill = () => {
     
     // Temporariamente removido: if (process.env.NODE_ENV === 'development') {
       console.log('DevAutoFill carregado');
+      
+      // Gerador de dados aleatórios
+      const gerarDadosAleatorios = () => {
+        const nomes = ["Ana", "Beatriz", "Carolina", "Débora", "Eduarda", "Fernanda", "Gabriela", "Helena", "Isabela", "Juliana", "Karina", "Larissa", "Mariana", "Natália", "Olívia", "Patricia", "Rafaela", "Sofia", "Tatiana", "Valentina"];
+        const sobrenomes = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira", "Lima", "Gomes", "Ribeiro", "Carvalho", "Almeida", "Lopes", "Monteiro", "Araújo", "Cardoso", "Martins", "Rocha", "Dias"];
+        const bairros = ["Vila Madalena", "Pinheiros", "Moema", "Jardins", "Vila Olímpia", "Itaim Bibi", "Bela Vista", "Centro", "Perdizes", "Santana", "Brooklin", "Campo Belo", "Tatuapé", "Liberdade", "Aclimação"];
+        const posicoes = ["goleira", "zagueira", "lateral", "volante", "meia", "atacante"];
+        const jaParticipou = ["sim", "nao"];
+
+        const gerarNome = () => {
+          const nome = nomes[Math.floor(Math.random() * nomes.length)];
+          const sobrenome1 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+          const sobrenome2 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+          return `${nome} ${sobrenome1} ${sobrenome2}`;
+        };
+
+        const gerarEmail = (nome: string) => {
+          const nomeEmail = nome.toLowerCase().replace(/\s+/g, '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          return `${nomeEmail}@email.com`;
+        };
+
+        const gerarTelefone = () => {
+          const ddd = "11";
+          const num = Math.floor(Math.random() * 900000000) + 100000000;
+          return `(${ddd}) 9${num.toString().substring(0,4)}-${num.toString().substring(4,8)}`;
+        };
+
+        const gerarIdade = () => String(Math.floor(Math.random() * 15) + 18); // 18 a 32 anos
+
+        const gerarBairro = () => `São Paulo - ${bairros[Math.floor(Math.random() * bairros.length)]}`;
+
+        const gerarPosicao = () => posicoes[Math.floor(Math.random() * posicoes.length)];
+
+        const gerarParticipacao = () => jaParticipou[Math.floor(Math.random() * jaParticipou.length)];
+
+        return {
+          gerarNome,
+          gerarEmail,
+          gerarTelefone,
+          gerarIdade,
+          gerarBairro,
+          gerarPosicao,
+          gerarParticipacao
+        };
+      };
+
+      const generator = gerarDadosAleatorios();
+
+      // Função para gerar dados de equipe completos
+      const gerarDadosEquipe = () => {
+        const nomeCapitao = generator.gerarNome();
+        const jogadoras = [];
+        
+        for (let i = 0; i < 7; i++) {
+          const nome = generator.gerarNome();
+          jogadoras.push({
+            nomeCompleto: nome,
+            email: generator.gerarEmail(nome),
+            telefone: generator.gerarTelefone(),
+            idade: generator.gerarIdade(),
+            cidadeBairro: generator.gerarBairro(),
+            posicao: generator.gerarPosicao(),
+            jaParticipou: generator.gerarParticipacao()
+          });
+        }
+
+        return {
+          nomeTime: `${generator.gerarNome().split(' ')[0]} FC`,
+          nomeCapitao: nomeCapitao.split(' ')[0] + " " + nomeCapitao.split(' ')[1],
+          capitao: {
+            nomeCompleto: nomeCapitao,
+            email: generator.gerarEmail(nomeCapitao),
+            telefone: generator.gerarTelefone(),
+            idade: generator.gerarIdade(),
+            cidadeBairro: generator.gerarBairro(),
+            posicao: generator.gerarPosicao(),
+            jaParticipou: generator.gerarParticipacao()
+          },
+          jogadoras: jogadoras
+        };
+      };
+
       // Dados universais
       const dadosUniversais = {
         // Dados para cadastro
         cadastro: {
-          individual: {
-            nomeCompleto: "Maria Silva dos Santos",
-            email: "maria.silva@email.com",
-            telefone: "(11) 99999-8888",
-            idade: "25",
-            cidadeBairro: "São Paulo - Vila Madalena",
-            posicao: "meia",
-            jaParticipou: "sim"
-          },
-          equipe: {
-            nomeTime: "Meninas do Futebol FC",
-            nomeCapitao: "Ana Paula Oliveira",
-            capitao: {
-              nomeCompleto: "Ana Paula Oliveira Santos",
-              email: "ana.paula@email.com",
-              telefone: "(11) 98765-4321",
-              idade: "28",
-              cidadeBairro: "São Paulo - Pinheiros",
-              posicao: "zagueira",
-              jaParticipou: "sim"
-            },
-            jogadoras: [
-              { nomeCompleto: "Fernanda Costa Lima", email: "fernanda@email.com", telefone: "(11) 97777-1111", idade: "22", cidadeBairro: "São Paulo - Vila Olímpia", posicao: "goleira", jaParticipou: "nao" },
-              { nomeCompleto: "Juliana Santos Pereira", email: "juliana@email.com", telefone: "(11) 96666-2222", idade: "24", cidadeBairro: "São Paulo - Moema", posicao: "lateral", jaParticipou: "sim" },
-              { nomeCompleto: "Carolina Rodrigues Silva", email: "carolina@email.com", telefone: "(11) 95555-3333", idade: "26", cidadeBairro: "São Paulo - Jardins", posicao: "volante", jaParticipou: "sim" },
-              { nomeCompleto: "Beatriz Almeida Santos", email: "beatriz@email.com", telefone: "(11) 94444-4444", idade: "23", cidadeBairro: "São Paulo - Itaim Bibi", posicao: "meia", jaParticipou: "nao" },
-              { nomeCompleto: "Gabriela Ferreira Lima", email: "gabriela@email.com", telefone: "(11) 93333-5555", idade: "27", cidadeBairro: "São Paulo - Bela Vista", posicao: "atacante", jaParticipou: "sim" },
-              { nomeCompleto: "Larissa Martins Costa", email: "larissa@email.com", telefone: "(11) 92222-6666", idade: "21", cidadeBairro: "São Paulo - Centro", posicao: "atacante", jaParticipou: "nao" },
-              { nomeCompleto: "Isabela Souza Oliveira", email: "isabela@email.com", telefone: "(11) 91111-7777", idade: "25", cidadeBairro: "São Paulo - Perdizes", posicao: "zagueira", jaParticipou: "sim" }
-            ]
-          }
+          individual: (() => {
+            const nome = generator.gerarNome();
+            return {
+              nomeCompleto: nome,
+              email: generator.gerarEmail(nome),
+              telefone: generator.gerarTelefone(),
+              idade: generator.gerarIdade(),
+              cidadeBairro: generator.gerarBairro(),
+              posicao: generator.gerarPosicao(),
+              jaParticipou: generator.gerarParticipacao()
+            };
+          })(),
+          equipe: gerarDadosEquipe()
         },
 
         // Dados para contato
@@ -226,7 +290,7 @@ export const useDevAutoFill = () => {
             case 'cadastro':
               console.log("Opcoes disponiveis:");
               console.log("- test.cadastroIndividual() (para cadastro individual)");
-              console.log("- test.cadastroEquipeCompleto() (para cadastro de equipe)");
+              console.log("- test.cadastroEquipeCompleto() (para cadastro de equipe - DADOS ALEATÓRIOS)");
               break;
             case 'contato':
               (window as any).PassaBolaTest.contato();
@@ -323,13 +387,15 @@ export const useDevAutoFill = () => {
 
         // CADASTRO EQUIPE COMPLETO
         cadastroEquipeCompleto: async () => {
-          console.log("Iniciando cadastro de equipe completo...");
+          console.log("Iniciando cadastro de equipe completo com dados aleatórios...");
+          
+          // Gerar novos dados aleatórios para cada execução
+          const dados = gerarDadosEquipe();
+          console.log("Dados gerados:", dados);
           
           // Primeiro selecionar TIME
           utils.clicar('button:contains("TIME")');
           await utils.aguardar(1000);
-          
-          const dados = dadosUniversais.cadastro.equipe;
           
           // ETAPA 1: Dados básicos da equipe e capitã
           console.log("ETAPA 1: Preenchendo dados básicos...");
@@ -387,125 +453,136 @@ export const useDevAutoFill = () => {
                 }
               }, 1000);
               
-              // ETAPA 3: Dados das 7 jogadoras
+              // Aguardar e ir para a próxima etapa
               setTimeout(() => {
-                console.log("ETAPA 3: Preenchendo dados das 7 jogadoras...");
+                console.log("Continuando para etapa 3 - dados das jogadoras...");
+                utils.clicar('button:contains("CONTINUAR")');
                 
-                const jogadoraCards = Array.from(document.querySelectorAll('.border.rounded-lg.p-6'))
-                  .filter(card => card.textContent?.includes('Jogadora'));
-                
-                dados.jogadoras.forEach((jogadora, index) => {
-                  setTimeout(() => {
-                    if (index < jogadoraCards.length) {
-                      const card = jogadoraCards[index];
-                      
-                      // Buscar inputs por tipo específico
-                      const inputNome = card.querySelector('input[placeholder*="nome" i], input[name*="nome" i]');
-                      const inputIdade = card.querySelector('input[placeholder*="idade" i], input[name*="idade" i]');
-                      const inputEmail = card.querySelector('input[type="email"], input[placeholder*="email" i]');
-                      // Buscar telefone pelo placeholder específico do projeto
-                      const inputTelefone = card.querySelector('input[placeholder="(11) 99999-9999"]') ||
-                                          card.querySelector('input[placeholder*="9999" i]') ||
-                                          Array.from(card.querySelectorAll('input')).find(input => {
-                                            const placeholder = input.getAttribute('placeholder') || '';
-                                            return placeholder.includes('99999') || placeholder.toLowerCase().includes('whatsapp');
-                                          });
-                      const inputCidade = card.querySelector('input[placeholder*="cidade" i], input[placeholder*="bairro" i]');
-                      
-                      // Preencher cada campo específico
-                      if (inputNome && inputNome instanceof HTMLInputElement) {
-                        utils.setReactInput(inputNome, jogadora.nomeCompleto);
-                      }
-                      if (inputIdade && inputIdade instanceof HTMLInputElement) {
-                        utils.setReactInput(inputIdade, jogadora.idade);
-                      }
-                      if (inputEmail && inputEmail instanceof HTMLInputElement) {
-                        utils.setReactInput(inputEmail, jogadora.email);
-                      }
-                      if (inputTelefone && inputTelefone instanceof HTMLInputElement) {
-                        utils.setReactInput(inputTelefone, jogadora.telefone);
-                        console.log(`Telefone preenchido para jogadora ${index + 1}: ${jogadora.telefone}`);
-                      } else {
-                        console.log(`ERRO: Campo telefone nao encontrado para jogadora ${index + 1}`);
-                        // Debug: mostrar todos os inputs encontrados
-                        const todosInputs = card.querySelectorAll('input');
-                        console.log(`Total de inputs encontrados: ${todosInputs.length}`);
-                        todosInputs.forEach((input, i) => {
-                          console.log(`Input ${i}: placeholder="${input.getAttribute('placeholder')}", type="${input.getAttribute('type')}"`);
-                        });
-                      }
-                      if (inputCidade && inputCidade instanceof HTMLInputElement) {
-                        utils.setReactInput(inputCidade, jogadora.cidadeBairro);
-                      }
-                      
-                      // Posição da jogadora (Select)
+                setTimeout(() => {
+                  console.log("ETAPA 3: Preenchendo dados das 7 jogadoras...");
+                  
+                  // Aguardar a página carregar e encontrar os cards das jogadoras
+                  const preencherJogadoras = () => {
+                    const jogadoraCards = Array.from(document.querySelectorAll('.border'))
+                      .filter(card => {
+                        const texto = card.textContent || '';
+                        return texto.includes('Jogadora') || texto.includes('Nome completo');
+                      });
+                    
+                    console.log(`Cards de jogadoras encontrados: ${jogadoraCards.length}`);
+                    
+                    if (jogadoraCards.length === 0) {
+                      console.log("Nenhum card encontrado, tentando novamente em 1s...");
+                      setTimeout(preencherJogadoras, 1000);
+                      return;
+                    }
+                    
+                    dados.jogadoras.forEach((jogadora, index) => {
                       setTimeout(() => {
-                        const selectButton = card.querySelector('button[role="combobox"]') ||
-                                           card.querySelector('[data-placeholder*="posição"]') ||
-                                           Array.from(card.querySelectorAll('button')).find(btn => 
-                                             btn.textContent?.includes('Selecione a posição')
-                                           );
-                        
-                        if (selectButton && selectButton instanceof HTMLElement) {
-                          selectButton.click();
+                        if (index < jogadoraCards.length) {
+                          const card = jogadoraCards[index];
+                          console.log(`Preenchendo jogadora ${index + 1}: ${jogadora.nomeCompleto}`);
                           
-                          setTimeout(() => {
-                            const opcaoPosicao = document.querySelector(`[data-value="${jogadora.posicao}"]`) ||
-                                               Array.from(document.querySelectorAll('[role="option"]')).find(opt => 
-                                                 opt.textContent?.toLowerCase().includes(jogadora.posicao)
-                                               );
-                            
-                            if (opcaoPosicao && opcaoPosicao instanceof HTMLElement) {
-                              opcaoPosicao.click();
-                            }
-                          }, 200);
-                        }
-                      }, 300);
-                      
-                      // Radio button "Já participou" da jogadora
-                      setTimeout(() => {
-                        console.log(`Buscando radio buttons para jogadora ${index + 1}...`);
-                        
-                        // Buscar pelos IDs específicos do projeto: player-X-sim e player-X-nao
-                        const jogadoraId = index + 1; // Baseado na estrutura do JSX
-                        const radioSim = document.getElementById(`player-${jogadoraId}-sim`);
-                        const radioNao = document.getElementById(`player-${jogadoraId}-nao`);
-                        
-                        console.log(`Radio SIM encontrado: ${radioSim ? 'sim' : 'nao'}`);
-                        console.log(`Radio NAO encontrado: ${radioNao ? 'sim' : 'nao'}`);
-                        
-                        const valorDesejado = jogadora.jaParticipou;
-                        let radioMarcado = false;
-                        
-                        if (valorDesejado === 'sim' && radioSim) {
-                          radioSim.click();
-                          radioMarcado = true;
-                          console.log(`Radio SIM marcado para jogadora ${index + 1}`);
-                        } else if (valorDesejado === 'nao' && radioNao) {
-                          radioNao.click();
-                          radioMarcado = true;
-                          console.log(`Radio NAO marcado para jogadora ${index + 1}`);
-                        }
-                        
-                        if (!radioMarcado) {
-                          console.log(`AVISO: Nenhum radio button foi marcado para jogadora ${index + 1}`);
-                          console.log(`Valor desejado: ${valorDesejado}`);
+                          // Buscar inputs com maior flexibilidade
+                          const inputs = card.querySelectorAll('input');
+                          console.log(`Inputs encontrados no card ${index + 1}: ${inputs.length}`);
                           
-                          // Fallback: buscar radio buttons dentro do card
-                          const radiosNoCard = card.querySelectorAll('input[type="radio"]');
-                          console.log(`Radios encontrados no card: ${radiosNoCard.length}`);
-                          radiosNoCard.forEach((radio, radioIndex) => {
-                            if (radio instanceof HTMLInputElement) {
-                              console.log(`Radio ${radioIndex}: id="${radio.id}", value="${radio.value}"`);
+                          inputs.forEach((input, inputIndex) => {
+                            if (input instanceof HTMLInputElement) {
+                              const placeholder = input.getAttribute('placeholder') || '';
+                              const type = input.getAttribute('type') || '';
+                              console.log(`Input ${inputIndex}: placeholder="${placeholder}", type="${type}"`);
+                              
+                              // Nome completo
+                              if (placeholder.toLowerCase().includes('nome') && !input.value) {
+                                utils.setReactInput(input, jogadora.nomeCompleto);
+                                console.log(`Nome preenchido: ${jogadora.nomeCompleto}`);
+                              }
+                              // Email
+                              else if (type === 'email' || placeholder.toLowerCase().includes('email')) {
+                                utils.setReactInput(input, jogadora.email);
+                                console.log(`Email preenchido: ${jogadora.email}`);
+                              }
+                              // Telefone/WhatsApp
+                              else if (placeholder.includes('99999') || placeholder.toLowerCase().includes('whatsapp') || placeholder.includes('(11)')) {
+                                utils.setReactInput(input, jogadora.telefone);
+                                console.log(`Telefone preenchido: ${jogadora.telefone}`);
+                              }
+                              // Idade
+                              else if (placeholder.toLowerCase().includes('idade')) {
+                                utils.setReactInput(input, jogadora.idade);
+                                console.log(`Idade preenchida: ${jogadora.idade}`);
+                              }
+                              // Cidade/Bairro
+                              else if (placeholder.toLowerCase().includes('cidade') || placeholder.toLowerCase().includes('bairro')) {
+                                utils.setReactInput(input, jogadora.cidadeBairro);
+                                console.log(`Cidade/Bairro preenchido: ${jogadora.cidadeBairro}`);
+                              }
                             }
                           });
+                          
+                          // Posição da jogadora (Select) - com delay maior
+                          setTimeout(() => {
+                            const selectButton = card.querySelector('button[role="combobox"]') ||
+                                               Array.from(card.querySelectorAll('button')).find(btn => 
+                                                 btn.textContent?.includes('Selecione a posição') ||
+                                                 btn.textContent?.includes('Selecione')
+                                               );
+                            
+                            if (selectButton && selectButton instanceof HTMLElement) {
+                              selectButton.click();
+                              
+                              setTimeout(() => {
+                                const opcaoPosicao = document.querySelector(`[data-value="${jogadora.posicao}"]`) ||
+                                                   Array.from(document.querySelectorAll('[role="option"]')).find(opt => 
+                                                     opt.textContent?.toLowerCase().includes(jogadora.posicao)
+                                                   );
+                                
+                                if (opcaoPosicao && opcaoPosicao instanceof HTMLElement) {
+                                  opcaoPosicao.click();
+                                  console.log(`Posição selecionada para jogadora ${index + 1}: ${jogadora.posicao}`);
+                                }
+                              }, 300);
+                            }
+                          }, 500);
+                          
+                          // Radio button "Já participou" da jogadora - com delay ainda maior
+                          setTimeout(() => {
+                            const jogadoraId = index + 1;
+                            const radioSim = document.getElementById(`player-${jogadoraId}-sim`);
+                            const radioNao = document.getElementById(`player-${jogadoraId}-nao`);
+                            
+                            const valorDesejado = jogadora.jaParticipou;
+                            
+                            if (valorDesejado === 'sim' && radioSim && radioSim instanceof HTMLElement) {
+                              radioSim.click();
+                              console.log(`Radio SIM marcado para jogadora ${index + 1}`);
+                            } else if (valorDesejado === 'nao' && radioNao && radioNao instanceof HTMLElement) {
+                              radioNao.click();
+                              console.log(`Radio NAO marcado para jogadora ${index + 1}`);
+                            } else {
+                              console.log(`AVISO: Radio button não encontrado para jogadora ${index + 1}. Tentando fallback...`);
+                              
+                              // Fallback: buscar qualquer radio button no card
+                              const radiosNoCard = card.querySelectorAll('input[type="radio"]');
+                              if (radiosNoCard.length >= 2) {
+                                const radioParaClicar = valorDesejado === 'sim' ? radiosNoCard[0] : radiosNoCard[1];
+                                if (radioParaClicar instanceof HTMLElement) {
+                                  radioParaClicar.click();
+                                  console.log(`Fallback: Radio ${valorDesejado} marcado para jogadora ${index + 1}`);
+                                }
+                              }
+                            }
+                          }, 1000);
                         }
-                      }, 700);
-                    }
-                  }, index * 800);
-                });
-                
-                console.log("Cadastro de equipe completo finalizado!");
+                      }, index * 1200); // Aumentei o delay entre jogadoras
+                    });
+                  };
+                  
+                  // Iniciar preenchimento das jogadoras
+                  setTimeout(preencherJogadoras, 500);
+                  
+                }, 1000);
               }, 1500);
             }, 1000);
           }, 2000);

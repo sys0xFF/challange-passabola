@@ -70,7 +70,8 @@ import {
   Search,
   X,
   Check,
-  Edit
+  Edit,
+  Activity
 } from "lucide-react"
 
 const bebasNeue = Bebas_Neue({
@@ -861,14 +862,27 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <Button 
-              onClick={handleLogout}
-              variant="outline" 
-              className="text-red-600 border-red-200 hover:bg-red-50 w-full sm:w-auto"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button 
+                asChild
+                variant="outline" 
+                className="text-[#8e44ad] border-[#8e44ad] hover:bg-[#8e44ad] hover:text-white"
+              >
+                <Link href="/pulseira/dashboard">
+                  <Activity className="h-4 w-4 mr-2" />
+                  Dashboard Pulseiras
+                </Link>
+              </Button>
+              
+              <Button 
+                onClick={handleLogout}
+                variant="outline" 
+                className="text-red-600 border-red-200 hover:bg-red-50"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            </div>
           </div>
         </div>
       </header>

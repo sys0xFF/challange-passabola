@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="overflow-x-hidden w-full">
       <body className={`${inter.className} overflow-x-hidden max-w-[100vw] w-full m-0 p-0`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <AuthProvider>
             <CartProvider>
               <div className="overflow-x-hidden w-full">
