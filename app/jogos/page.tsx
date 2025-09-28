@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Bebas_Neue } from 'next/font/google'
+import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +17,9 @@ import { saveTicketPurchase, Game, Tournament, TicketType } from '@/lib/database
 import { Calendar, Clock, MapPin, Users, Search, Ticket, Loader2, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { AuthButton } from '@/components/ui/auth-button'
+import { MobileMenu } from '@/components/ui/mobile-menu'
 
 const bebasNeue = Bebas_Neue({ 
   weight: '400', 
@@ -93,8 +97,9 @@ export default function JogosPage() {
 
   const handleBuyTickets = (game: Game & { id: string }) => {
     if (!user) {
-      toast.error("Você precisa estar logado para comprar ingressos")
-      signIn()
+      toast.error("🔐 Acesso Restrito: Para comprar ingressos você precisa estar logado. Clique no botão de login no canto superior direito!")
+      // Aguardar um pouco para o toast aparecer antes de abrir o modal
+      setTimeout(() => signIn(), 100)
       return
     }
     
@@ -151,9 +156,33 @@ export default function JogosPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header fixo */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="relative h-8 w-8">
+                  <Image src="/logo.png" alt="Copa Passa Bola" fill className="object-contain" />
+                </div>
+                <span className={`${bebasNeue.className} text-2xl text-[#8e44ad] tracking-wider`}>
+                  PASSA BOLA
+                </span>
+              </Link>
+            </div>
+            <div className="flex items-center gap-2">
+              <AuthButton />
+              <div className="md:hidden">
+                <MobileMenu />
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <ScrollAnimation>
-        <div className="relative bg-gradient-to-r from-[#8e44ad] to-purple-600 text-white py-20">
+        <div className="relative bg-gradient-to-r from-[#8e44ad] to-purple-600 text-white pt-28 pb-16">
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
             <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
@@ -181,7 +210,7 @@ export default function JogosPage() {
         </div>
       </ScrollAnimation>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 pt-8">
         {/* Botão Voltar */}
         <ScrollAnimation>
           <Button
