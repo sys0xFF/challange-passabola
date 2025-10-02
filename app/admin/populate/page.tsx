@@ -21,6 +21,7 @@ import {
   CheckCircle
 } from "lucide-react"
 import Link from "next/link"
+import { faker } from '@faker-js/faker'
 import { 
   saveTeamRegistration,
   saveIndividualRegistration,
@@ -51,549 +52,92 @@ export default function PopulatePage() {
     setProgress(prev => ({ ...prev, [key]: status }))
   }
 
+  
+  // Arrays para gerar nomes de times aleatórios
+  const teamPrefixes = [
+    'Águias', 'Leões', 'Tigres', 'Panteras', 'Falcões', 'Dragões', 'Lobos', 'Cobras',
+    'Tubarões', 'Raios', 'Trovões', 'Meteoros', 'Cometas', 'Estrelas', 'Sóis', 'Luas',
+    'Amazonas', 'Guerreiras', 'Valquírias', 'Spartanas', 'Gladiadoras', 'Vikingues', 
+    'Piratas', 'Corsárias', 'Tempestades', 'Furacões', 'Ciclones', 'Tornados'
+  ]
+  
+  const teamSuffixes = [
+    'Douradas', 'Prateadas', 'de Ferro', 'de Aço', 'de Fogo', 'de Gelo', 'Negras',
+    'Vermelhas', 'Azuis', 'Verdes', 'Roxas', 'Brancas', 'do Norte', 'do Sul',
+    'do Leste', 'do Oeste', 'Invencíveis', 'Imortais', 'Selvagens', 'Ferozes',
+    'Brilhantes', 'Radiantes', 'Místicas', 'Lendárias', 'Supremas', 'Divinas'
+  ]
+
+  const positions = ['Goleira', 'Zagueira', 'Lateral', 'Meio-campo', 'Atacante']
+  const saoPauloNeighborhoods = [
+    'Vila Madalena', 'Pinheiros', 'Itaim Bibi', 'Vila Olímpia', 'Mooca', 'Tatuapé',
+    'Santana', 'Liberdade', 'Bela Vista', 'República', 'Consolação', 'Higienópolis',
+    'Santa Cecília', 'Campos Elíseos', 'Brooklin', 'Campo Belo', 'Saúde', 'Vila Mariana',
+    'Ipiranga', 'Cursino', 'Jabaquara', 'Morumbi', 'Butantã', 'Cidade Jardim',
+    'Alto de Pinheiros', 'Jardim América', 'Vila Nova Conceição', 'Moema',
+    'Jardim Paulista', 'Perdizes', 'Sumaré', 'Pompeia', 'Lapa', 'Barra Funda'
+  ]
+
+  const generateRandomTeamName = () => {
+    const prefix = faker.helpers.arrayElement(teamPrefixes)
+    const suffix = faker.helpers.arrayElement(teamSuffixes)
+    return `${prefix} ${suffix}`
+  }
+
+  const generatePlayer = (id: number) => {
+    const firstName = faker.person.firstName('female')
+    const lastName = faker.person.lastName()
+    return {
+      id,
+      nomeCompleto: `${firstName} ${lastName}`,
+      idade: faker.number.int({ min: 18, max: 35 }).toString(),
+      email: faker.internet.email().toLowerCase(),
+      telefone: `(11) 9${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+      cidadeBairro: `${faker.helpers.arrayElement(saoPauloNeighborhoods)}, São Paulo`,
+      posicao: faker.helpers.arrayElement(positions),
+      jaParticipou: faker.helpers.arrayElement(['Sim', 'Não'])
+    }
+  }
+
+  const generateTeam = () => {
+    const captainName = faker.person.fullName({ sex: 'female' })
+    const teamName = generateRandomTeamName()
+    
+    return {
+      teamData: { 
+        nomeTime: teamName, 
+        nomeCapitao: captainName.split(' ').slice(0, 2).join(' ') 
+      },
+      captainData: {
+        nomeCompleto: captainName,
+        idade: faker.number.int({ min: 20, max: 35 }).toString(),
+        email: faker.internet.email().toLowerCase(),
+        telefone: `(11) 9${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+        cidadeBairro: `${faker.helpers.arrayElement(saoPauloNeighborhoods)}, São Paulo`,
+        posicao: faker.helpers.arrayElement(positions),
+        jaParticipou: faker.helpers.arrayElement(['Sim', 'Não'])
+      },
+      players: Array.from({ length: 6 }, (_, i) => generatePlayer(i + 1)),
+      preferences: { 
+        acceptTerms: true, 
+        wantNotifications: faker.datatype.boolean() 
+      },
+      type: "team" as const
+    }
+  }
+
   const generateTeamsData = async () => {
     updateProgress('teams', 'loading')
     
-    const teamsData = [
-      {
-        teamData: { nomeTime: "Amazonas FC", nomeCapitao: "Marina Silva" },
-        captainData: {
-          nomeCompleto: "Marina Silva Santos",
-          idade: "28",
-          email: "marina.silva@email.com",
-          telefone: "(11) 99876-5432",
-          cidadeBairro: "Vila Madalena, São Paulo",
-          posicao: "Meio-campo",
-          jaParticipou: "Sim"
-        },
-        players: [
-          {
-            id: 1,
-            nomeCompleto: "Ana Carolina Souza",
-            idade: "24",
-            email: "ana.souza@email.com",
-            telefone: "(11) 98765-4321",
-            cidadeBairro: "Pinheiros, São Paulo",
-            posicao: "Goleira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 2,
-            nomeCompleto: "Beatriz Lima Costa",
-            idade: "26",
-            email: "beatriz.lima@email.com",
-            telefone: "(11) 97654-3210",
-            cidadeBairro: "Itaim Bibi, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 3,
-            nomeCompleto: "Carla Fernanda Oliveira",
-            idade: "25",
-            email: "carla.oliveira@email.com",
-            telefone: "(11) 96543-2109",
-            cidadeBairro: "Vila Olímpia, São Paulo",
-            posicao: "Lateral",
-            jaParticipou: "Não"
-          },
-          {
-            id: 4,
-            nomeCompleto: "Daniela Santos Pereira",
-            idade: "29",
-            email: "daniela.pereira@email.com",
-            telefone: "(11) 95432-1098",
-            cidadeBairro: "Mooca, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 5,
-            nomeCompleto: "Eduarda Mendes Silva",
-            idade: "23",
-            email: "eduarda.silva@email.com",
-            telefone: "(11) 94321-0987",
-            cidadeBairro: "Tatuapé, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Não"
-          },
-          {
-            id: 6,
-            nomeCompleto: "Fernanda Costa Rodrigues",
-            idade: "27",
-            email: "fernanda.rodrigues@email.com",
-            telefone: "(11) 93210-9876",
-            cidadeBairro: "Santana, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Sim"
-          }
-        ],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "team" as const
-      },
-      {
-        teamData: { nomeTime: "Panteras Douradas", nomeCapitao: "Julia Martins" },
-        captainData: {
-          nomeCompleto: "Julia Martins Ferreira",
-          idade: "30",
-          email: "julia.martins@email.com",
-          telefone: "(11) 99123-4567",
-          cidadeBairro: "Liberdade, São Paulo",
-          posicao: "Zagueira",
-          jaParticipou: "Sim"
-        },
-        players: [
-          {
-            id: 1,
-            nomeCompleto: "Gabriela Ramos Silva",
-            idade: "22",
-            email: "gabriela.ramos@email.com",
-            telefone: "(11) 98123-4567",
-            cidadeBairro: "Bela Vista, São Paulo",
-            posicao: "Goleira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 2,
-            nomeCompleto: "Helena Castro Oliveira",
-            idade: "25",
-            email: "helena.castro@email.com",
-            telefone: "(11) 97123-4567",
-            cidadeBairro: "República, São Paulo",
-            posicao: "Lateral",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 3,
-            nomeCompleto: "Isabel Rodrigues Santos",
-            idade: "28",
-            email: "isabel.santos@email.com",
-            telefone: "(11) 96123-4567",
-            cidadeBairro: "Consolação, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 4,
-            nomeCompleto: "Joana Pereira Lima",
-            idade: "24",
-            email: "joana.lima@email.com",
-            telefone: "(11) 95123-4567",
-            cidadeBairro: "Higienópolis, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 5,
-            nomeCompleto: "Karen Almeida Costa",
-            idade: "26",
-            email: "karen.costa@email.com",
-            telefone: "(11) 94123-4567",
-            cidadeBairro: "Santa Cecília, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Não"
-          },
-          {
-            id: 6,
-            nomeCompleto: "Laura Oliveira Souza",
-            idade: "27",
-            email: "laura.souza@email.com",
-            telefone: "(11) 93123-4567",
-            cidadeBairro: "Campos Elíseos, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Sim"
-          }
-        ],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "team" as const
-      },
-      {
-        teamData: { nomeTime: "Tigres de Aço", nomeCapitao: "Renata Alves" },
-        captainData: {
-          nomeCompleto: "Renata Alves Pereira",
-          idade: "32",
-          email: "renata.alves@email.com",
-          telefone: "(11) 99234-5678",
-          cidadeBairro: "Brooklin, São Paulo",
-          posicao: "Goleira",
-          jaParticipou: "Sim"
-        },
-        players: [
-          {
-            id: 1,
-            nomeCompleto: "Mariana Santos Cruz",
-            idade: "21",
-            email: "mariana.cruz@email.com",
-            telefone: "(11) 98234-5678",
-            cidadeBairro: "Campo Belo, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 2,
-            nomeCompleto: "Natalia Costa Ferreira",
-            idade: "23",
-            email: "natalia.ferreira@email.com",
-            telefone: "(11) 97234-5678",
-            cidadeBairro: "Saúde, São Paulo",
-            posicao: "Lateral",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 3,
-            nomeCompleto: "Olivia Rodrigues Lima",
-            idade: "25",
-            email: "olivia.lima@email.com",
-            telefone: "(11) 96234-5678",
-            cidadeBairro: "Vila Mariana, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Não"
-          },
-          {
-            id: 4,
-            nomeCompleto: "Patricia Silva Santos",
-            idade: "29",
-            email: "patricia.santos@email.com",
-            telefone: "(11) 95234-5678",
-            cidadeBairro: "Ipiranga, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 5,
-            nomeCompleto: "Quezia Oliveira Costa",
-            idade: "24",
-            email: "quezia.costa@email.com",
-            telefone: "(11) 94234-5678",
-            cidadeBairro: "Cursino, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Não"
-          },
-          {
-            id: 6,
-            nomeCompleto: "Rosa Maria Pereira",
-            idade: "31",
-            email: "rosa.pereira@email.com",
-            telefone: "(11) 93234-5678",
-            cidadeBairro: "Jabaquara, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Sim"
-          }
-        ],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "team" as const
-      },
-      {
-        teamData: { nomeTime: "Águias Negras", nomeCapitao: "Camila Torres" },
-        captainData: {
-          nomeCompleto: "Camila Torres Ribeiro",
-          idade: "29",
-          email: "camila.torres@email.com",
-          telefone: "(11) 99345-6789",
-          cidadeBairro: "Morumbi, São Paulo",
-          posicao: "Atacante",
-          jaParticipou: "Sim"
-        },
-        players: [
-          {
-            id: 1,
-            nomeCompleto: "Sandra Regina Lima",
-            idade: "26",
-            email: "sandra.lima@email.com",
-            telefone: "(11) 98345-6789",
-            cidadeBairro: "Butantã, São Paulo",
-            posicao: "Goleira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 2,
-            nomeCompleto: "Talita Mendes Costa",
-            idade: "24",
-            email: "talita.costa@email.com",
-            telefone: "(11) 97345-6789",
-            cidadeBairro: "Cidade Jardim, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 3,
-            nomeCompleto: "Vanessa Silva Santos",
-            idade: "27",
-            email: "vanessa.santos@email.com",
-            telefone: "(11) 96345-6789",
-            cidadeBairro: "Pinheiros, São Paulo",
-            posicao: "Lateral",
-            jaParticipou: "Não"
-          },
-          {
-            id: 4,
-            nomeCompleto: "Wanessa Oliveira Pereira",
-            idade: "25",
-            email: "wanessa.pereira@email.com",
-            telefone: "(11) 95345-6789",
-            cidadeBairro: "Alto de Pinheiros, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 5,
-            nomeCompleto: "Xiomara Rodrigues Silva",
-            idade: "28",
-            email: "xiomara.silva@email.com",
-            telefone: "(11) 94345-6789",
-            cidadeBairro: "Vila Madalena, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Não"
-          },
-          {
-            id: 6,
-            nomeCompleto: "Yara Santos Costa",
-            idade: "30",
-            email: "yara.costa@email.com",
-            telefone: "(11) 93345-6789",
-            cidadeBairro: "Jardim América, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Sim"
-          }
-        ],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "team" as const
-      },
-      {
-        teamData: { nomeTime: "Leoas do Sul", nomeCapitao: "Brenda Ferreira" },
-        captainData: {
-          nomeCompleto: "Brenda Ferreira Santos",
-          idade: "31",
-          email: "brenda.ferreira@email.com",
-          telefone: "(11) 99456-7890",
-          cidadeBairro: "Vila Olímpia, São Paulo",
-          posicao: "Meio-campo",
-          jaParticipou: "Sim"
-        },
-        players: [
-          {
-            id: 1,
-            nomeCompleto: "Adriana Costa Lima",
-            idade: "23",
-            email: "adriana.lima@email.com",
-            telefone: "(11) 98456-7890",
-            cidadeBairro: "Campo Belo, São Paulo",
-            posicao: "Goleira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 2,
-            nomeCompleto: "Bianca Oliveira Silva",
-            idade: "25",
-            email: "bianca.silva@email.com",
-            telefone: "(11) 97456-7890",
-            cidadeBairro: "Brooklin, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 3,
-            nomeCompleto: "Cintia Santos Pereira",
-            idade: "26",
-            email: "cintia.pereira@email.com",
-            telefone: "(11) 96456-7890",
-            cidadeBairro: "Vila Nova Conceição, São Paulo",
-            posicao: "Lateral",
-            jaParticipou: "Não"
-          },
-          {
-            id: 4,
-            nomeCompleto: "Denise Lima Rodrigues",
-            idade: "29",
-            email: "denise.rodrigues@email.com",
-            telefone: "(11) 95456-7890",
-            cidadeBairro: "Itaim Bibi, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 5,
-            nomeCompleto: "Ester Pereira Costa",
-            idade: "24",
-            email: "ester.costa@email.com",
-            telefone: "(11) 94456-7890",
-            cidadeBairro: "Moema, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Não"
-          },
-          {
-            id: 6,
-            nomeCompleto: "Fabiana Silva Santos",
-            idade: "27",
-            email: "fabiana.santos@email.com",
-            telefone: "(11) 93456-7890",
-            cidadeBairro: "Jardim Paulista, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Sim"
-          }
-        ],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "team" as const
-      },
-      {
-        teamData: { nomeTime: "Falcões Vermelhos", nomeCapitao: "Luciana Mendes" },
-        captainData: {
-          nomeCompleto: "Luciana Mendes Oliveira",
-          idade: "33",
-          email: "luciana.mendes@email.com",
-          telefone: "(11) 99567-8901",
-          cidadeBairro: "Perdizes, São Paulo",
-          posicao: "Zagueira",
-          jaParticipou: "Sim"
-        },
-        players: [
-          {
-            id: 1,
-            nomeCompleto: "Gisele Rodrigues Lima",
-            idade: "22",
-            email: "gisele.lima@email.com",
-            telefone: "(11) 98567-8901",
-            cidadeBairro: "Sumaré, São Paulo",
-            posicao: "Goleira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 2,
-            nomeCompleto: "Helena Santos Costa",
-            idade: "28",
-            email: "helena.costa@email.com",
-            telefone: "(11) 97567-8901",
-            cidadeBairro: "Pompeia, São Paulo",
-            posicao: "Lateral",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 3,
-            nomeCompleto: "Ingrid Silva Pereira",
-            idade: "26",
-            email: "ingrid.pereira@email.com",
-            telefone: "(11) 96567-8901",
-            cidadeBairro: "Lapa, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Não"
-          },
-          {
-            id: 4,
-            nomeCompleto: "Juliana Costa Santos",
-            idade: "25",
-            email: "juliana.santos@email.com",
-            telefone: "(11) 95567-8901",
-            cidadeBairro: "Barra Funda, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 5,
-            nomeCompleto: "Karina Oliveira Lima",
-            idade: "29",
-            email: "karina.lima@email.com",
-            telefone: "(11) 94567-8901",
-            cidadeBairro: "Água Branca, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Não"
-          },
-          {
-            id: 6,
-            nomeCompleto: "Leticia Pereira Silva",
-            idade: "24",
-            email: "leticia.silva@email.com",
-            telefone: "(11) 93567-8901",
-            cidadeBairro: "Alto da Lapa, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Sim"
-          }
-        ],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "team" as const
-      },
-      {
-        teamData: { nomeTime: "Dragões Azuis", nomeCapitao: "Patricia Andrade" },
-        captainData: {
-          nomeCompleto: "Patricia Andrade Silva",
-          idade: "30",
-          email: "patricia.andrade@email.com",
-          telefone: "(11) 99678-9012",
-          cidadeBairro: "Vila Leopoldina, São Paulo",
-          posicao: "Lateral",
-          jaParticipou: "Sim"
-        },
-        players: [
-          {
-            id: 1,
-            nomeCompleto: "Monica Santos Rodrigues",
-            idade: "27",
-            email: "monica.rodrigues@email.com",
-            telefone: "(11) 98678-9012",
-            cidadeBairro: "Jaguaré, São Paulo",
-            posicao: "Goleira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 2,
-            nomeCompleto: "Natasha Costa Oliveira",
-            idade: "25",
-            email: "natasha.oliveira@email.com",
-            telefone: "(11) 97678-9012",
-            cidadeBairro: "Rio Pequeno, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 3,
-            nomeCompleto: "Priscila Lima Santos",
-            idade: "26",
-            email: "priscila.santos@email.com",
-            telefone: "(11) 96678-9012",
-            cidadeBairro: "Raposo Tavares, São Paulo",
-            posicao: "Zagueira",
-            jaParticipou: "Não"
-          },
-          {
-            id: 4,
-            nomeCompleto: "Roberta Silva Costa",
-            idade: "28",
-            email: "roberta.costa@email.com",
-            telefone: "(11) 95678-9012",
-            cidadeBairro: "Vila Sônia, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Sim"
-          },
-          {
-            id: 5,
-            nomeCompleto: "Simone Pereira Lima",
-            idade: "24",
-            email: "simone.lima@email.com",
-            telefone: "(11) 94678-9012",
-            cidadeBairro: "Morumbi, São Paulo",
-            posicao: "Meio-campo",
-            jaParticipou: "Não"
-          },
-          {
-            id: 6,
-            nomeCompleto: "Viviane Oliveira Santos",
-            idade: "31",
-            email: "viviane.santos@email.com",
-            telefone: "(11) 93678-9012",
-            cidadeBairro: "Real Parque, São Paulo",
-            posicao: "Atacante",
-            jaParticipou: "Sim"
-          }
-        ],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "team" as const
-      }
-    ]
-
     try {
+      const numberOfTeams = 8 // Gerar 8 equipes
+      const teamsData = Array.from({ length: numberOfTeams }, () => generateTeam())
+      
       for (const team of teamsData) {
         await saveTeamRegistration(team)
         await new Promise(resolve => setTimeout(resolve, 500)) // Delay para não sobrecarregar
       }
+      
       updateProgress('teams', 'success')
       toast.success(`${teamsData.length} equipes criadas com sucesso!`)
     } catch (error) {
@@ -603,121 +147,40 @@ export default function PopulatePage() {
     }
   }
 
+  const generateIndividual = () => {
+    return {
+      captainData: {
+        nomeCompleto: faker.person.fullName({ sex: 'female' }),
+        idade: faker.number.int({ min: 18, max: 35 }).toString(),
+        email: faker.internet.email().toLowerCase(),
+        telefone: `(11) 9${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+        cidadeBairro: `${faker.helpers.arrayElement(saoPauloNeighborhoods)}, São Paulo`,
+        posicao: faker.helpers.arrayElement(positions),
+        jaParticipou: faker.helpers.arrayElement(['Sim', 'Não'])
+      },
+      preferences: { 
+        acceptTerms: true, 
+        wantNotifications: faker.datatype.boolean() 
+      },
+      type: "individual" as const
+    }
+  }
+
   const generateIndividualsData = async () => {
     updateProgress('individuals', 'loading')
     
-    const individualsData = [
-      {
-        captainData: {
-          nomeCompleto: "Sofia Almeida Castro",
-          idade: "26",
-          email: "sofia.castro@email.com",
-          telefone: "(11) 99345-6789",
-          cidadeBairro: "Perdizes, São Paulo",
-          posicao: "Goleira",
-          jaParticipou: "Não"
-        },
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "individual" as const
-      },
-      {
-        captainData: {
-          nomeCompleto: "Tatiana Ferreira Souza",
-          idade: "24",
-          email: "tatiana.souza@email.com",
-          telefone: "(11) 99456-7890",
-          cidadeBairro: "Pompeia, São Paulo",
-          posicao: "Zagueira",
-          jaParticipou: "Sim"
-        },
-        preferences: { acceptTerms: true, wantNotifications: false },
-        type: "individual" as const
-      },
-      {
-        captainData: {
-          nomeCompleto: "Ursula Santos Lima",
-          idade: "28",
-          email: "ursula.lima@email.com",
-          telefone: "(11) 99567-8901",
-          cidadeBairro: "Lapa, São Paulo",
-          posicao: "Meio-campo",
-          jaParticipou: "Não"
-        },
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "individual" as const
-      },
-      {
-        captainData: {
-          nomeCompleto: "Vitoria Costa Oliveira",
-          idade: "22",
-          email: "vitoria.oliveira@email.com",
-          telefone: "(11) 99678-9012",
-          cidadeBairro: "Barra Funda, São Paulo",
-          posicao: "Atacante",
-          jaParticipou: "Sim"
-        },
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "individual" as const
-      },
-      {
-        captainData: {
-          nomeCompleto: "Wanda Silva Pereira",
-          idade: "30",
-          email: "wanda.pereira@email.com",
-          telefone: "(11) 99789-0123",
-          cidadeBairro: "Água Branca, São Paulo",
-          posicao: "Lateral",
-          jaParticipou: "Não"
-        },
-        preferences: { acceptTerms: true, wantNotifications: false },
-        type: "individual" as const
-      },
-      {
-        captainData: {
-          nomeCompleto: "Ximena Rodriguez Santos",
-          idade: "25",
-          email: "ximena.santos@email.com",
-          telefone: "(11) 99890-1234",
-          cidadeBairro: "Alto da Lapa, São Paulo",
-          posicao: "Meio-campo",
-          jaParticipou: "Sim"
-        },
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "individual" as const
-      },
-      {
-        captainData: {
-          nomeCompleto: "Yasmin Oliveira Costa",
-          idade: "27",
-          email: "yasmin.costa@email.com",
-          telefone: "(11) 99901-2345",
-          cidadeBairro: "Vila Leopoldina, São Paulo",
-          posicao: "Goleira",
-          jaParticipou: "Não"
-        },
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "individual" as const
-      },
-      {
-        captainData: {
-          nomeCompleto: "Zara Santos Ferreira",
-          idade: "29",
-          email: "zara.ferreira@email.com",
-          telefone: "(11) 99012-3456",
-          cidadeBairro: "Jaguaré, São Paulo",
-          posicao: "Atacante",
-          jaParticipou: "Sim"
-        },
-        preferences: { acceptTerms: true, wantNotifications: false },
-        type: "individual" as const
-      }
-    ]
-
     try {
+      const numberOfIndividuals = 8 // Gerar 8 jogadoras individuais
+      const individualsData = Array.from({ length: numberOfIndividuals }, () => generateIndividual())
+      
+      // Garantir que pelo menos 1 seja goleira
+      individualsData[0].captainData.posicao = 'Goleira'
+      
       for (const individual of individualsData) {
         await saveIndividualRegistration(individual)
         await new Promise(resolve => setTimeout(resolve, 300))
       }
+      
       updateProgress('individuals', 'success')
       toast.success(`${individualsData.length} jogadoras individuais criadas com sucesso!`)
     } catch (error) {
@@ -727,80 +190,59 @@ export default function PopulatePage() {
     }
   }
 
+  const volunteerAreas = [
+    'Atendimento Médico', 'Organização', 'Logística', 'Marketing', 'Mídia Social',
+    'Segurança', 'Limpeza', 'Transporte', 'Alimentação', 'Recepção'
+  ]
+  
+  const professions = [
+    'Enfermeira', 'Médica', 'Designer', 'Administradora', 'Professora', 'Estudante',
+    'Engenheira', 'Advogada', 'Psicóloga', 'Fisioterapeuta', 'Jornalista', 'Contador'
+  ]
+  
+  const dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo']
+  const horarios = ['Manhã', 'Tarde', 'Noite']
+
+  const generateVolunteer = () => {
+    const name = faker.person.fullName({ sex: 'female' })
+    return {
+      formData: {
+        nomeCompleto: name,
+        idade: faker.number.int({ min: 18, max: 60 }).toString(),
+        email: faker.internet.email().toLowerCase(),
+        telefone: `(11) 9${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+        cidadeBairro: `${faker.helpers.arrayElement(saoPauloNeighborhoods)}, São Paulo`,
+        profissao: faker.helpers.arrayElement(professions),
+        experienciaAnterior: faker.lorem.sentence(),
+        motivacao: faker.lorem.sentence(),
+        disponibilidadeDias: faker.helpers.arrayElements(dias, { min: 1, max: 3 }),
+        disponibilidadeHorarios: faker.helpers.arrayElements(horarios, { min: 1, max: 2 }),
+        temTransporte: faker.helpers.arrayElement(['Sim', 'Não']),
+        referencias: faker.company.name(),
+        antecedentes: 'Não',
+        observacoes: faker.lorem.sentence()
+      },
+      selectedAreas: faker.helpers.arrayElements(volunteerAreas, { min: 1, max: 3 }),
+      preferences: { 
+        acceptTerms: true, 
+        wantNotifications: faker.datatype.boolean() 
+      },
+      type: "volunteer" as const
+    }
+  }
+
   const generateVolunteersData = async () => {
     updateProgress('volunteers', 'loading')
     
-    const volunteersData = [
-      {
-        formData: {
-          nomeCompleto: "Amanda Silva Santos",
-          idade: "35",
-          email: "amanda.santos@email.com",
-          telefone: "(11) 99111-2222",
-          cidadeBairro: "Jardins, São Paulo",
-          profissao: "Enfermeira",
-          experienciaAnterior: "Trabalho voluntário em hospitais",
-          motivacao: "Amor pelo esporte feminino",
-          disponibilidadeDias: ["Sábado", "Domingo"],
-          disponibilidadeHorarios: ["Manhã", "Tarde"],
-          temTransporte: "Sim",
-          referencias: "Hospital São Camilo",
-          antecedentes: "Não",
-          observacoes: "Disponível para primeiros socorros"
-        },
-        selectedAreas: ["Atendimento Médico", "Organização"],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "volunteer" as const
-      },
-      {
-        formData: {
-          nomeCompleto: "Bruna Costa Lima",
-          idade: "28",
-          email: "bruna.lima@email.com",
-          telefone: "(11) 99222-3333",
-          cidadeBairro: "Moema, São Paulo",
-          profissao: "Designer Gráfica",
-          experienciaAnterior: "Design para ONGs",
-          motivacao: "Apoiar o futebol feminino",
-          disponibilidadeDias: ["Sexta-feira", "Sábado"],
-          disponibilidadeHorarios: ["Tarde", "Noite"],
-          temTransporte: "Sim",
-          referencias: "Estúdio Creative",
-          antecedentes: "Não",
-          observacoes: "Posso ajudar com material gráfico"
-        },
-        selectedAreas: ["Marketing", "Mídia Social"],
-        preferences: { acceptTerms: true, wantNotifications: true },
-        type: "volunteer" as const
-      },
-      {
-        formData: {
-          nomeCompleto: "Cristina Rodrigues Oliveira",
-          idade: "42",
-          email: "cristina.oliveira@email.com",
-          telefone: "(11) 99333-4444",
-          cidadeBairro: "Vila Nova Conceição, São Paulo",
-          profissao: "Administradora",
-          experienciaAnterior: "Gestão de eventos esportivos",
-          motivacao: "Experiência em organização",
-          disponibilidadeDias: ["Sábado", "Domingo"],
-          disponibilidadeHorarios: ["Manhã", "Tarde", "Noite"],
-          temTransporte: "Sim",
-          referencias: "Clube Atlético Paulistano",
-          antecedentes: "Não",
-          observacoes: "Experiência em coordenação"
-        },
-        selectedAreas: ["Organização", "Logística"],
-        preferences: { acceptTerms: true, wantNotifications: false },
-        type: "volunteer" as const
-      }
-    ]
-
     try {
+      const numberOfVolunteers = 5 // Gerar 5 voluntárias
+      const volunteersData = Array.from({ length: numberOfVolunteers }, () => generateVolunteer())
+      
       for (const volunteer of volunteersData) {
         await saveVolunteerRegistration(volunteer)
         await new Promise(resolve => setTimeout(resolve, 300))
       }
+      
       updateProgress('volunteers', 'success')
       toast.success(`${volunteersData.length} voluntárias criadas com sucesso!`)
     } catch (error) {
@@ -810,77 +252,56 @@ export default function PopulatePage() {
     }
   }
 
+  const generateDonation = () => {
+    const isAnonymous = faker.datatype.boolean()
+    const paymentMethod = faker.helpers.arrayElement(['pix', 'card'])
+    const amount = faker.number.float({ min: 25, max: 500, fractionDigits: 2 })
+    
+    const baseDonation = {
+      donationType: isAnonymous ? "anonymous" as const : "identified" as const,
+      amount,
+      paymentMethod: paymentMethod as 'pix' | 'card',
+      type: "donation" as const
+    }
+
+    if (!isAnonymous) {
+      const name = faker.person.fullName()
+      return {
+        ...baseDonation,
+        donorData: {
+          nomeCompleto: name,
+          email: faker.internet.email().toLowerCase(),
+          telefone: `(11) 9${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+          cpf: faker.string.numeric(11).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"),
+          receberRecibo: faker.datatype.boolean(),
+          receberNoticias: faker.datatype.boolean()
+        },
+        ...(paymentMethod === 'card' && {
+          cardData: {
+            numero: "4111 1111 1111 1111",
+            nome: name,
+            validade: "12/2026",
+            cvv: "123"
+          }
+        })
+      }
+    }
+
+    return baseDonation
+  }
+
   const generateDonationsData = async () => {
     updateProgress('donations', 'loading')
     
-    const donationsData = [
-      {
-        donationType: "identified" as const,
-        amount: 100.00,
-        paymentMethod: "pix" as const,
-        donorData: {
-          nomeCompleto: "Carlos Eduardo Silva",
-          email: "carlos.silva@email.com",
-          telefone: "(11) 99444-5555",
-          cpf: "123.456.789-01",
-          receberRecibo: true,
-          receberNoticias: true
-        },
-        type: "donation" as const
-      },
-      {
-        donationType: "anonymous" as const,
-        amount: 50.00,
-        paymentMethod: "card" as const,
-        type: "donation" as const
-      },
-      {
-        donationType: "identified" as const,
-        amount: 200.00,
-        paymentMethod: "pix" as const,
-        donorData: {
-          nomeCompleto: "Maria Fernanda Costa",
-          email: "maria.costa@email.com",
-          telefone: "(11) 99555-6666",
-          cpf: "987.654.321-00",
-          receberRecibo: true,
-          receberNoticias: false
-        },
-        type: "donation" as const
-      },
-      {
-        donationType: "anonymous" as const,
-        amount: 25.00,
-        paymentMethod: "pix" as const,
-        type: "donation" as const
-      },
-      {
-        donationType: "identified" as const,
-        amount: 150.00,
-        paymentMethod: "card" as const,
-        donorData: {
-          nomeCompleto: "Roberto Santos Lima",
-          email: "roberto.lima@email.com",
-          telefone: "(11) 99666-7777",
-          cpf: "456.789.123-45",
-          receberRecibo: false,
-          receberNoticias: true
-        },
-        cardData: {
-          numero: "4111 1111 1111 1111",
-          nome: "Roberto Santos Lima",
-          validade: "12/2026",
-          cvv: "123"
-        },
-        type: "donation" as const
-      }
-    ]
-
     try {
+      const numberOfDonations = 6 // Gerar 6 doações
+      const donationsData = Array.from({ length: numberOfDonations }, () => generateDonation())
+      
       for (const donation of donationsData) {
         await saveDonation(donation)
         await new Promise(resolve => setTimeout(resolve, 300))
       }
+      
       updateProgress('donations', 'success')
       toast.success(`${donationsData.length} doações criadas com sucesso!`)
     } catch (error) {
@@ -890,98 +311,82 @@ export default function PopulatePage() {
     }
   }
 
+  const products = [
+    { id: "camisa-oficial", name: "Camisa Oficial Copa Passa Bola", price: 89.90, hasSize: true },
+    { id: "caneca", name: "Caneca Copa Passa Bola", price: 25.00, hasSize: false },
+    { id: "bone", name: "Boné Copa Passa Bola", price: 45.00, hasSize: true },
+    { id: "sacola", name: "Sacola Ecológica", price: 20.00, hasSize: false },
+    { id: "chaveiro", name: "Chaveiro Copa Passa Bola", price: 15.00, hasSize: false },
+    { id: "garrafa", name: "Garrafa Esportiva", price: 35.00, hasSize: false }
+  ]
+
+  const sizes = ['PP', 'P', 'M', 'G', 'GG']
+  const saoPauloCEPs = ['01310-100', '04038-001', '05508-020', '01227-200', '04567-001']
+
+  const generatePurchase = () => {
+    const name = faker.person.fullName()
+    const paymentMethod = faker.helpers.arrayElement(['pix', 'card'])
+    const numberOfItems = faker.number.int({ min: 1, max: 3 })
+    const selectedProducts = faker.helpers.arrayElements(products, numberOfItems)
+    
+    const items = selectedProducts.map(product => ({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: faker.number.int({ min: 1, max: 2 }),
+      ...(product.hasSize && { selectedSize: faker.helpers.arrayElement(sizes) })
+    }))
+
+    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    const shipping = faker.number.float({ min: 10, max: 20, fractionDigits: 2 })
+    const total = subtotal + shipping
+
+    return {
+      customerData: {
+        nomeCompleto: name,
+        email: faker.internet.email().toLowerCase(),
+        telefone: `(11) 9${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+        cpf: faker.string.numeric(11).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"),
+        cep: faker.helpers.arrayElement(saoPauloCEPs),
+        endereco: faker.location.streetAddress(),
+        numero: faker.location.buildingNumber(),
+        complemento: faker.datatype.boolean() ? faker.location.secondaryAddress() : "",
+        bairro: faker.helpers.arrayElement(saoPauloNeighborhoods),
+        cidade: "São Paulo",
+        estado: "SP",
+        receberNoticias: faker.datatype.boolean()
+      },
+      items,
+      paymentMethod: paymentMethod as 'pix' | 'card',
+      ...(paymentMethod === 'card' && {
+        cardData: {
+          numero: faker.helpers.arrayElement(["4111 1111 1111 1111", "5555 5555 5555 4444"]),
+          nome: name,
+          validade: `${faker.number.int({ min: 1, max: 12 }).toString().padStart(2, '0')}/${faker.number.int({ min: 2025, max: 2030 })}`,
+          cvv: faker.string.numeric(3)
+        }
+      }),
+      pricing: {
+        subtotal: Number(subtotal.toFixed(2)),
+        shipping: Number(shipping.toFixed(2)),
+        total: Number(total.toFixed(2))
+      },
+      type: "purchase" as const
+    }
+  }
+
   const generatePurchasesData = async () => {
     updateProgress('purchases', 'loading')
     
-    const purchasesData = [
-      {
-        customerData: {
-          nomeCompleto: "Ana Paula Rodrigues",
-          email: "ana.rodrigues@email.com",
-          telefone: "(11) 99777-8888",
-          cpf: "111.222.333-44",
-          cep: "01310-100",
-          endereco: "Av. Paulista",
-          numero: "1500",
-          complemento: "Apto 120",
-          bairro: "Bela Vista",
-          cidade: "São Paulo",
-          estado: "SP",
-          receberNoticias: true
-        },
-        items: [
-          {
-            id: "camisa-oficial",
-            name: "Camisa Oficial Copa Passa Bola",
-            price: 89.90,
-            quantity: 2,
-            selectedSize: "M"
-          },
-          {
-            id: "caneca",
-            name: "Caneca Copa Passa Bola",
-            price: 25.00,
-            quantity: 1
-          }
-        ],
-        paymentMethod: "pix" as const,
-        pricing: {
-          subtotal: 204.80,
-          shipping: 15.00,
-          total: 219.80
-        },
-        type: "purchase" as const
-      },
-      {
-        customerData: {
-          nomeCompleto: "Beatriz Santos Silva",
-          email: "beatriz.silva@email.com",
-          telefone: "(11) 99888-9999",
-          cpf: "555.666.777-88",
-          cep: "04038-001",
-          endereco: "Rua Domingos de Morais",
-          numero: "2781",
-          complemento: "",
-          bairro: "Vila Mariana",
-          cidade: "São Paulo",
-          estado: "SP",
-          receberNoticias: false
-        },
-        items: [
-          {
-            id: "bone",
-            name: "Boné Copa Passa Bola",
-            price: 45.00,
-            quantity: 1
-          },
-          {
-            id: "sacola",
-            name: "Sacola Ecológica",
-            price: 20.00,
-            quantity: 3
-          }
-        ],
-        paymentMethod: "card" as const,
-        cardData: {
-          numero: "5555 5555 5555 4444",
-          nome: "Beatriz Santos Silva",
-          validade: "08/2027",
-          cvv: "321"
-        },
-        pricing: {
-          subtotal: 105.00,
-          shipping: 12.00,
-          total: 117.00
-        },
-        type: "purchase" as const
-      }
-    ]
-
     try {
+      const numberOfPurchases = 4 // Gerar 4 compras
+      const purchasesData = Array.from({ length: numberOfPurchases }, () => generatePurchase())
+      
       for (const purchase of purchasesData) {
         await savePurchase(purchase)
         await new Promise(resolve => setTimeout(resolve, 500))
       }
+      
       updateProgress('purchases', 'success')
       toast.success(`${purchasesData.length} compras criadas com sucesso!`)
     } catch (error) {
@@ -991,63 +396,93 @@ export default function PopulatePage() {
     }
   }
 
+  const tournamentTypes = [
+    "Copa", "Torneio", "Campeonato", "Liga", "Festival", "Taça", "Troféu", "Championship"
+  ]
+  
+  const tournamentThemes = [
+    "Feminino", "das Estrelas", "de Verão", "de Inverno", "Amistoso", "Regional", 
+    "Municipal", "Jovem", "Veterano", "da Amizade", "da Paz", "Solidário"
+  ]
+
+  const locations = [
+    "Centro Esportivo Municipal", "Complexo Esportivo da Vila", "Campo da Praça Central",
+    "Estádio Municipal", "Arena Esportiva", "Campo do Parque", "Centro de Treinamento",
+    "Quadra Poliesportiva"
+  ]
+
+  const gameTimes = ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00", "19:00", "20:00"]
+  const tournamentStatuses = ["draft", "registration-open", "registration-closed", "ongoing", "completed"]
+
+  const generateTournament = () => {
+    const tournamentType = faker.helpers.arrayElement(tournamentTypes)
+    const theme = faker.helpers.arrayElement(tournamentThemes)
+    const name = `${tournamentType} ${theme} ${faker.date.future().getFullYear()}`
+    
+    const isCopaPassaBola = name.includes("Copa") && faker.datatype.boolean(0.3) // 30% chance
+    const isPaid = faker.datatype.boolean(0.4) // 40% chance
+    
+    // Gerar datas futuras em sequência lógica
+    const registrationStart = faker.date.between({ 
+      from: new Date(), 
+      to: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) // próximos 60 dias
+    })
+    
+    const registrationEnd = faker.date.between({ 
+      from: registrationStart, 
+      to: new Date(registrationStart.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 dias após início
+    })
+    
+    const startDate = faker.date.between({ 
+      from: registrationEnd, 
+      to: new Date(registrationEnd.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 dias após fim inscrições
+    })
+    
+    const tournamentDuration = faker.number.int({ min: 1, max: 5 }) // 1 a 5 dias
+    const endDate = new Date(startDate.getTime() + tournamentDuration * 24 * 60 * 60 * 1000)
+
+    return {
+      name,
+      maxTeams: faker.helpers.arrayElement([4, 8, 12, 16, 20]),
+      isCopaPassaBola,
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      registrationStart: registrationStart.toISOString().split('T')[0],
+      registrationEnd: registrationEnd.toISOString().split('T')[0],
+      isPaid,
+      ...(isPaid && { entryFee: faker.number.float({ min: 25, max: 100, fractionDigits: 2 }) }),
+      location: faker.helpers.arrayElement(locations),
+      gameTime: faker.helpers.arrayElement(gameTimes),
+      description: `${faker.lorem.sentence()} Venha participar e mostrar seu talento no futebol feminino!`,
+      status: faker.helpers.arrayElement(tournamentStatuses) as any,
+      createdBy: "admin"
+    }
+  }
+
   const generateTournamentsData = async () => {
     updateProgress('tournaments', 'loading')
     
-    const tournamentsData = [
-      {
-        name: "Copa Passa Bola 2025",
-        maxTeams: 16,
-        isCopaPassaBola: true,
-        startDate: "2025-10-15",
-        endDate: "2025-10-17",
-        registrationStart: "2025-09-01",
-        registrationEnd: "2025-10-01",
-        isPaid: false,
-        location: "Centro Esportivo Municipal",
-        gameTime: "08:00",
-        description: "A principal competição feminina de futebol do ano! Venha participar da Copa Passa Bola 2025 e mostrar seu talento!",
-        status: "registration-open" as const,
-        createdBy: "admin"
-      },
-      {
-        name: "Torneio de Verão",
-        maxTeams: 8,
-        isCopaPassaBola: false,
-        startDate: "2025-12-20",
-        endDate: "2025-12-22",
-        registrationStart: "2025-11-15",
-        registrationEnd: "2025-12-10",
-        isPaid: true,
-        entryFee: 50.00,
-        location: "Complexo Esportivo da Vila",
-        gameTime: "14:00",
-        description: "Torneio de pré-temporada para aquecer os motores para 2026!",
-        status: "draft" as const,
-        createdBy: "admin"
-      },
-      {
-        name: "Amistoso das Estrelas",
-        maxTeams: 4,
-        isCopaPassaBola: false,
-        startDate: "2025-11-05",
-        endDate: "2025-11-05",
-        registrationStart: "2025-10-20",
-        registrationEnd: "2025-11-01",
-        isPaid: false,
-        location: "Campo da Praça Central",
-        gameTime: "16:00",
-        description: "Jogo amistoso para promover o esporte feminino na comunidade.",
-        status: "registration-closed" as const,
-        createdBy: "admin"
-      }
-    ]
-
     try {
+      const numberOfTournaments = 5 // Gerar 5 torneios
+      const tournamentsData = Array.from({ length: numberOfTournaments }, () => generateTournament())
+      
+      // Garantir que pelo menos um seja Copa Passa Bola
+      if (!tournamentsData.some(t => t.isCopaPassaBola)) {
+        tournamentsData[0] = {
+          ...tournamentsData[0],
+          name: "Copa Passa Bola 2025",
+          isCopaPassaBola: true,
+          maxTeams: 16,
+          isPaid: false,
+          description: "A principal competição feminina de futebol do ano! Venha participar da Copa Passa Bola 2025 e mostrar seu talento!"
+        }
+      }
+      
       for (const tournament of tournamentsData) {
         await saveTournament(tournament)
         await new Promise(resolve => setTimeout(resolve, 400))
       }
+      
       updateProgress('tournaments', 'success')
       toast.success(`${tournamentsData.length} torneios criados com sucesso!`)
     } catch (error) {
