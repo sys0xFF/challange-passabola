@@ -523,6 +523,152 @@ export async function updateTournament(tournamentId: string, updates: Partial<To
   }
 }
 
+export async function updateMatchAndAdvanceWinners(tournamentId: string, matchId: string, updates: Partial<Match>) {
+  try {
+    console.log('=== updateMatchAndAdvanceWinners START ===');
+    console.log('Tournament ID:', tournamentId);
+    console.log('Match ID:', matchId);
+    console.log('Updates:', updates);
+    
+    // Primeiro, buscar o torneio completo
+    const { get } = await import('firebase/database');
+    const tournamentRef = ref(database, `tournaments/${tournamentId}`);
+    const snapshot = await get(tournamentRef);
+    const tournament = snapshot.val();
+    
+    if (!tournament || !tournament.bracket) {
+      throw new Error('Tournament or bracket not found');
+    }
+    
+    console.log('Current bracket before update:', JSON.stringify(tournament.bracket.map((m: Match) => ({
+      id: m.id,
+      round: m.round,
+      position: m.position,
+      team1: m.team1?.name || 'null',
+      team2: m.team2?.name || 'null',
+      winner: m.winner || 'none'
+    })), null, 2));
+    
+    // Atualizar a partida específica no bracket
+    let updatedBracket = tournament.bracket.map((match: Match) => 
+      match.id === matchId ? { ...match, ...updates } : match
+    );
+    
+    console.log('Bracket after match update, before advancing winner');
+    
+    // Se a partida foi completada com um vencedor, avançar automaticamente
+    if (updates.status === 'completed' && updates.winner) {
+      console.log('Match completed with winner, advancing...');
+      updatedBracket = advanceWinnerInBracket(updatedBracket, matchId, updates.winner);
+    }
+    
+    console.log('Final bracket after advancing winner:', JSON.stringify(updatedBracket.map((m: Match) => ({
+      id: m.id,
+      round: m.round,
+      position: m.position,
+      team1: m.team1?.name || 'null',
+      team2: m.team2?.name || 'null',
+      winner: m.winner || 'none'
+    })), null, 2));
+    
+    // Verificar se a partida completada é a final (última rodada)
+    const maxRound = Math.max(...updatedBracket.map((m: Match) => m.round));
+    const completedMatch = updatedBracket.find((m: Match) => m.id === matchId);
+    const isFinalMatch = completedMatch && completedMatch.round === maxRound;
+    
+    // Atualizar torneio
+    if (isFinalMatch && updates.status === 'completed') {
+      // Se foi a final, atualizar status do torneio para 'completed'
+      console.log('Final match completed! Updating tournament status to completed');
+      await set(ref(database, `tournaments/${tournamentId}`), {
+        ...tournament,
+        bracket: updatedBracket,
+        status: 'completed'
+      });
+    } else {
+      // Apenas salvar o bracket atualizado
+      await set(ref(database, `tournaments/${tournamentId}/bracket`), updatedBracket);
+    }
+    
+    console.log('Match updated and winners advanced successfully!');
+    console.log('=== updateMatchAndAdvanceWinners END ===');
+    return { success: true, bracket: updatedBracket };
+  } catch (error) {
+    console.error('Error updating match:', error);
+    return { success: false, error };
+  }
+}
+
+// Função auxiliar para avançar vencedor no bracket
+function advanceWinnerInBracket(bracket: Match[], completedMatchId: string, winnerId: string): Match[] {
+  const completedMatch = bracket.find(match => match.id === completedMatchId);
+  if (!completedMatch) {
+    console.log('Completed match not found');
+    return bracket;
+  }
+  
+  const winnerTeam = completedMatch.team1?.id === winnerId ? completedMatch.team1 : completedMatch.team2;
+  if (!winnerTeam) {
+    console.log('Winner team not found');
+    return bracket;
+  }
+  
+  console.log(`Advancing winner: ${winnerTeam.name} from match ${completedMatch.id} (round ${completedMatch.round}, pos ${completedMatch.position})`);
+  
+  // Encontrar a próxima partida onde este vencedor deve ir
+  const nextRound = completedMatch.round + 1;
+  const nextRoundMatches = bracket.filter(match => match.round === nextRound).sort((a, b) => a.position - b.position);
+  
+  if (nextRoundMatches.length === 0) {
+    // É a final, não há próxima rodada
+    console.log('This was the final match, no next round');
+    return bracket;
+  }
+  
+  console.log(`Next round matches:`, nextRoundMatches.map(m => `pos=${m.position}, team1=${m.team1?.name || 'null'} (type: ${typeof m.team1}), team2=${m.team2?.name || 'null'} (type: ${typeof m.team2})`));
+  
+  // Lógica para determinar para qual partida o vencedor deve avançar
+  // A lógica varia dependendo da estrutura do torneio
+  let targetMatch: Match | null = null;
+  let targetPosition: 'team1' | 'team2' | null = null;
+  
+  // Verificar se alguma partida da próxima rodada já está esperando este vencedor
+  // Procurar por uma partida que tenha uma posição vazia (null ou undefined)
+  for (const nextMatch of nextRoundMatches) {
+    // Se team1 está vazio, este é um candidato
+    if (nextMatch.team1 === null || nextMatch.team1 === undefined || !nextMatch.team1) {
+      targetMatch = nextMatch;
+      targetPosition = 'team1';
+      console.log(`Found empty team1 in match pos=${nextMatch.position}`);
+      break;
+    }
+    // Se team2 está vazio, este é um candidato
+    if (nextMatch.team2 === null || nextMatch.team2 === undefined || !nextMatch.team2) {
+      targetMatch = nextMatch;
+      targetPosition = 'team2';
+      console.log(`Found empty team2 in match pos=${nextMatch.position}`);
+      break;
+    }
+  }
+  
+  if (!targetMatch || !targetPosition) {
+    console.log('No available position found in next round');
+    return bracket;
+  }
+  
+  console.log(`Target: match pos=${targetMatch.position}, placing in ${targetPosition}`);
+  
+  return bracket.map(match => {
+    if (match.id === targetMatch!.id) {
+      const updated = { ...match, [targetPosition!]: winnerTeam };
+      console.log(`Updated match:`, updated);
+      return updated;
+    }
+    return match;
+  });
+}
+
+// Manter a função original para compatibilidade
 export async function updateMatch(tournamentId: string, matchId: string, updates: Partial<Match>) {
   try {
     // Primeiro, buscar o torneio completo
