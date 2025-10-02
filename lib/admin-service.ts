@@ -410,6 +410,10 @@ function generateQuarterFinals(teams: GameTeam[], startMatchId: number): Match[]
 }
 
 function generateTenTeamBracket(teams: GameTeam[], startMatchId: number): Match[] {
+  console.log('=== generateTenTeamBracket ===')
+  console.log('Received teams:', teams.length)
+  console.log('Teams:', teams.map((t, i) => `${i}: ${t.name}`))
+  
   const matches: Match[] = [];
   let matchId = startMatchId;
 
@@ -795,28 +799,44 @@ function generateSixteenTeamBracket(teams: GameTeam[], startMatchId: number): Ma
   return matches;
 }
 
-export function generateAutoTeamsFromIndividuals(individuals: Array<IndividualRegistration & { id: string }>): GameTeam[] {
+export function generateAutoTeamsFromIndividuals(individuals: Array<IndividualRegistration & { id: string }>, maxTeams?: number): GameTeam[] {
   const teams: GameTeam[] = [];
   const playersPerTeam = 7; // 6 jogadoras + 1 goleira
+  
+  console.log('=== generateAutoTeamsFromIndividuals ===')
+  console.log('Total individuals:', individuals.length)
+  console.log('Max teams requested:', maxTeams)
   
   // Separar por posição
   const goalkeepers = individuals.filter(ind => ind.captainData.posicao.toLowerCase().includes('goleira'));
   const fieldPlayers = individuals.filter(ind => !ind.captainData.posicao.toLowerCase().includes('goleira'));
   
+  console.log('Goalkeepers:', goalkeepers.length)
+  console.log('Field players:', fieldPlayers.length)
+  
   // Embaralhar arrays para distribuição aleatória
   const shuffledGoalkeepers = [...goalkeepers].sort(() => Math.random() - 0.5);
   const shuffledFieldPlayers = [...fieldPlayers].sort(() => Math.random() - 0.5);
   
+  // Calcular quantos times podemos formar com os jogadores disponíveis
   let numPossibleTeams = Math.min(
     shuffledGoalkeepers.length, 
     Math.floor(shuffledFieldPlayers.length / 6)
   );
   
-  // Tentar fazer número par de times se possível
-  if (numPossibleTeams > 1 && numPossibleTeams % 2 !== 0) {
-    // Se o número é ímpar e maior que 1, reduzir em 1 para tornar par
-    numPossibleTeams = numPossibleTeams - 1;
+  console.log('Possible teams from players:', numPossibleTeams)
+  
+  // Se foi especificado um máximo de times, usar esse valor
+  if (maxTeams && maxTeams > 0) {
+    numPossibleTeams = Math.min(numPossibleTeams, maxTeams);
+  } else {
+    // Apenas se não foi especificado maxTeams, tentar fazer número par
+    if (numPossibleTeams > 1 && numPossibleTeams % 2 !== 0) {
+      numPossibleTeams = numPossibleTeams - 1;
+    }
   }
+  
+  console.log('Final number of teams to generate:', numPossibleTeams)
   
   for (let i = 0; i < numPossibleTeams; i++) {
     const teamPlayers = [];
@@ -897,27 +917,53 @@ export async function advanceWinnersToNextRound(tournamentId: string, bracket: M
       const nextRoundMatches = matchesByRound[nextRound];
       
       if (nextRoundMatches) {
-        roundMatches.forEach((match, index) => {
+        // Ordenar as partidas da rodada atual por posição para processamento ordenado
+        const sortedRoundMatches = [...roundMatches].sort((a, b) => a.position - b.position);
+        
+        sortedRoundMatches.forEach((match, index) => {
           if (match.winner && match.status === 'completed') {
             const winnerTeam = match.team1?.id === match.winner ? match.team1 : match.team2;
-            const nextMatchIndex = Math.floor(index / 2);
-            const nextMatch = nextRoundMatches[nextMatchIndex];
             
-            if (nextMatch) {
-              const updatedNextMatchIndex = updatedBracket.findIndex(m => m.id === nextMatch.id);
+            // Calcular qual partida da próxima rodada deve receber este vencedor
+            const nextMatchIndex = Math.floor(index / 2);
+            const nextMatchToUpdate = nextRoundMatches.find((m: Match) => m.position === nextMatchIndex + 1);
+            
+            if (nextMatchToUpdate && winnerTeam) {
+              const updatedNextMatchIndex = updatedBracket.findIndex(m => m.id === nextMatchToUpdate.id);
               if (updatedNextMatchIndex !== -1) {
-                // Determinar se o vencedor vai para team1 ou team2 da próxima partida
-                const isFirstSlot = index % 2 === 0;
-                if (isFirstSlot) {
-                  updatedBracket[updatedNextMatchIndex] = {
-                    ...updatedBracket[updatedNextMatchIndex],
-                    team1: winnerTeam
-                  };
-                } else {
-                  updatedBracket[updatedNextMatchIndex] = {
-                    ...updatedBracket[updatedNextMatchIndex],
-                    team2: winnerTeam
-                  };
+                const nextMatch = updatedBracket[updatedNextMatchIndex];
+                
+                // Verificar se este vencedor já foi colocado nesta partida para evitar duplicação
+                const winnerAlreadyInNextMatch = nextMatch.team1?.id === winnerTeam.id || nextMatch.team2?.id === winnerTeam.id;
+                
+                if (!winnerAlreadyInNextMatch) {
+                  // Determinar se vai para team1 ou team2 baseado na posição original da partida
+                  const isFirstTeamInPair = index % 2 === 0;
+                  
+                  if (isFirstTeamInPair && nextMatch.team1 === null) {
+                    updatedBracket[updatedNextMatchIndex] = {
+                      ...updatedBracket[updatedNextMatchIndex],
+                      team1: winnerTeam
+                    };
+                  } else if (!isFirstTeamInPair && nextMatch.team2 === null) {
+                    updatedBracket[updatedNextMatchIndex] = {
+                      ...updatedBracket[updatedNextMatchIndex],
+                      team2: winnerTeam
+                    };
+                  } else {
+                    // Se a posição preferida já está ocupada, usar a vazia disponível
+                    if (nextMatch.team1 === null) {
+                      updatedBracket[updatedNextMatchIndex] = {
+                        ...updatedBracket[updatedNextMatchIndex],
+                        team1: winnerTeam
+                      };
+                    } else if (nextMatch.team2 === null) {
+                      updatedBracket[updatedNextMatchIndex] = {
+                        ...updatedBracket[updatedNextMatchIndex],
+                        team2: winnerTeam
+                      };
+                    }
+                  }
                 }
               }
             }
@@ -944,7 +990,7 @@ export async function advanceWinnersToNextRound(tournamentId: string, bracket: M
     return { success: result.success, bracket: updatedBracket, error: result.error };
   } catch (error) {
     console.error('Error advancing winners:', error);
-    return { success: false, bracket, error };
+    return { success: false, bracket: bracket, error };
   }
 }
 
