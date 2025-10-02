@@ -21,13 +21,10 @@ import {
   Eye, 
   Users, 
   Calendar, 
-  MapPin, 
-  Clock, 
   DollarSign, 
   Trophy, 
   Shuffle,
   Save,
-  Play,
   Loader2
 } from "lucide-react"
 import { Tournament, GameTeam, Match } from "@/lib/database-service"
@@ -64,6 +61,12 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
       loadAvailableParticipants()
     }
   }, [open])
+
+  // Sincronizar bracket quando o tournament prop mudar
+  useEffect(() => {
+    setBracket(tournament.bracket || [])
+    setTournamentTeams(tournament.teams || [])
+  }, [tournament.bracket, tournament.teams])
 
   const loadAvailableParticipants = async () => {
     try {
@@ -146,9 +149,13 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
 
       // Gerar times automáticos se necessário
       const remainingSlots = tournament.maxTeams - registeredTeams.length
-      const autoTeams = remainingSlots > 0 ? generateAutoTeamsFromIndividuals(availableIndividuals).slice(0, remainingSlots) : []
+      const autoTeams = remainingSlots > 0 ? generateAutoTeamsFromIndividuals(availableIndividuals, remainingSlots) : []
 
       const allTournamentTeams = [...registeredTeams, ...autoTeams]
+      
+      console.log('Registered teams:', registeredTeams.length)
+      console.log('Auto teams generated:', autoTeams.length)
+      console.log('Remaining slots needed:', remainingSlots)
       
       if (allTournamentTeams.length < 2) {
         toast.error("Não há participantes suficientes para gerar o chaveamento")
@@ -163,13 +170,21 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
       // Embaralhar times para distribuição aleatória
       const shuffledTeams = [...allTournamentTeams].sort(() => Math.random() - 0.5)
       
+      console.log('=== GENERATING BRACKET ===')
+      console.log('Total teams:', shuffledTeams.length)
+      console.log('Tournament max teams:', tournament.maxTeams)
+      console.log('Teams:', shuffledTeams.map(t => t.name))
+      
       // Gerar chaveamento automático
       const generatedBracket = generateAutomaticBracket(shuffledTeams)
+      
+      console.log('Generated bracket rounds:', Math.max(...generatedBracket.map(m => m.round)))
+      console.log('Total matches:', generatedBracket.length)
 
       setTournamentTeams(shuffledTeams)
       setBracket(generatedBracket)
 
-      toast.success("Chaveamento gerado com sucesso!")
+      toast.success(`Chaveamento gerado com sucesso! ${shuffledTeams.length} times`)
     } catch (error) {
       console.error("Error generating bracket:", error)
       toast.error("Erro ao gerar chaveamento")
@@ -200,30 +215,25 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
 
   const updateMatchScore = async (matchId: string, team1Score: number, team2Score: number) => {
     try {
-      const updatedBracket = bracket.map(match => {
-        if (match.id === matchId) {
-          const winner = team1Score > team2Score ? match.team1?.id : match.team2?.id
-          return {
-            ...match,
-            score: { team1: team1Score, team2: team2Score },
-            winner,
-            status: 'completed' as const
-          }
-        }
-        return match
+      // Usar a nova função que atualiza o match e avança vencedores automaticamente
+      const { updateMatchAndAdvanceWinners } = await import('../../lib/database-service')
+      const winner = team1Score > team2Score ? 
+        bracket.find(m => m.id === matchId)?.team1?.id : 
+        bracket.find(m => m.id === matchId)?.team2?.id
+
+      const result = await updateMatchAndAdvanceWinners(tournament.id, matchId, {
+        score: { team1: team1Score, team2: team2Score },
+        winner,
+        status: 'completed'
       })
-      
-      setBracket(updatedBracket)
-      
-      // Automaticamente avançar os vencedores para a próxima rodada
-      const advanceResult = await advanceWinnersToNextRound(tournament.id, updatedBracket)
-      
-      if (advanceResult.success) {
-        setBracket(advanceResult.bracket)
+
+      if (result.success) {
+        // Atualizar o bracket local com o bracket retornado que já tem os vencedores avançados
+        setBracket(result.bracket)
         toast.success("Resultado salvo! Vencedores avançaram automaticamente.")
         onTournamentUpdated()
       } else {
-        toast.error("Resultado salvo, mas houve erro ao avançar vencedores")
+        toast.error("Erro ao salvar resultado da partida")
       }
     } catch (error) {
       console.error("Error updating match score:", error)
@@ -330,20 +340,6 @@ export function TournamentDetailsModal({ tournament, trigger, onTournamentUpdate
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
                   <strong>Inscrições:</strong> {formatDate(tournament.registrationStart)} - {formatDate(tournament.registrationEnd)}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
-                  <strong>Local:</strong> {tournament.location}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
-                  <strong>Horário:</strong> {tournament.gameTime}
                 </span>
               </div>
 
