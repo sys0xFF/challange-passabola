@@ -31,11 +31,15 @@ import {
   CheckCircle,
   Package,
   CreditCard,
-  Ticket
+  Ticket,
+  Watch,
+  AlertCircle
 } from 'lucide-react'
 import { Bebas_Neue } from 'next/font/google'
 import { ref, get } from 'firebase/database'
 import { database } from '@/lib/firebase'
+import { linkBandToUser, getUserBands } from '@/lib/database-service'
+import type { BandLink } from '@/lib/band-service'
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
@@ -75,6 +79,13 @@ function PerfilPageContent() {
     estadoCivil: user?.estadoCivil || ''
   })
   const [saving, setSaving] = useState(false)
+  
+  // Estados para pulseiras
+  const [userBands, setUserBands] = useState<BandLink[]>([])
+  const [loadingBands, setLoadingBands] = useState(false)
+  const [bandIdInput, setBandIdInput] = useState('')
+  const [linkingBand, setLinkingBand] = useState(false)
+  const [bandMessage, setBandMessage] = useState('')
 
   useEffect(() => {
     if (!loading && !user) {
@@ -105,6 +116,7 @@ function PerfilPageContent() {
   useEffect(() => {
     if (user) {
       loadUserActivities()
+      loadUserBands()
     }
   }, [user])
 
@@ -195,6 +207,53 @@ function PerfilPageContent() {
       console.error('Error loading user activities:', error)
     } finally {
       setLoadingActivities(false)
+    }
+  }
+
+  const loadUserBands = async () => {
+    if (!user) return
+    
+    try {
+      setLoadingBands(true)
+      const bands = await getUserBands(user.id)
+      setUserBands(bands)
+    } catch (error) {
+      console.error('Error loading user bands:', error)
+    } finally {
+      setLoadingBands(false)
+    }
+  }
+
+  const handleLinkBand = async () => {
+    if (!user || !bandIdInput.trim()) {
+      setBandMessage('Por favor, informe o ID da pulseira')
+      setTimeout(() => setBandMessage(''), 3000)
+      return
+    }
+
+    try {
+      setLinkingBand(true)
+      setBandMessage('')
+      
+      const result = await linkBandToUser(
+        bandIdInput.trim(),
+        user.id,
+        user.name,
+        user.email
+      )
+      
+      if (result.success) {
+        setBandMessage('Pulseira vinculada com sucesso!')
+        setBandIdInput('')
+        await loadUserBands()
+      } else {
+        setBandMessage(`Erro: ${result.error}`)
+      }
+    } catch (error) {
+      setBandMessage('Erro ao vincular pulseira: ' + (error as Error).message)
+    } finally {
+      setLinkingBand(false)
+      setTimeout(() => setBandMessage(''), 5000)
     }
   }
 
@@ -495,9 +554,12 @@ function PerfilPageContent() {
               {/* Conteúdo principal - Atividades */}
               <div className="lg:col-span-3">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-                  <TabsList className="grid w-full grid-cols-3 sm:grid-cols-7 gap-1 h-auto p-1">
+                  <TabsList className="grid w-full grid-cols-3 sm:grid-cols-8 gap-1 h-auto p-1">
                     <TabsTrigger value="resumo" className="text-xs sm:text-sm py-2 px-2 sm:px-3">
                       Resumo
+                    </TabsTrigger>
+                    <TabsTrigger value="bands" className="text-xs sm:text-sm py-2 px-2 sm:px-3">
+                      Pulseiras
                     </TabsTrigger>
                     <TabsTrigger value="teams" className="text-xs sm:text-sm py-2 px-2 sm:px-3">
                       Times
@@ -705,6 +767,114 @@ function PerfilPageContent() {
                             </CardContent>
                           </Card>
                         )}
+                      </TabsContent>
+
+                      {/* Aba de Pulseiras */}
+                      <TabsContent value="bands" className="space-y-4 sm:space-y-6">
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                              <Watch className="h-5 w-5" />
+                              Vincular Nova Pulseira
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="bandId">ID da Pulseira</Label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    id="bandId"
+                                    placeholder="Digite o ID da pulseira (ex: 001)"
+                                    value={bandIdInput}
+                                    onChange={(e) => setBandIdInput(e.target.value)}
+                                    disabled={linkingBand}
+                                  />
+                                  <Button
+                                    onClick={handleLinkBand}
+                                    disabled={linkingBand || !bandIdInput.trim()}
+                                  >
+                                    {linkingBand ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      'Vincular'
+                                    )}
+                                  </Button>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  Digite o ID da pulseira que você recebeu para vinculá-la à sua conta
+                                </p>
+                              </div>
+
+                              {bandMessage && (
+                                <div className={`flex items-center gap-2 text-sm p-3 rounded-md ${
+                                  bandMessage.includes('sucesso') 
+                                    ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' 
+                                    : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                                }`}>
+                                  {bandMessage.includes('sucesso') 
+                                    ? <CheckCircle className="h-4 w-4" />
+                                    : <AlertCircle className="h-4 w-4" />
+                                  }
+                                  {bandMessage}
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>Minhas Pulseiras</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            {loadingBands ? (
+                              <div className="flex justify-center items-center py-8">
+                                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                              </div>
+                            ) : userBands.length === 0 ? (
+                              <div className="text-center py-8 text-muted-foreground">
+                                <Watch className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                                <p>Você ainda não possui pulseiras vinculadas</p>
+                                <p className="text-sm mt-2">Vincule uma pulseira acima para começar a ganhar pontos!</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {userBands.map((band) => (
+                                  <Card key={band.bandId} className="p-4">
+                                    <div className="flex items-start justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <Watch className="h-5 w-5 text-primary" />
+                                          <h3 className="font-semibold text-lg">Pulseira {band.bandId}</h3>
+                                          <Badge variant="default">
+                                            Ativa
+                                          </Badge>
+                                        </div>
+                                        
+                                        <div className="space-y-1 text-sm text-muted-foreground">
+                                          <p><strong>Vinculada em:</strong> {formatDate(band.linkedAt)}</p>
+                                          <p><strong>Pontos acumulados:</strong> {band.totalPoints || 0}</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <Trophy className="h-8 w-8 text-yellow-500" />
+                                    </div>
+                                    
+                                    <Separator className="my-3" />
+                                    
+                                    <div className="text-sm">
+                                      <p className="text-muted-foreground">
+                                        Use sua pulseira durante os eventos para ganhar pontos automaticamente! 
+                                        Os pontos são calculados com base nos seus movimentos.
+                                      </p>
+                                    </div>
+                                  </Card>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
                       </TabsContent>
 
                       <TabsContent value="teams" className="space-y-4 sm:space-y-6">

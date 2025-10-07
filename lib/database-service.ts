@@ -1,5 +1,6 @@
 import { database } from './firebase';
-import { ref, push, set, get } from 'firebase/database';
+import { ref, push, set, get, update, remove } from 'firebase/database';
+import type { BandLink } from './band-service';
 
 export interface TeamRegistration {
   type: 'team';
@@ -732,6 +733,238 @@ export async function saveRewardPurchase(purchaseData: {
     return { success: true, purchaseId: newPurchaseRef.key };
   } catch (error) {
     console.error('Error saving reward purchase:', error);
+    return { success: false, error };
+  }
+}
+
+// ============= FUNÇÕES PARA GERENCIAMENTO DE PULSEIRAS =============
+
+/**
+ * Vincular pulseira a um usuário
+ */
+export async function linkBandToUser(bandId: string, userId: string, userName: string, userEmail: string) {
+  try {
+    const bandLinkRef = ref(database, `bandLinks/${bandId}`);
+    
+    // Verificar se a pulseira já está vinculada
+    const snapshot = await get(bandLinkRef);
+    if (snapshot.exists()) {
+      const existingLink = snapshot.val() as BandLink;
+      if (existingLink.status === 'linked') {
+        return { success: false, error: 'Pulseira já está vinculada a outro usuário' };
+      }
+      if (existingLink.status === 'blocked') {
+        return { success: false, error: 'Pulseira está bloqueada' };
+      }
+    }
+    
+    const bandLink: BandLink = {
+      bandId,
+      userId,
+      userName,
+      userEmail,
+      linkedAt: new Date().toISOString(),
+      status: 'linked',
+      totalPoints: 0
+    };
+    
+    await set(bandLinkRef, bandLink);
+    console.log('Band linked successfully!');
+    return { success: true };
+  } catch (error) {
+    console.error('Error linking band:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Desvincular pulseira de um usuário
+ */
+export async function unlinkBand(bandId: string) {
+  try {
+    const bandLinkRef = ref(database, `bandLinks/${bandId}`);
+    
+    // Buscar dados atuais antes de remover
+    const snapshot = await get(bandLinkRef);
+    if (!snapshot.exists()) {
+      return { success: false, error: 'Pulseira não está vinculada' };
+    }
+    
+    // Remover vínculo
+    await remove(bandLinkRef);
+    console.log('Band unlinked successfully!');
+    return { success: true };
+  } catch (error) {
+    console.error('Error unlinking band:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Bloquear pulseira
+ */
+export async function blockBand(bandId: string) {
+  try {
+    const bandLinkRef = ref(database, `bandLinks/${bandId}`);
+    
+    const snapshot = await get(bandLinkRef);
+    if (!snapshot.exists()) {
+      // Criar registro bloqueado se não existir
+      const bandLink: BandLink = {
+        bandId,
+        userId: '',
+        userName: '',
+        userEmail: '',
+        linkedAt: new Date().toISOString(),
+        status: 'blocked',
+        totalPoints: 0
+      };
+      await set(bandLinkRef, bandLink);
+    } else {
+      // Atualizar status para bloqueado
+      await update(bandLinkRef, { status: 'blocked' });
+    }
+    
+    console.log('Band blocked successfully!');
+    return { success: true };
+  } catch (error) {
+    console.error('Error blocking band:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Liberar/desbloquear pulseira
+ */
+export async function unlockBand(bandId: string) {
+  try {
+    const bandLinkRef = ref(database, `bandLinks/${bandId}`);
+    
+    const snapshot = await get(bandLinkRef);
+    if (!snapshot.exists()) {
+      return { success: false, error: 'Pulseira não encontrada' };
+    }
+    
+    const bandLink = snapshot.val() as BandLink;
+    
+    // Se estava vinculada, mantém vinculada; se não, fica disponível
+    const newStatus = bandLink.userId ? 'linked' : 'available';
+    
+    await update(bandLinkRef, { status: newStatus });
+    
+    console.log('Band unlocked successfully!');
+    return { success: true };
+  } catch (error) {
+    console.error('Error unlocking band:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Buscar vínculo de uma pulseira
+ */
+export async function getBandLink(bandId: string): Promise<BandLink | null> {
+  try {
+    const bandLinkRef = ref(database, `bandLinks/${bandId}`);
+    const snapshot = await get(bandLinkRef);
+    
+    if (snapshot.exists()) {
+      return snapshot.val() as BandLink;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error getting band link:', error);
+    return null;
+  }
+}
+
+/**
+ * Buscar todas as pulseiras vinculadas de um usuário
+ */
+export async function getUserBands(userId: string): Promise<BandLink[]> {
+  try {
+    const bandLinksRef = ref(database, 'bandLinks');
+    const snapshot = await get(bandLinksRef);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+    
+    const allLinks = snapshot.val();
+    const userBands: BandLink[] = [];
+    
+    Object.values(allLinks).forEach((link: any) => {
+      if (link.userId === userId && link.status === 'linked') {
+        userBands.push(link as BandLink);
+      }
+    });
+    
+    return userBands;
+  } catch (error) {
+    console.error('Error getting user bands:', error);
+    return [];
+  }
+}
+
+/**
+ * Buscar todos os vínculos de pulseiras (para admin)
+ */
+export async function getAllBandLinks(): Promise<BandLink[]> {
+  try {
+    const bandLinksRef = ref(database, 'bandLinks');
+    const snapshot = await get(bandLinksRef);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+    
+    const allLinks = snapshot.val();
+    return Object.values(allLinks) as BandLink[];
+  } catch (error) {
+    console.error('Error getting all band links:', error);
+    return [];
+  }
+}
+
+/**
+ * Adicionar pontos a uma pulseira vinculada
+ */
+export async function addPointsToBand(bandId: string, points: number) {
+  try {
+    console.log(`[addPointsToBand] Tentando adicionar ${points} pontos à pulseira ${bandId}`)
+    const bandLinkRef = ref(database, `bandLinks/${bandId}`);
+    
+    const snapshot = await get(bandLinkRef);
+    console.log(`[addPointsToBand] Snapshot exists: ${snapshot.exists()}`)
+    
+    if (!snapshot.exists()) {
+      console.log(`[addPointsToBand] ❌ Pulseira ${bandId} não está vinculada`)
+      return { success: false, error: 'Pulseira não está vinculada' };
+    }
+    
+    const bandLink = snapshot.val() as BandLink;
+    console.log(`[addPointsToBand] BandLink atual:`, bandLink)
+    
+    const newTotalPoints = (bandLink.totalPoints || 0) + points;
+    console.log(`[addPointsToBand] Pontos: ${bandLink.totalPoints || 0} + ${points} = ${newTotalPoints}`)
+    
+    await update(bandLinkRef, { totalPoints: newTotalPoints });
+    console.log(`[addPointsToBand] ✓ Pontos atualizados no Firebase`)
+    
+    // Também adicionar pontos ao usuário
+    if (bandLink.userId) {
+      console.log(`[addPointsToBand] Atualizando pontos do usuário ${bandLink.userId}`)
+      await updateUserPoints(bandLink.userId, points);
+      console.log(`[addPointsToBand] ✓ Pontos do usuário atualizados`)
+    } else {
+      console.log(`[addPointsToBand] ⚠ Pulseira não tem userId vinculado`)
+    }
+    
+    console.log(`[addPointsToBand] ✓ ${points} pontos adicionados à pulseira ${bandId}. Total: ${newTotalPoints}`);
+    return { success: true, newTotal: newTotalPoints };
+  } catch (error) {
+    console.error('[addPointsToBand] ❌ Erro:', error);
     return { success: false, error };
   }
 }

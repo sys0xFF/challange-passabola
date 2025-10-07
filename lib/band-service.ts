@@ -25,6 +25,16 @@ export interface BandDevice {
   protocol: string
 }
 
+export interface BandLink {
+  bandId: string
+  userId: string
+  userName: string
+  userEmail: string
+  linkedAt: string
+  status: 'available' | 'linked' | 'blocked'
+  totalPoints: number
+}
+
 export interface BandDevicesResponse {
   count: number
   devices: BandDevice[]
@@ -245,3 +255,4 @@ export function extractBandId(entityName: string): string {
 export function formatBandId(bandId: string): string {
   return `Pulseira ${bandId}`
 }
+

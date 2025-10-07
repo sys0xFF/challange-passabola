@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -18,6 +18,14 @@ import {
   BandDevice,
   MovementPreset
 } from "@/lib/band-service"
+import { 
+  getAllBandLinks, 
+  unlinkBand, 
+  blockBand, 
+  unlockBand, 
+  addPointsToBand
+} from "@/lib/database-service"
+import type { BandLink } from "@/lib/band-service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -75,6 +83,14 @@ export default function BandDashboard() {
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
+  // Ref para sempre ter acesso ao histórico mais recente
+  const scoreHistoryRef = useRef<BandScoreData[]>([])
+  
+  // Atualizar ref sempre que scoreHistory mudar
+  useEffect(() => {
+    scoreHistoryRef.current = scoreHistory
+  }, [scoreHistory])
+  
   // Estados para controle de eventos
   const [eventStatus, setEventStatus] = useState<EventStatus>({ isRunning: false })
   const [selectedPreset, setSelectedPreset] = useState<string>('')
@@ -82,12 +98,17 @@ export default function BandDashboard() {
   const [customAxis, setCustomAxis] = useState<'X' | 'Y' | 'Z'>('Y')
   const [eventMessage, setEventMessage] = useState<string>('')
   
+  // Estados para gerenciamento de pulseiras
+  const [bandLinks, setBandLinks] = useState<BandLink[]>([])
+  const [loadingLinks, setLoadingLinks] = useState(false)
+  
   // Estados para interface
   const [activeTab, setActiveTab] = useState('overview')
 
   // Carrega dispositivos na inicialização
   useEffect(() => {
     loadDevices()
+    loadBandLinks()
     
     // Atualiza dados a cada 5 segundos quando não há evento ativo
     const interval = setInterval(() => {
@@ -140,6 +161,18 @@ export default function BandDashboard() {
     }
   }
 
+  const loadBandLinks = async () => {
+    try {
+      setLoadingLinks(true)
+      const links = await getAllBandLinks()
+      setBandLinks(links)
+    } catch (err) {
+      console.error('Erro ao carregar vínculos de pulseiras:', err)
+    } finally {
+      setLoadingLinks(false)
+    }
+  }
+
   const refreshScores = async (deviceList?: BandDevice[]) => {
     try {
       setRefreshing(true)
@@ -167,13 +200,16 @@ export default function BandDashboard() {
               // Se o evento estiver ativo, busca os valores reais da API
               const scores = await getBandScores(bandId)
               
-              newScoreData.push({
+              const scoreData = {
                 bandId,
                 timestamp,
                 scoreX: scores.scoreX?.value || 0,
                 scoreY: scores.scoreY?.value || 0,
                 scoreZ: scores.scoreZ?.value || 0
-              })
+              }
+              
+              console.log(`[refreshScores] Pulseira ${bandId}:`, scoreData)
+              newScoreData.push(scoreData)
             }
           } catch (err) {
             console.error(`Erro ao buscar scores da pulseira ${bandId}:`, err)
@@ -265,22 +301,164 @@ export default function BandDashboard() {
     try {
       const bandIds = devices.map(device => extractBandId(device.entity_name)).filter(Boolean)
       
-      setEventMessage('Parando evento...')
+      console.log('=== DEBUG: Parando evento ===')
+      console.log('Band IDs:', bandIds)
       
+      setEventMessage('Coletando dados finais...')
+      
+      // IMPORTANTE: Fazer uma última coleta de dados ANTES de parar
+      await refreshScores()
+      
+      // Aguardar um pouco para o state atualizar
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Usar o REF que sempre tem o valor mais recente
+      const historySnapshot = [...scoreHistoryRef.current]
+      console.log('Score History Snapshot (do REF):', historySnapshot)
+      console.log('Score History Snapshot length:', historySnapshot.length)
+      
+      setEventMessage('Parando evento e calculando pontos...')
+      
+      // Parar o evento nas pulseiras
       const result = await stopEventForAllBands(bandIds)
       
-      if (result.failed.length > 0) {
-        setEventMessage(`Evento parado parcialmente. Falhas: ${result.failed.join(', ')}`)
-      } else {
-        setEventMessage(`Evento parado com sucesso em ${result.success.length} pulseira(s)!`)
+      // Parar o status do evento AGORA (para não interferir com a coleta)
+      setEventStatus({ isRunning: false })
+      
+      // Usar a MESMA lógica da aba de gráficos para calcular pontos
+      // USANDO O SNAPSHOT do histórico (não o state atual que pode ter mudado)
+      const bandScores = historySnapshot.reduce((acc, data) => {
+        if (!acc[data.bandId]) {
+          acc[data.bandId] = {
+            bandId: data.bandId,
+            totalPoints: 0,
+            xPoints: 0,
+            yPoints: 0,
+            zPoints: 0,
+            count: 0
+          }
+        }
+        
+        acc[data.bandId].xPoints += Math.abs(data.scoreX)
+        acc[data.bandId].yPoints += Math.abs(data.scoreY)
+        acc[data.bandId].zPoints += Math.abs(data.scoreZ)
+        acc[data.bandId].totalPoints += Math.abs(data.scoreX) + Math.abs(data.scoreY) + Math.abs(data.scoreZ)
+        acc[data.bandId].count += 1
+        
+        return acc
+      }, {} as Record<string, any>)
+      
+      console.log('Pontos calculados por pulseira:', bandScores)
+      
+      // Distribuir pontos para pulseiras vinculadas
+      const pointsDistributed: { [bandId: string]: number } = {}
+      
+      for (const bandId of bandIds) {
+        console.log(`\n--- Processando pulseira ${bandId} ---`)
+        
+        const bandScore = bandScores[bandId]
+        
+        if (bandScore && bandScore.totalPoints > 0) {
+          const totalPoints = Math.round(bandScore.totalPoints)
+          console.log(`Pontos da pulseira ${bandId}:`, {
+            X: bandScore.xPoints.toFixed(1),
+            Y: bandScore.yPoints.toFixed(1),
+            Z: bandScore.zPoints.toFixed(1),
+            Total: totalPoints
+          })
+          
+          // Adicionar pontos à pulseira (e ao usuário se vinculada)
+          console.log(`Tentando adicionar ${totalPoints} pontos à pulseira ${bandId}`)
+          const pointsResult = await addPointsToBand(bandId, totalPoints)
+          console.log(`Resultado da adição de pontos:`, pointsResult)
+          
+          if (pointsResult.success) {
+            pointsDistributed[bandId] = totalPoints
+            console.log(`✓ Pulseira ${bandId} recebeu ${totalPoints} pontos`)
+          } else {
+            console.log(`✗ Falha ao adicionar pontos para ${bandId}:`, pointsResult.error)
+          }
+        } else {
+          console.log(`⚠ Pulseira ${bandId} não tem pontos para distribuir`)
+        }
       }
       
-      setEventStatus({ isRunning: false })
-      setTimeout(() => setEventMessage(''), 3000)
+      console.log('\n=== Resumo da distribuição ===')
+      console.log('Pontos distribuídos:', pointsDistributed)
+      console.log('Total de pulseiras que receberam pontos:', Object.keys(pointsDistributed).length)
+      
+      // Recarregar vínculos para atualizar totais
+      await loadBandLinks()
+      
+      const distributedCount = Object.keys(pointsDistributed).length
+      const totalPointsDistributed = Object.values(pointsDistributed).reduce((sum, pts) => sum + pts, 0)
+      
+      if (result.failed.length > 0) {
+        setEventMessage(`Evento parado parcialmente. ${distributedCount} pulseira(s) receberam ${totalPointsDistributed} pontos. Falhas: ${result.failed.join(', ')}`)
+      } else {
+        setEventMessage(`Evento parado! ${distributedCount} pulseira(s) receberam ${totalPointsDistributed} pontos no total!`)
+      }
+      
+      setTimeout(() => setEventMessage(''), 5000)
       
     } catch (err) {
+      console.error('Erro ao parar evento:', err)
       setEventMessage('Erro ao parar evento: ' + (err as Error).message)
       setTimeout(() => setEventMessage(''), 5000)
+    }
+  }
+
+  const handleUnlinkBand = async (bandId: string) => {
+    if (!confirm(`Deseja realmente desvincular a pulseira ${bandId}?`)) return
+    
+    try {
+      const result = await unlinkBand(bandId)
+      if (result.success) {
+        setEventMessage(`Pulseira ${bandId} desvinculada com sucesso!`)
+        await loadBandLinks()
+      } else {
+        setEventMessage(`Erro ao desvincular: ${result.error}`)
+      }
+      setTimeout(() => setEventMessage(''), 3000)
+    } catch (err) {
+      setEventMessage('Erro ao desvincular pulseira: ' + (err as Error).message)
+      setTimeout(() => setEventMessage(''), 3000)
+    }
+  }
+
+  const handleBlockBand = async (bandId: string) => {
+    if (!confirm(`Deseja bloquear a pulseira ${bandId}?`)) return
+    
+    try {
+      const result = await blockBand(bandId)
+      if (result.success) {
+        setEventMessage(`Pulseira ${bandId} bloqueada com sucesso!`)
+        await loadBandLinks()
+      } else {
+        setEventMessage(`Erro ao bloquear: ${result.error}`)
+      }
+      setTimeout(() => setEventMessage(''), 3000)
+    } catch (err) {
+      setEventMessage('Erro ao bloquear pulseira: ' + (err as Error).message)
+      setTimeout(() => setEventMessage(''), 3000)
+    }
+  }
+
+  const handleUnlockBand = async (bandId: string) => {
+    if (!confirm(`Deseja desbloquear a pulseira ${bandId}?`)) return
+    
+    try {
+      const result = await unlockBand(bandId)
+      if (result.success) {
+        setEventMessage(`Pulseira ${bandId} desbloqueada com sucesso!`)
+        await loadBandLinks()
+      } else {
+        setEventMessage(`Erro ao desbloquear: ${result.error}`)
+      }
+      setTimeout(() => setEventMessage(''), 3000)
+    } catch (err) {
+      setEventMessage('Erro ao desbloquear pulseira: ' + (err as Error).message)
+      setTimeout(() => setEventMessage(''), 3000)
     }
   }
 
@@ -414,6 +592,23 @@ export default function BandDashboard() {
                 </div>
               )}
               
+              {/* Botão de Debug (temporário) */}
+              <Button 
+                onClick={() => {
+                  console.log('=== DEBUG INFO ===')
+                  console.log('Score History:', scoreHistory)
+                  console.log('Devices:', devices)
+                  console.log('Band Links:', bandLinks)
+                  console.log('Event Status:', eventStatus)
+                  alert(`Score History: ${scoreHistory.length} registros. Veja o console para detalhes.`)
+                }}
+                variant="outline" 
+                size="sm"
+                className="w-full sm:w-auto"
+              >
+                🐛 Debug
+              </Button>
+              
               <Button 
                 onClick={() => loadDevices()}
                 variant="outline" 
@@ -457,7 +652,7 @@ export default function BandDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 gap-1 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto p-1">
             <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="truncate">Visão Geral</span>
@@ -469,6 +664,10 @@ export default function BandDashboard() {
             <TabsTrigger value="events" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
               <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="truncate">Eventos</span>
+            </TabsTrigger>
+            <TabsTrigger value="manage" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="truncate">Gerenciar</span>
             </TabsTrigger>
           </TabsList>
 
@@ -842,6 +1041,111 @@ export default function BandDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Gerenciar Pulseiras */}
+          <TabsContent value="manage" className="space-y-4 sm:space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Gerenciamento de Pulseiras
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingLinks ? (
+                  <div className="flex justify-center items-center py-8">
+                    <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : bandLinks.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Nenhuma pulseira vinculada encontrada</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {bandLinks.map((link) => (
+                      <Card key={link.bandId} className="p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold text-lg">{formatBandId(link.bandId)}</h3>
+                              <Badge 
+                                variant={
+                                  link.status === 'linked' ? 'default' : 
+                                  link.status === 'blocked' ? 'destructive' : 
+                                  'secondary'
+                                }
+                              >
+                                {link.status === 'linked' ? 'Vinculada' : 
+                                 link.status === 'blocked' ? 'Bloqueada' : 
+                                 'Disponível'}
+                              </Badge>
+                            </div>
+                            
+                            {link.status === 'linked' && link.userId && (
+                              <div className="space-y-1 text-sm text-muted-foreground">
+                                <p><strong>Usuário:</strong> {link.userName}</p>
+                                <p><strong>Email:</strong> {link.userEmail}</p>
+                                <p><strong>Vinculada em:</strong> {new Date(link.linkedAt).toLocaleDateString('pt-BR')}</p>
+                                <p><strong>Pontos acumulados:</strong> {link.totalPoints || 0}</p>
+                              </div>
+                            )}
+                            
+                            {link.status === 'blocked' && (
+                              <p className="text-sm text-red-600 dark:text-red-400">
+                                Esta pulseira está bloqueada e não pode ser vinculada.
+                              </p>
+                            )}
+                          </div>
+                          
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            {link.status === 'linked' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUnlinkBand(link.bandId)}
+                              >
+                                Desvincular
+                              </Button>
+                            )}
+                            
+                            {link.status === 'blocked' ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUnlockBand(link.bandId)}
+                              >
+                                Desbloquear
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleBlockBand(link.bandId)}
+                              >
+                                Bloquear
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="mt-6 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={loadBandLinks}
+                    disabled={loadingLinks}
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${loadingLinks ? 'animate-spin' : ''}`} />
+                    Atualizar Lista
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
