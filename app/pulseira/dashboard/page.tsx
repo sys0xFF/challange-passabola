@@ -19,12 +19,16 @@ import {
   MovementPreset
 } from "@/lib/band-service"
 import { 
-  getAllBandLinks, 
-  unlinkBand, 
-  blockBand, 
-  unlockBand, 
-  addPointsToBand
-} from "@/lib/database-service"
+  getAllNext2025BandLinks, 
+  unlinkNext2025Band, 
+  addPointsToNext2025Band
+} from "@/lib/next2025-service"
+import { 
+  createGameEvent, 
+  hasActiveGameEvent, 
+  subscribeToGameEvent,
+  GameEvent 
+} from "@/lib/game-service"
 import type { BandLink } from "@/lib/band-service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -46,7 +50,8 @@ import {
   Settings,
   RefreshCw,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Trophy
 } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts'
 
@@ -102,6 +107,10 @@ export default function BandDashboard() {
   const [bandLinks, setBandLinks] = useState<BandLink[]>([])
   const [loadingLinks, setLoadingLinks] = useState(false)
   
+  // Estados para modo de jogo
+  const [gameMode, setGameMode] = useState(false)
+  const [activeGame, setActiveGame] = useState<GameEvent | null>(null)
+  
   // Estados para interface
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -109,16 +118,27 @@ export default function BandDashboard() {
   useEffect(() => {
     loadDevices()
     loadBandLinks()
+    checkGameMode()
     
     // Atualiza dados a cada 5 segundos quando não há evento ativo
     const interval = setInterval(() => {
-      if (!eventStatus.isRunning) {
+      if (!eventStatus.isRunning && !gameMode) {
         refreshScores()
       }
     }, 5000)
     
     return () => clearInterval(interval)
-  }, [eventStatus.isRunning])
+  }, [eventStatus.isRunning, gameMode])
+  
+  // Monitorar eventos de jogo
+  useEffect(() => {
+    const unsubscribe = subscribeToGameEvent((event) => {
+      setActiveGame(event)
+      setGameMode(event !== null && event.status !== 'finished')
+    })
+    
+    return unsubscribe
+  }, [])
 
   // Atualiza dados em tempo real durante eventos
   useEffect(() => {
@@ -164,12 +184,74 @@ export default function BandDashboard() {
   const loadBandLinks = async () => {
     try {
       setLoadingLinks(true)
-      const links = await getAllBandLinks()
+      const links = await getAllNext2025BandLinks()
       setBandLinks(links)
     } catch (err) {
       console.error('Erro ao carregar vínculos de pulseiras:', err)
     } finally {
       setLoadingLinks(false)
+    }
+  }
+  
+  const checkGameMode = async () => {
+    const hasGame = await hasActiveGameEvent()
+    setGameMode(hasGame)
+  }
+  
+  const handleStartGameMode = async () => {
+    // Verificar se há exatamente 2 pulseiras vinculadas (010 e 020)
+    const band010 = bandLinks.find(link => link.bandId === '010' && link.status === 'linked')
+    const band020 = bandLinks.find(link => link.bandId === '020' && link.status === 'linked')
+    
+    if (!band010 || !band020) {
+      setEventMessage('É necessário ter as pulseiras 010 e 020 vinculadas para iniciar o modo de jogo!')
+      setTimeout(() => setEventMessage(''), 5000)
+      return
+    }
+    
+    // Configurar rounds com presets
+    const preset1 = MOVEMENT_PRESETS.find(p => p.id === selectedPreset) || MOVEMENT_PRESETS[0]
+    const preset2 = MOVEMENT_PRESETS.find(p => p.id !== selectedPreset && p.id !== 'manual') || MOVEMENT_PRESETS[1]
+    
+    const rounds = [
+      {
+        movement: preset1.name,
+        duration: preset1.duration,
+        axis: preset1.axis,
+        preset: preset1
+      },
+      {
+        movement: preset2.name,
+        duration: preset2.duration,
+        axis: preset2.axis,
+        preset: preset2
+      }
+    ]
+    
+    // Criar evento de jogo
+    const result = await createGameEvent(
+      rounds,
+      {
+        bandId: '010',
+        userId: band010.userId,
+        userName: band010.userName,
+        userEmail: band010.userEmail
+      },
+      {
+        bandId: '020',
+        userId: band020.userId,
+        userName: band020.userName,
+        userEmail: band020.userEmail
+      }
+    )
+    
+    if (result.success) {
+      setEventMessage('Modo de jogo iniciado! Abra /next2025/game-display na TV')
+      setGameMode(true)
+      setTimeout(() => setEventMessage(''), 5000)
+    } else {
+      setEventMessage(`Erro ao iniciar modo de jogo: ${result.error}`)
+      setTimeout(() => setEventMessage(''), 5000)
     }
   }
 
@@ -367,9 +449,14 @@ export default function BandDashboard() {
             Total: totalPoints
           })
           
-          // Adicionar pontos à pulseira (e ao usuário se vinculada)
+          // Adicionar pontos à pulseira (e ao usuário NEXT 2025 vinculado)
           console.log(`Tentando adicionar ${totalPoints} pontos à pulseira ${bandId}`)
-          const pointsResult = await addPointsToBand(bandId, totalPoints)
+          const eventName = eventStatus.selectedPreset?.name || 'Personalizado'
+          const pointsResult = await addPointsToNext2025Band(
+            bandId, 
+            totalPoints,
+            `Pontos ganhos durante evento: ${eventName}`
+          )
           console.log(`Resultado da adição de pontos:`, pointsResult)
           
           if (pointsResult.success) {
@@ -412,52 +499,16 @@ export default function BandDashboard() {
     if (!confirm(`Deseja realmente desvincular a pulseira ${bandId}?`)) return
     
     try {
-      const result = await unlinkBand(bandId)
-      if (result.success) {
+      const result = await unlinkNext2025Band(bandId)
+      if (result) {
         setEventMessage(`Pulseira ${bandId} desvinculada com sucesso!`)
         await loadBandLinks()
       } else {
-        setEventMessage(`Erro ao desvincular: ${result.error}`)
+        setEventMessage(`Erro ao desvincular pulseira`)
       }
       setTimeout(() => setEventMessage(''), 3000)
     } catch (err) {
       setEventMessage('Erro ao desvincular pulseira: ' + (err as Error).message)
-      setTimeout(() => setEventMessage(''), 3000)
-    }
-  }
-
-  const handleBlockBand = async (bandId: string) => {
-    if (!confirm(`Deseja bloquear a pulseira ${bandId}?`)) return
-    
-    try {
-      const result = await blockBand(bandId)
-      if (result.success) {
-        setEventMessage(`Pulseira ${bandId} bloqueada com sucesso!`)
-        await loadBandLinks()
-      } else {
-        setEventMessage(`Erro ao bloquear: ${result.error}`)
-      }
-      setTimeout(() => setEventMessage(''), 3000)
-    } catch (err) {
-      setEventMessage('Erro ao bloquear pulseira: ' + (err as Error).message)
-      setTimeout(() => setEventMessage(''), 3000)
-    }
-  }
-
-  const handleUnlockBand = async (bandId: string) => {
-    if (!confirm(`Deseja desbloquear a pulseira ${bandId}?`)) return
-    
-    try {
-      const result = await unlockBand(bandId)
-      if (result.success) {
-        setEventMessage(`Pulseira ${bandId} desbloqueada com sucesso!`)
-        await loadBandLinks()
-      } else {
-        setEventMessage(`Erro ao desbloquear: ${result.error}`)
-      }
-      setTimeout(() => setEventMessage(''), 3000)
-    } catch (err) {
-      setEventMessage('Erro ao desbloquear pulseira: ' + (err as Error).message)
       setTimeout(() => setEventMessage(''), 3000)
     }
   }
@@ -578,20 +629,24 @@ export default function BandDashboard() {
                 <h1 className={`${bebasNeue.className} text-xl sm:text-2xl text-[#8e44ad] dark:text-primary tracking-wider`}>
                   DASHBOARD PULSEIRAS
                 </h1>
-                <Badge className="bg-[#c2ff28] text-[#8e44ad] mt-1 text-xs sm:text-sm">
-                  {eventStatus.isRunning ? 'EVENTO ATIVO' : 'MONITORAMENTO'}
-                </Badge>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <Badge className="bg-[#c2ff28] text-[#8e44ad] text-xs sm:text-sm">
+                    {eventStatus.isRunning ? 'EVENTO ATIVO' : 'MONITORAMENTO'}
+                  </Badge>
+                  <Badge variant="outline" className="text-purple-600 border-purple-600 text-xs sm:text-sm">
+                    Integrado com NEXT 2025
+                  </Badge>
+                </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              {eventStatus.isRunning && (
-                <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
-                  <Timer className="h-4 w-4" />
-                  <span>{formatTime(getRemainingTime())}</span>
+              {(!eventStatus.isRunning && gameMode) && (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm">Modo de jogo ativo</p>
+                  <p className="text-xs mt-2">Os controles manuais estão desabilitados</p>
                 </div>
               )}
-              
               {/* Botão de Debug (temporário) */}
               <Button 
                 onClick={() => {
@@ -651,6 +706,33 @@ export default function BandDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Aviso de Modo de Jogo */}
+        {gameMode && activeGame && (
+          <div className="mb-6 p-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg text-white">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className="text-5xl">🎮</div>
+                <div>
+                  <h3 className="text-2xl font-bold mb-1">Modo de Jogo Ativo!</h3>
+                  <p className="text-white/90">
+                    O jogo está sendo controlado pela tela de exibição. Os controles manuais estão desabilitados.
+                  </p>
+                  <p className="text-sm text-white/80 mt-1">
+                    Status: <span className="font-bold">{activeGame.status}</span> | Round: {activeGame.currentRound + 1}/2
+                  </p>
+                </div>
+              </div>
+              <a 
+                href="/next2025/game-display" 
+                target="_blank"
+                className="px-6 py-3 bg-white text-purple-600 font-bold rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Abrir Tela do Jogo →
+              </a>
+            </div>
+          </div>
+        )}
+        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto p-1">
             <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
@@ -910,30 +992,29 @@ export default function BandDashboard() {
               {/* Controle de Eventos */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Controle de Eventos</CardTitle>
+                  <CardTitle>Controle de Eventos {gameMode && '(Desabilitado no Modo de Jogo)'}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {!eventStatus.isRunning ? (
-                    <>
-                      <div className="space-y-2">
-                        <Label>Preset de Movimento</Label>
-                        <Select value={selectedPreset} onValueChange={setSelectedPreset}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione um preset ou configure manualmente" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="manual">Configuração manual</SelectItem>
-                            {MOVEMENT_PRESETS.map((preset) => (
-                              <SelectItem key={preset.id} value={preset.id}>
-                                {preset.name} ({preset.duration}s - Eixo {preset.axis})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                  {!eventStatus.isRunning && !gameMode ? (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Preset de Movimento</Label>
+                          <Select value={selectedPreset} onValueChange={setSelectedPreset}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione um preset ou configure manualmente" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="manual">Configuração manual</SelectItem>
+                              {MOVEMENT_PRESETS.map((preset) => (
+                                <SelectItem key={preset.id} value={preset.id}>
+                                  {preset.name} ({preset.duration}s - Eixo {preset.axis})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-                      {(!selectedPreset || selectedPreset === 'manual') && (
-                        <>
+                        {(!selectedPreset || selectedPreset === 'manual') && (
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label>Duração (segundos)</Label>
@@ -959,47 +1040,54 @@ export default function BandDashboard() {
                               </Select>
                             </div>
                           </div>
-                        </>
-                      )}
+                        )}
 
-                      <Button 
-                        onClick={handleStartEvent}
-                        disabled={devices.length === 0}
-                        className="w-full"
-                      >
-                        <Play className="h-4 w-4 mr-2" />
-                        Iniciar Evento
-                      </Button>
-                    </>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Button 
+                            onClick={handleStartEvent}
+                            disabled={devices.length === 0 || gameMode}
+                            className="w-full"
+                            variant="default"
+                          >
+                            <Play className="h-4 w-4 mr-2" />
+                            Iniciar Evento
+                          </Button>
+                          
+                          <Button 
+                            onClick={handleStartGameMode}
+                            disabled={gameMode}
+                            className="w-full"
+                            variant="default"
+                          >
+                            <Trophy className="h-4 w-4 mr-2" />
+                            Modo de Jogo
+                          </Button>
+                        </div>
+                      </div>
+                  ) : gameMode ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <p className="text-sm font-medium">Modo de jogo ativo</p>
+                      <p className="text-xs mt-2">Os controles manuais estão desabilitados</p>
+                    </div>
                   ) : (
                     <div className="space-y-4">
-                      <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold text-orange-800 dark:text-orange-200">
-                            Evento em Andamento
-                          </span>
-                          <Badge variant="default">{formatTime(getRemainingTime())}</Badge>
+                      <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                          <h4 className="font-semibold text-green-700 dark:text-green-400">Evento em Andamento</h4>
                         </div>
+                        
                         {eventStatus.selectedPreset ? (
-                          <div>
-                            <p className="text-sm text-orange-700 dark:text-orange-300">
-                              <strong>{eventStatus.selectedPreset.name}</strong>
-                            </p>
-                            <p className="text-xs text-orange-600 dark:text-orange-400">
-                              {eventStatus.selectedPreset.description}
-                            </p>
-                            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                              Eixo: {eventStatus.selectedPreset.axis} | Duração: {eventStatus.selectedPreset.duration}s
-                            </p>
+                          <div className="space-y-2 text-sm">
+                            <p><strong>Preset:</strong> {eventStatus.selectedPreset.name}</p>
+                            <p><strong>Eixo:</strong> {eventStatus.selectedPreset.axis}</p>
+                            <p><strong>Tempo restante:</strong> {formatTime(getRemainingTime())}</p>
                           </div>
                         ) : (
-                          <div>
-                            <p className="text-sm text-orange-700 dark:text-orange-300">
-                              Evento personalizado
-                            </p>
-                            <p className="text-xs text-orange-600 dark:text-orange-400">
-                              Eixo: {eventStatus.customAxis} | Duração: {eventStatus.customDuration}s
-                            </p>
+                          <div className="space-y-2 text-sm">
+                            <p><strong>Configuração:</strong> Personalizada</p>
+                            <p><strong>Eixo:</strong> {eventStatus.customAxis}</p>
+                            <p><strong>Tempo restante:</strong> {formatTime(getRemainingTime())}</p>
                           </div>
                         )}
                       </div>
@@ -1008,6 +1096,7 @@ export default function BandDashboard() {
                         onClick={handleStopEvent}
                         variant="destructive"
                         className="w-full"
+                        disabled={gameMode}
                       >
                         <Pause className="h-4 w-4 mr-2" />
                         Parar Evento
@@ -1070,31 +1159,19 @@ export default function BandDashboard() {
                             <div className="flex items-center gap-2 mb-2">
                               <h3 className="font-semibold text-lg">{formatBandId(link.bandId)}</h3>
                               <Badge 
-                                variant={
-                                  link.status === 'linked' ? 'default' : 
-                                  link.status === 'blocked' ? 'destructive' : 
-                                  'secondary'
-                                }
+                                variant={link.status === 'linked' ? 'default' : 'secondary'}
                               >
-                                {link.status === 'linked' ? 'Vinculada' : 
-                                 link.status === 'blocked' ? 'Bloqueada' : 
-                                 'Disponível'}
+                                {link.status === 'linked' ? 'Vinculada' : 'Disponível'}
                               </Badge>
                             </div>
                             
                             {link.status === 'linked' && link.userId && (
                               <div className="space-y-1 text-sm text-muted-foreground">
-                                <p><strong>Usuário:</strong> {link.userName}</p>
+                                <p><strong>Usuário NEXT 2025:</strong> {link.userName}</p>
                                 <p><strong>Email:</strong> {link.userEmail}</p>
                                 <p><strong>Vinculada em:</strong> {new Date(link.linkedAt).toLocaleDateString('pt-BR')}</p>
                                 <p><strong>Pontos acumulados:</strong> {link.totalPoints || 0}</p>
                               </div>
-                            )}
-                            
-                            {link.status === 'blocked' && (
-                              <p className="text-sm text-red-600 dark:text-red-400">
-                                Esta pulseira está bloqueada e não pode ser vinculada.
-                              </p>
                             )}
                           </div>
                           
@@ -1106,24 +1183,6 @@ export default function BandDashboard() {
                                 onClick={() => handleUnlinkBand(link.bandId)}
                               >
                                 Desvincular
-                              </Button>
-                            )}
-                            
-                            {link.status === 'blocked' ? (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleUnlockBand(link.bandId)}
-                              >
-                                Desbloquear
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleBlockBand(link.bandId)}
-                              >
-                                Bloquear
                               </Button>
                             )}
                           </div>
