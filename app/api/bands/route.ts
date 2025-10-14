@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const DEVICE_API_BASE_URL = "http://20.62.13.44:4041/iot/devices"
+const DEVICE_API_BASE_URL = "http://156.67.25.64:4041/iot/devices"
 
 export async function GET() {
   try {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BAND_API_BASE_URL = "http://20.62.13.44:1026/v2/entities"
+const BAND_API_BASE_URL = "http://156.67.25.64:1026/v2/entities"
 
 export async function GET(
   request: NextRequest,
