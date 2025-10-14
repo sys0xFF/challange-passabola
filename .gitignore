@@ -116,3 +116,7 @@ temp/
 
 # sentry
 .sentryclirc
+# Documentação interna
+ADICIONAR_RECOMPENSAS.md
+GERENCIAR_EVENTOS.md
+NEXT2025_README.md
