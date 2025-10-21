@@ -81,6 +81,10 @@ export async function PATCH(
     const entityId = `urn:ngsi-ld:Band:${bandId.padStart(3, '0')}`
     const body = await request.json()
     
+    console.log(`[PATCH /api/bands/${bandId}] Recebido:`, body)
+    console.log(`[PATCH] Entity ID: ${entityId}`)
+    console.log(`[PATCH] URL: ${BAND_API_BASE_URL}/${entityId}/attrs`)
+    
     const response = await fetch(`${BAND_API_BASE_URL}/${entityId}/attrs`, {
       method: 'PATCH',
       headers: {
@@ -91,7 +95,11 @@ export async function PATCH(
       body: JSON.stringify(body)
     })
     
+    console.log(`[PATCH] Response status: ${response.status}`)
+    
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`[PATCH] Error response:`, errorText)
       return NextResponse.json(
         { error: `Erro ao controlar evento: ${response.status}` },
         { status: response.status }
