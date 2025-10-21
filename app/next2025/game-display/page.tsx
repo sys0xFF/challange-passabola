@@ -423,12 +423,42 @@ export default function GameDisplayPage() {
 
   if (!gameEvent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-purple-900 flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="animate-pulse mb-4">
-            <Zap className="h-16 w-16 mx-auto" />
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 via-blue-900 to-purple-900 animate-gradient flex items-center justify-center relative overflow-hidden">
+        {/* Partículas flutuantes de fundo */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }}></div>
+          <div className="absolute top-1/3 right-1/4 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-1/4 left-1/3 w-36 h-36 bg-indigo-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute bottom-1/3 right-1/3 w-28 h-28 bg-pink-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        <div className="text-center text-white z-10 space-y-6">
+          {/* Ícone de raio com efeito glow */}
+          <div className="relative inline-block mb-4">
+            <div className="absolute inset-0 animate-shockwave">
+              <Zap className="h-16 w-16 mx-auto text-yellow-400 opacity-40" />
+            </div>
+            <Zap className="h-16 w-16 mx-auto text-yellow-400 animate-glow will-change-transform relative z-10" />
           </div>
-          <p className="text-2xl font-bold">Aguardando novo jogo...</p>
+
+          {/* Texto com animação */}
+          <div className="space-y-3">
+            <p className="text-4xl font-black tracking-tight animate-pulse-slow" style={{
+              textShadow: '0 0 20px rgba(251, 191, 36, 0.5), 0 0 40px rgba(251, 191, 36, 0.3)'
+            }}>
+              AGUARDANDO
+            </p>
+            <p className="text-2xl font-bold text-yellow-400/90 animate-pulse" style={{ animationDelay: '0.3s' }}>
+              Novo Jogo...
+            </p>
+          </div>
+
+          {/* Barra de loading */}
+          <div className="max-w-md mx-auto mt-6">
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500 animate-energy"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -460,24 +490,76 @@ export default function GameDisplayPage() {
   // TELA 1: Intro do Round
   if (gameEvent.status === 'round1_intro' || gameEvent.status === 'round2_intro') {
     const roundNumber = gameEvent.status === 'round1_intro' ? 1 : 2;
-    
+
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex flex-col items-center justify-center p-8">
-        <div className="text-center text-white space-y-8 animate-fade-in">
-          <h1 className="text-8xl font-black tracking-tight drop-shadow-2xl">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 via-pink-600 to-rose-600 animate-gradient flex flex-col items-center justify-center p-8 relative overflow-hidden">
+        {/* Partículas de fundo */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-2xl animate-float"></div>
+          <div className="absolute top-1/4 right-20 w-32 h-32 bg-pink-300/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-20 left-1/4 w-28 h-28 bg-purple-300/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute bottom-1/3 right-1/3 w-24 h-24 bg-indigo-300/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '0.5s' }}></div>
+        </div>
+
+        <div className="text-center text-white space-y-8 animate-slide-top z-10">
+          {/* Título com efeito 3D */}
+          <h1
+            className="text-6xl font-black tracking-tight will-change-transform animate-pulse-slow"
+            style={{
+              textShadow: `
+                3px 3px 0px rgba(0, 0, 0, 0.3),
+                6px 6px 0px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(255, 255, 255, 0.3)
+              `
+            }}
+          >
             {roundNumber === 1 ? 'PRIMEIRO JOGO!' : 'SEGUNDO JOGO!'}
           </h1>
-          
-          <div className="bg-white/20 backdrop-blur-sm rounded-3xl p-12 border-4 border-white/30 shadow-2xl">
-            <p className="text-3xl font-bold mb-4">Movimento:</p>
-            <p className="text-7xl font-black uppercase tracking-wider">
-              {currentRound.movement}
+
+          {/* Card do movimento com glass-morphism e neon */}
+          <div className="relative inline-block">
+            {/* Borda neon animada */}
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 rounded-3xl blur-xl opacity-60 animate-neon-pulse"></div>
+
+            {/* Card principal */}
+            <div className="relative glass-morphism-strong rounded-3xl p-10 border-4 border-white/40 shadow-2xl">
+              {/* Estrelas decorativas */}
+              <div className="absolute -top-4 -left-4">
+                <Star className="h-8 w-8 text-yellow-300 animate-float" />
+              </div>
+              <div className="absolute -top-4 -right-4">
+                <Star className="h-8 w-8 text-pink-300 animate-float" style={{ animationDelay: '1s' }} />
+              </div>
+              <div className="absolute -bottom-4 -left-4">
+                <Star className="h-8 w-8 text-purple-300 animate-float" style={{ animationDelay: '2s' }} />
+              </div>
+              <div className="absolute -bottom-4 -right-4">
+                <Star className="h-8 w-8 text-blue-300 animate-float" style={{ animationDelay: '0.5s' }} />
+              </div>
+
+              <p className="text-2xl font-bold mb-4 opacity-90">Movimento:</p>
+              <p
+                className="text-5xl font-black uppercase tracking-wider"
+                style={{
+                  textShadow: '0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.3)'
+                }}
+              >
+                {currentRound.movement}
+              </p>
+            </div>
+          </div>
+
+          {/* Texto de preparação */}
+          <div className="space-y-3 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <p className="text-3xl font-bold flex items-center justify-center gap-3">
+              <Zap className="h-8 w-8 text-yellow-300 animate-bounce" />
+              Prepare-se!
+              <Zap className="h-8 w-8 text-yellow-300 animate-bounce" style={{ animationDelay: '0.2s' }} />
+            </p>
+            <p className="text-xl font-semibold opacity-80">
+              O jogo começará em breve...
             </p>
           </div>
-          
-          <p className="text-2xl font-semibold opacity-80">
-            Prepare-se! O jogo começará em breve...
-          </p>
         </div>
       </div>
     );
@@ -485,24 +567,98 @@ export default function GameDisplayPage() {
 
   // TELA 2: Contagem Regressiva
   if (gameEvent.status === 'round1_countdown' || gameEvent.status === 'round2_countdown') {
+    // Gradiente dinâmico baseado no countdown
+    const gradientColors = countdown === 3
+      ? 'from-orange-500 via-amber-500 to-yellow-500'
+      : countdown === 2
+      ? 'from-red-500 via-rose-500 to-pink-500'
+      : 'from-purple-600 via-fuchsia-600 to-pink-600';
+
+    const shadowColor = countdown === 3
+      ? 'rgba(251, 191, 36, 0.8)'  // amarelo
+      : countdown === 2
+      ? 'rgba(244, 63, 94, 0.8)'   // vermelho
+      : 'rgba(192, 38, 211, 0.8)'; // roxo
+
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 flex flex-col items-center justify-center p-8">
-        <div className="text-center text-white space-y-12">
-          <div className="relative">
-            <div className="text-[20rem] font-black leading-none animate-bounce-slow drop-shadow-2xl">
+      <div className={`min-h-screen bg-gradient-to-br ${gradientColors} animate-gradient flex flex-col items-center justify-center p-8 relative overflow-hidden`}>
+        {/* Shockwaves múltiplas ao redor do número */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="absolute w-96 h-96 border-8 border-white/30 rounded-full animate-shockwave"></div>
+          <div className="absolute w-96 h-96 border-8 border-white/20 rounded-full animate-shockwave" style={{ animationDelay: '0.3s' }}></div>
+          <div className="absolute w-96 h-96 border-8 border-white/10 rounded-full animate-shockwave" style={{ animationDelay: '0.6s' }}></div>
+        </div>
+
+        <div className="text-center text-white space-y-10 z-10">
+          {/* Número gigante com efeito 3D */}
+          <div className="relative will-change-transform">
+            {/* Explosão de partículas */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Star className="absolute -top-20 left-0 h-12 w-12 text-yellow-200 animate-firework" />
+              <Star className="absolute -top-20 right-0 h-12 w-12 text-pink-200 animate-firework" style={{ animationDelay: '0.2s' }} />
+              <Star className="absolute top-0 -left-20 h-10 w-10 text-orange-200 animate-firework" style={{ animationDelay: '0.4s' }} />
+              <Star className="absolute top-0 -right-20 h-10 w-10 text-red-200 animate-firework" style={{ animationDelay: '0.6s' }} />
+            </div>
+
+            <div
+              className="text-[14rem] font-black leading-none animate-bounce-slow will-change-transform"
+              style={{
+                textShadow: `
+                  6px 6px 0px rgba(0, 0, 0, 0.4),
+                  12px 12px 0px rgba(0, 0, 0, 0.3),
+                  0 0 40px ${shadowColor},
+                  0 0 80px ${shadowColor}
+                `,
+                transform: `rotate(${countdown === 1 ? '5deg' : countdown === 2 ? '-3deg' : '0deg'})`
+              }}
+            >
               {countdown}
             </div>
           </div>
-          
-          {/* Espaço para animação do boneco */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-16 border-4 border-white/20 w-96 h-96 flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="text-6xl">🏃‍♂️</div>
-              <p className="text-xl font-semibold">
-                [Animação: {currentRound.movement}]
-              </p>
+
+          {/* Card do movimento com glass-morphism */}
+          <div className="relative inline-block animate-slide-top">
+            {/* Borda brilhante */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white via-yellow-200 to-white rounded-3xl blur-2xl opacity-50 animate-pulse"></div>
+
+            <div className="relative glass-morphism-strong rounded-3xl p-8 border-4 border-white/30 shadow-2xl max-w-xl">
+              <div className="space-y-4">
+                {/* Emoji grande */}
+                <div className="text-5xl animate-float">
+                  🏃‍♂️
+                </div>
+
+                {/* Descrição do movimento */}
+                <div className="space-y-2">
+                  <p className="text-xl font-bold opacity-90">Execute:</p>
+                  <p
+                    className="text-3xl font-black uppercase tracking-wide"
+                    style={{
+                      textShadow: '0 0 20px rgba(255, 255, 255, 0.5)'
+                    }}
+                  >
+                    {currentRound.movement}
+                  </p>
+                </div>
+
+                {/* Raios decorativos */}
+                <div className="flex items-center justify-center gap-3 mt-3">
+                  <Zap className="h-6 w-6 text-yellow-300 animate-bounce" />
+                  <Zap className="h-6 w-6 text-yellow-300 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  <Zap className="h-6 w-6 text-yellow-300 animate-bounce" style={{ animationDelay: '0.4s' }} />
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* Texto motivacional */}
+          <p className="text-3xl font-black animate-pulse-slow tracking-wide"
+            style={{
+              textShadow: '0 0 20px rgba(255, 255, 255, 0.5)'
+            }}
+          >
+            PREPAREM-SE! 🔥
+          </p>
         </div>
       </div>
     );
@@ -510,14 +666,53 @@ export default function GameDisplayPage() {
 
   // TELA 3: Jogo Ativo
   if (gameEvent.status === 'round1_active' || gameEvent.status === 'round2_active') {
+    // Cor do timer baseada no tempo restante
+    const timerColorClass = timeRemaining > 60
+      ? 'from-green-600 to-green-800'
+      : timeRemaining > 30
+      ? 'from-yellow-500 to-amber-600'
+      : timeRemaining > 10
+      ? 'from-orange-500 to-orange-700'
+      : 'from-red-600 to-red-800';
+
+    const timerBorderColor = timeRemaining > 60
+      ? 'border-green-400'
+      : timeRemaining > 30
+      ? 'border-yellow-400'
+      : timeRemaining > 10
+      ? 'border-orange-400'
+      : 'border-red-400';
+
+    const timerTextColor = timeRemaining > 60
+      ? 'text-green-300'
+      : timeRemaining > 30
+      ? 'text-yellow-300'
+      : timeRemaining > 10
+      ? 'text-orange-300'
+      : 'text-red-300';
+
+    const shouldPulse = timeRemaining <= 10;
+
     return (
-      <div className="min-h-screen bg-gray-900 flex flex-col">
-        {/* Timer no topo */}
-        <div className="bg-gray-800 border-b-4 border-yellow-400 py-6 px-8">
-          <div className="max-w-7xl mx-auto flex items-center justify-center">
+      <div className="h-screen bg-gray-900 flex flex-col overflow-hidden">
+        {/* Timer no topo com urgência */}
+        <div className={`bg-gradient-to-r ${timerColorClass} border-b-4 ${timerBorderColor} py-4 px-6 relative overflow-hidden ${shouldPulse ? 'animate-pulse' : ''}`}>
+          {/* Brilho animado no fundo */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-energy"></div>
+
+          <div className="max-w-7xl mx-auto flex items-center justify-center relative z-10">
             <div className="text-center">
-              <p className="text-2xl font-bold text-yellow-400 mb-2">TEMPO RESTANTE</p>
-              <div className="text-7xl font-black text-white tabular-nums">
+              <p className={`text-xl font-bold ${timerTextColor} mb-2 tracking-wide uppercase`}>
+                TEMPO RESTANTE
+              </p>
+              <div
+                className="text-5xl font-black text-white tabular-nums will-change-transform"
+                style={{
+                  textShadow: shouldPulse
+                    ? '0 0 30px rgba(239, 68, 68, 0.8), 0 0 60px rgba(239, 68, 68, 0.5)'
+                    : '0 0 20px rgba(0, 0, 0, 0.5)'
+                }}
+              >
                 {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
               </div>
             </div>
@@ -525,68 +720,142 @@ export default function GameDisplayPage() {
         </div>
 
         {/* Área dividida - Azul vs Vermelho */}
-        <div className="flex-1 flex">
-          {/* Lado AZUL - Band 010 */}
-          <div className="flex-1 bg-gradient-to-br from-blue-600 to-blue-800 flex flex-col items-center justify-center p-12 border-r-4 border-gray-800">
-            <div className="text-center space-y-8 text-white">
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border-2 border-white/30">
-                <p className="text-2xl font-bold">PULSEIRA 010</p>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border-4 border-white/20">
-                <p className="text-3xl font-semibold mb-2">{band010?.userName}</p>
-                <p className="text-xl opacity-80">{band010?.userEmail}</p>
-              </div>
-              
-              <div className="relative">
-                <div className="text-9xl font-black tabular-nums drop-shadow-2xl animate-pulse-slow">
-                  {band010Points}
-                </div>
-                <p className="text-3xl font-bold mt-4">PONTOS</p>
-              </div>
-              
-              {/* Indicador de pontos subindo */}
-              <div className="flex items-center justify-center gap-2">
-                <Zap className="h-8 w-8 animate-bounce" />
-                <div className="h-3 w-48 bg-white/20 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-white transition-all duration-300"
-                    style={{ width: `${Math.min((band010Points / 1000) * 100, 100)}%` }}
-                  />
-                </div>
+        <div className="flex-1 flex relative">
+          {/* Divisor central com VS */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+            <div className="relative">
+              <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-50 animate-pulse"></div>
+              <div className="relative glass-morphism-strong rounded-full w-20 h-20 flex items-center justify-center border-4 border-yellow-400 shadow-2xl">
+                <p className="text-2xl font-black text-white" style={{
+                  textShadow: '0 0 20px rgba(0, 0, 0, 0.8)'
+                }}>VS</p>
               </div>
             </div>
           </div>
 
-          {/* Lado VERMELHO - Band 020 */}
-          <div className="flex-1 bg-gradient-to-br from-red-600 to-red-800 flex flex-col items-center justify-center p-12">
-            <div className="text-center space-y-8 text-white">
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border-2 border-white/30">
-                <p className="text-2xl font-bold">PULSEIRA 020</p>
+          {/* Lado AZUL - Band 010 */}
+          <div className="flex-1 bg-gradient-to-br from-cyan-400 via-blue-600 to-indigo-800 flex flex-col items-center justify-center p-12 border-r-4 border-gray-900 relative overflow-hidden">
+            {/* Partículas decorativas */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-10 left-10 w-20 h-20 bg-white/5 rounded-full blur-2xl animate-float"></div>
+              <div className="absolute top-1/3 left-1/4 w-16 h-16 bg-cyan-300/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }}></div>
+              <div className="absolute bottom-20 left-20 w-24 h-24 bg-blue-300/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute top-20 right-20 w-12 h-12 bg-indigo-300/10 rounded-full blur-xl animate-float" style={{ animationDelay: '0.5s' }}></div>
+            </div>
+
+            {/* Borda lateral com energia fluindo */}
+            <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-b from-cyan-400 via-blue-500 to-indigo-600 animate-energy"></div>
+
+            <div className="text-center space-y-6 text-white relative z-10">
+              {/* Badge da pulseira */}
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-blue-400 blur-lg opacity-50 animate-pulse"></div>
+                <div className="relative glass-morphism-strong rounded-2xl px-6 py-3 border-2 border-blue-300/50 shadow-2xl">
+                  <p className="text-xl font-black tracking-wide">PULSEIRA 010</p>
+                </div>
               </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border-4 border-white/20">
-                <p className="text-3xl font-semibold mb-2">{band020?.userName}</p>
-                <p className="text-xl opacity-80">{band020?.userEmail}</p>
-              </div>
-              
+
+              {/* Card do jogador */}
               <div className="relative">
-                <div className="text-9xl font-black tabular-nums drop-shadow-2xl animate-pulse-slow">
-                  {band020Points}
-                </div>
-                <p className="text-3xl font-bold mt-4">PONTOS</p>
-              </div>
-              
-              {/* Indicador de pontos subindo */}
-              <div className="flex items-center justify-center gap-2">
-                <Zap className="h-8 w-8 animate-bounce" />
-                <div className="h-3 w-48 bg-white/20 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-white transition-all duration-300"
-                    style={{ width: `${Math.min((band020Points / 1000) * 100, 100)}%` }}
-                  />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative glass-morphism-strong rounded-2xl p-4 border-2 border-blue-300/40 shadow-2xl">
+                  <p className="text-2xl font-bold mb-1" style={{
+                    textShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
+                  }}>{band010?.userName}</p>
+                  <p className="text-sm opacity-90">{band010?.userEmail}</p>
                 </div>
               </div>
+
+              {/* Pontos com efeito metálico */}
+              <div className="relative py-4">
+                {/* Glow azul */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-48 h-48 bg-blue-400 rounded-full blur-3xl opacity-40 animate-pulse-slow"></div>
+                </div>
+
+                <div className="relative">
+                  <div
+                    className="text-[7rem] font-black tabular-nums text-white will-change-transform"
+                    style={{
+                      textShadow: `
+                        0 0 30px rgba(96, 165, 250, 1),
+                        0 0 60px rgba(59, 130, 246, 0.8),
+                        4px 4px 0px rgba(0, 0, 0, 0.5),
+                        -2px -2px 0px rgba(147, 197, 253, 0.5)
+                      `
+                    }}
+                  >
+                    {band010Points}
+                  </div>
+                  <p className="text-2xl font-black mt-1 tracking-wider text-white" style={{
+                    textShadow: '0 0 12px rgba(96, 165, 250, 0.8), 2px 2px 0px rgba(0, 0, 0, 0.3)'
+                  }}>PONTOS</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Lado VERMELHO - Band 020 */}
+          <div className="flex-1 bg-gradient-to-br from-red-400 via-rose-600 to-pink-800 flex flex-col items-center justify-center p-12 relative overflow-hidden">
+            {/* Partículas decorativas */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-10 right-10 w-20 h-20 bg-white/5 rounded-full blur-2xl animate-float"></div>
+              <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-pink-300/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+              <div className="absolute bottom-20 right-20 w-24 h-24 bg-rose-300/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2.5s' }}></div>
+              <div className="absolute top-20 left-20 w-12 h-12 bg-red-300/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }}></div>
+            </div>
+
+            {/* Borda lateral com energia fluindo */}
+            <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-red-400 via-rose-500 to-pink-600 animate-energy"></div>
+
+            <div className="text-center space-y-6 text-white relative z-10">
+              {/* Badge da pulseira */}
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-red-400 blur-lg opacity-50 animate-pulse"></div>
+                <div className="relative glass-morphism-strong rounded-2xl px-6 py-3 border-2 border-red-300/50 shadow-2xl">
+                  <p className="text-xl font-black tracking-wide">PULSEIRA 020</p>
+                </div>
+              </div>
+
+              {/* Card do jogador */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-400 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative glass-morphism-strong rounded-2xl p-4 border-2 border-red-300/40 shadow-2xl">
+                  <p className="text-2xl font-bold mb-1" style={{
+                    textShadow: '0 0 15px rgba(239, 68, 68, 0.5)'
+                  }}>{band020?.userName}</p>
+                  <p className="text-sm opacity-90">{band020?.userEmail}</p>
+                </div>
+              </div>
+
+              {/* Pontos com efeito metálico */}
+              <div className="relative py-4">
+                {/* Glow vermelho */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-48 h-48 bg-red-400 rounded-full blur-3xl opacity-40 animate-pulse-slow"></div>
+                </div>
+
+                <div className="relative">
+                  <div
+                    className="text-[7rem] font-black tabular-nums text-white will-change-transform"
+                    style={{
+                      textShadow: `
+                        0 0 30px rgba(248, 113, 113, 1),
+                        0 0 60px rgba(239, 68, 68, 0.8),
+                        4px 4px 0px rgba(0, 0, 0, 0.5),
+                        -2px -2px 0px rgba(252, 165, 165, 0.5)
+                      `
+                    }}
+                  >
+                    {band020Points}
+                  </div>
+                  <p className="text-2xl font-black mt-1 tracking-wider text-white" style={{
+                    textShadow: '0 0 12px rgba(248, 113, 113, 0.8), 2px 2px 0px rgba(0, 0, 0, 0.3)'
+                  }}>PONTOS</p>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -604,72 +873,364 @@ export default function GameDisplayPage() {
     // Após 5 segundos, mostra o leaderboard
     if (showLeaderboard) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
-          <div className="max-w-6xl mx-auto">
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 animate-gradient p-8 relative overflow-hidden">
+          {/* Partículas de fundo - mais numerosas */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-float"></div>
+            <div className="absolute top-1/3 right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-1/4 left-1/4 w-36 h-36 bg-indigo-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+            <div className="absolute top-1/2 left-1/3 w-28 h-28 bg-pink-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute bottom-1/3 right-1/3 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
+            <div className="absolute top-10 right-1/4 w-24 h-24 bg-yellow-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '0.5s' }}></div>
+          </div>
+
+          {/* Estrelas decorativas ao redor */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <Star className="absolute top-10 left-20 h-6 w-6 text-yellow-400/30 animate-float" />
+            <Star className="absolute top-1/4 right-10 h-8 w-8 text-purple-400/30 animate-float" style={{ animationDelay: '1.5s' }} />
+            <Star className="absolute bottom-1/4 left-1/4 h-5 w-5 text-blue-400/30 animate-float" style={{ animationDelay: '2.5s' }} />
+            <Star className="absolute bottom-10 right-1/3 h-7 w-7 text-pink-400/30 animate-float" style={{ animationDelay: '0.8s' }} />
+            <Star className="absolute top-1/3 left-10 h-6 w-6 text-cyan-400/30 animate-float" style={{ animationDelay: '3.2s' }} />
+          </div>
+
+          <div className="max-w-7xl mx-auto relative z-10">
             {/* Header do Leaderboard */}
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <Trophy className="h-16 w-16 text-yellow-400" />
+            <div className="text-center mb-10 animate-slide-top">
+              {/* Coroa inclinada */}
+              <div className="relative inline-block mb-4">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-28 h-28 bg-yellow-400 rounded-full blur-3xl opacity-40 animate-pulse-slow"></div>
+                </div>
+                <Crown className="h-16 w-16 mx-auto text-yellow-300 animate-float relative z-10" style={{
+                  filter: 'drop-shadow(0 0 20px rgba(253, 224, 71, 0.9))',
+                  transform: 'rotate(-15deg)'
+                }} />
               </div>
-              <h1 className="text-7xl font-black text-white mb-4 drop-shadow-2xl">
+
+              <h1
+                className="text-5xl font-black text-white mb-4"
+                style={{
+                  textShadow: `
+                    3px 3px 0px rgba(0, 0, 0, 0.3),
+                    6px 6px 0px rgba(0, 0, 0, 0.2),
+                    0 0 30px rgba(251, 191, 36, 0.4)
+                  `
+                }}
+              >
                 TOP VENCEDORES
               </h1>
-              <p className="text-2xl text-white/80">
-                Ranking por Vitórias
-              </p>
+
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Star className="h-6 w-6 text-yellow-400 opacity-70" style={{ 
+                  animation: 'float-gentle 4s ease-in-out infinite'
+                }} />
+                <p className="text-xl text-white/90 font-bold">Ranking por Vitórias</p>
+                <Star className="h-6 w-6 text-yellow-400 opacity-70" style={{ 
+                  animation: 'float-gentle 4s ease-in-out infinite',
+                  animationDelay: '2s' 
+                }} />
+              </div>
             </div>
 
-            {/* Lista do Leaderboard */}
-            <div className="space-y-4">
-              {leaderboardData.map((entry, index) => (
-                <div
-                  key={entry.userId}
-                  className={`flex items-center gap-6 p-6 rounded-2xl backdrop-blur-sm border-2 transition-all animate-fade-in ${
-                    index === 0
-                      ? 'bg-yellow-500/30 border-yellow-400 scale-105'
-                      : index === 1
-                      ? 'bg-gray-300/20 border-gray-300'
-                      : index === 2
-                      ? 'bg-orange-600/20 border-orange-400'
-                      : 'bg-white/10 border-white/20'
-                  }`}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {/* Posição */}
-                  <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center">
-                    {index === 0 ? (
-                      <div className="text-5xl">🥇</div>
-                    ) : index === 1 ? (
-                      <div className="text-5xl">🥈</div>
-                    ) : index === 2 ? (
-                      <div className="text-5xl">🥉</div>
-                    ) : (
-                      <div className="text-4xl font-black text-white/70">#{entry.rank}</div>
-                    )}
-                  </div>
-
-                  {/* Nome */}
-                  <div className="flex-1">
-                    <p className="text-3xl font-bold text-white">{entry.userName}</p>
-                  </div>
-
-                  {/* Estatísticas */}
-                  <div className="flex gap-8 items-center">
-                    <div className="text-right">
-                      <p className="text-5xl font-black text-white tabular-nums">
-                        {entry.victories}
-                      </p>
-                      <p className="text-sm text-white/60 uppercase">Vitórias</p>
+            {/* Pódio estilo Kahoot - Top 3 */}
+            <div className="relative mb-12">
+              <div className="flex items-end justify-center gap-6 px-4">
+                {/* 2º Lugar - Esquerda */}
+                {leaderboardData[1] && (
+                  <div
+                    className="flex flex-col items-center"
+                    style={{
+                      animation: 'slide-up-podium 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                      animationDelay: '0.2s',
+                      opacity: 0
+                    }}
+                  >
+                    {/* Avatar/Medalha */}
+                    <div className="relative mb-4">
+                      <div className="absolute inset-0 bg-gray-300 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                      <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 flex items-center justify-center border-4 border-gray-100 shadow-2xl">
+                        <div className="text-5xl">🥈</div>
+                      </div>
                     </div>
-                    <div className="text-right opacity-60">
-                      <p className="text-2xl font-bold text-white">
-                        {entry.points}
-                      </p>
-                      <p className="text-xs text-white/60 uppercase">Pontos</p>
+
+                    {/* Pilar */}
+                    <div className="relative w-56">
+                      {/* Glow do pilar */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-blue-400/40 to-transparent rounded-t-2xl blur-xl"></div>
+                      
+                      {/* Pilar principal */}
+                      <div className="relative bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 rounded-t-3xl border-4 border-blue-300 shadow-2xl overflow-hidden"
+                        style={{ height: '280px' }}>
+                        {/* Brilho interno */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20"></div>
+                        
+                        {/* Conteúdo */}
+                        <div className="relative h-full flex flex-col items-center justify-between p-6">
+                          {/* Nome */}
+                          <div className="text-center">
+                            <p className="text-2xl font-black text-white mb-1" style={{
+                              textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                            }}>
+                              {leaderboardData[1].userName}
+                            </p>
+                          </div>
+
+                          {/* Estatísticas */}
+                          <div className="text-center space-y-2">
+                            <div>
+                              <p className="text-5xl font-black text-white tabular-nums" style={{
+                                textShadow: '0 0 20px rgba(255, 255, 255, 0.5), 0 2px 10px rgba(0,0,0,0.3)'
+                              }}>
+                                {leaderboardData[1].victories}
+                              </p>
+                              <p className="text-sm text-white/90 uppercase font-bold tracking-wider">Vitórias</p>
+                            </div>
+                            <div className="pt-2 border-t-2 border-white/30">
+                              <p className="text-2xl font-bold text-white">{leaderboardData[1].points}</p>
+                              <p className="text-xs text-white/80 uppercase tracking-wider">Pontos</p>
+                            </div>
+                          </div>
+
+                          {/* Número do rank */}
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                            <div className="text-7xl font-black text-white/20">#2</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                  </div>
+                )}
+
+                {/* 1º Lugar - Centro (mais alto) */}
+                {leaderboardData[0] && (
+                  <div
+                    className="flex flex-col items-center"
+                    style={{
+                      animation: 'slide-up-podium 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                      animationDelay: '0s',
+                      opacity: 0
+                    }}
+                  >
+                    {/* Avatar/Medalha */}
+                    <div className="relative mb-4">
+                      {/* Raios de luz */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="absolute w-32 h-2 bg-gradient-to-r from-transparent via-yellow-300 to-transparent opacity-60 blur-sm"></div>
+                        <div className="absolute w-2 h-32 bg-gradient-to-b from-transparent via-yellow-300 to-transparent opacity-60 blur-sm"></div>
+                      </div>
+                      <div className="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-60 animate-pulse-slow"></div>
+                      <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-600 flex items-center justify-center border-4 border-yellow-200 shadow-2xl">
+                        <div className="text-6xl">🥇</div>
+                      </div>
+                    </div>
+
+                    {/* Pilar */}
+                    <div className="relative w-64">
+                      {/* Glow do pilar */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-yellow-400/60 to-transparent rounded-t-2xl blur-2xl animate-neon-pulse"></div>
+                      
+                      {/* Pilar principal */}
+                      <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 rounded-t-3xl border-4 border-yellow-300 shadow-2xl overflow-hidden"
+                        style={{ height: '360px' }}>
+                        {/* Brilho interno */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-white/30"></div>
+                        
+                        {/* Partículas de estrelas */}
+                        <div className="absolute inset-0 overflow-hidden">
+                          <Star className="absolute top-4 right-4 h-6 w-6 text-white/40 animate-float" />
+                          <Star className="absolute top-12 left-6 h-4 w-4 text-white/30 animate-float" style={{ animationDelay: '1s' }} />
+                          <Star className="absolute bottom-20 right-8 h-5 w-5 text-white/35 animate-float" style={{ animationDelay: '2s' }} />
+                        </div>
+
+                        {/* Conteúdo */}
+                        <div className="relative h-full flex flex-col items-center justify-between p-6">
+                          {/* Nome */}
+                          <div className="text-center">
+                            <p className="text-3xl font-black text-white mb-1" style={{
+                              textShadow: '0 2px 15px rgba(0,0,0,0.4)'
+                            }}>
+                              {leaderboardData[0].userName}
+                            </p>
+                          </div>
+
+                          {/* Estatísticas */}
+                          <div className="text-center space-y-3">
+                            <div>
+                              <p className="text-7xl font-black text-white tabular-nums" style={{
+                                textShadow: '0 0 30px rgba(255, 255, 255, 0.8), 0 2px 15px rgba(0,0,0,0.4)'
+                              }}>
+                                {leaderboardData[0].victories}
+                              </p>
+                              <p className="text-base text-white uppercase font-bold tracking-wider">Vitórias</p>
+                            </div>
+                            <div className="pt-3 border-t-2 border-white/40">
+                              <p className="text-3xl font-bold text-white">{leaderboardData[0].points}</p>
+                              <p className="text-sm text-white/90 uppercase tracking-wider">Pontos</p>
+                            </div>
+                          </div>
+
+                          {/* Número do rank */}
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                            <div className="text-8xl font-black text-white/20">#1</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3º Lugar - Direita */}
+                {leaderboardData[2] && (
+                  <div
+                    className="flex flex-col items-center"
+                    style={{
+                      animation: 'slide-up-podium 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                      animationDelay: '0.4s',
+                      opacity: 0
+                    }}
+                  >
+                    {/* Avatar/Medalha */}
+                    <div className="relative mb-4">
+                      <div className="absolute inset-0 bg-orange-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                      <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-orange-300 via-orange-400 to-orange-600 flex items-center justify-center border-4 border-orange-200 shadow-2xl">
+                        <div className="text-5xl">🥉</div>
+                      </div>
+                    </div>
+
+                    {/* Pilar */}
+                    <div className="relative w-56">
+                      {/* Glow do pilar */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-red-400/40 to-transparent rounded-t-2xl blur-xl"></div>
+                      
+                      {/* Pilar principal */}
+                      <div className="relative bg-gradient-to-br from-red-400 via-red-500 to-red-600 rounded-t-3xl border-4 border-red-300 shadow-2xl overflow-hidden"
+                        style={{ height: '240px' }}>
+                        {/* Brilho interno */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20"></div>
+                        
+                        {/* Conteúdo */}
+                        <div className="relative h-full flex flex-col items-center justify-between p-6">
+                          {/* Nome */}
+                          <div className="text-center">
+                            <p className="text-2xl font-black text-white mb-1" style={{
+                              textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                            }}>
+                              {leaderboardData[2].userName}
+                            </p>
+                          </div>
+
+                          {/* Estatísticas */}
+                          <div className="text-center space-y-2">
+                            <div>
+                              <p className="text-4xl font-black text-white tabular-nums" style={{
+                                textShadow: '0 0 20px rgba(255, 255, 255, 0.5), 0 2px 10px rgba(0,0,0,0.3)'
+                              }}>
+                                {leaderboardData[2].victories}
+                              </p>
+                              <p className="text-sm text-white/90 uppercase font-bold tracking-wider">Vitórias</p>
+                            </div>
+                            <div className="pt-2 border-t-2 border-white/30">
+                              <p className="text-xl font-bold text-white">{leaderboardData[2].points}</p>
+                              <p className="text-xs text-white/80 uppercase tracking-wider">Pontos</p>
+                            </div>
+                          </div>
+
+                          {/* Número do rank */}
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                            <div className="text-7xl font-black text-white/20">#3</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Lista dos demais (4º em diante) */}
+            {leaderboardData.length > 3 && (
+              <div className="space-y-4 max-w-4xl mx-auto">
+                <div className="text-center mb-4">
+                  <div className="inline-block px-6 py-2 bg-white/10 rounded-full backdrop-blur-sm border border-white/20">
+                    <p className="text-lg font-bold text-white/90">Outros Competidores</p>
                   </div>
                 </div>
-              ))}
+                
+                {leaderboardData.slice(3).map((entry, index) => {
+                  const actualIndex = index + 3;
+                  return (
+                    <div
+                      key={entry.userId}
+                      className="relative group"
+                      style={{
+                        animation: 'slide-from-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                        animationDelay: `${0.6 + index * 0.1}s`,
+                        opacity: 0
+                      }}
+                    >
+                      {/* Card principal */}
+                      <div className="relative flex items-center gap-4 p-4 rounded-2xl bg-white/5 backdrop-blur-sm border-2 border-white/20 hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 shadow-lg">
+                        {/* Número da posição */}
+                        <div className="flex-shrink-0 w-14 h-14 flex items-center justify-center">
+                          <div
+                            className="text-2xl font-black text-white/70"
+                            style={{
+                              textShadow: '0 0 8px rgba(255, 255, 255, 0.3)'
+                            }}
+                          >
+                            #{entry.rank}
+                          </div>
+                        </div>
+
+                        {/* Nome do usuário */}
+                        <div className="flex-1">
+                          <p
+                            className="text-xl font-black text-white"
+                            style={{
+                              textShadow: '0 0 8px rgba(255, 255, 255, 0.3)'
+                            }}
+                          >
+                            {entry.userName}
+                          </p>
+                        </div>
+
+                        {/* Estatísticas */}
+                        <div className="flex gap-6 items-center">
+                          {/* Vitórias */}
+                          <div className="text-right">
+                            <p
+                              className="text-2xl font-black text-white tabular-nums"
+                              style={{
+                                textShadow: '0 0 8px rgba(255, 255, 255, 0.3)'
+                              }}
+                            >
+                              {entry.victories}
+                            </p>
+                            <p className="text-xs text-white/60 uppercase font-bold tracking-wider mt-1">
+                              Vitórias
+                            </p>
+                          </div>
+
+                          {/* Pontos */}
+                          <div className="text-right opacity-70">
+                            <p className="text-lg font-bold text-white">
+                              {entry.points}
+                            </p>
+                            <p className="text-xs text-white/60 uppercase tracking-wider mt-1">Pontos</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="text-center mt-8 animate-fade-in" style={{ animationDelay: '1s' }}>
+              <p className="text-lg text-white/60">
+                Continue jogando para subir no ranking! 🚀
+              </p>
             </div>
           </div>
         </div>
@@ -678,72 +1239,189 @@ export default function GameDisplayPage() {
     
     // Primeiros 8 segundos: Tela de resultado
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex flex-col items-center justify-center p-8">
-        <div className="text-center text-white space-y-12 animate-fade-in">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 animate-gradient flex flex-col items-center justify-center p-8 relative overflow-hidden">
+        {/* Confete caindo (apenas para vencedor, não empate) */}
+        {!isDraw && (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-3 h-3 rounded-full animate-confetti"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `-${Math.random() * 20}px`,
+                  backgroundColor: ['#fbbf24', '#f59e0b', '#fb923c', '#f472b6', '#c084fc'][Math.floor(Math.random() * 5)],
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${3 + Math.random() * 2}s`
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="text-center text-white space-y-12 animate-fade-in relative z-10">
           {isDraw ? (
             <>
-              <h1 className="text-9xl font-black tracking-tight drop-shadow-2xl animate-pulse">
+              {/* Empate com efeito holográfico */}
+              <h1
+                className="text-[10rem] font-black tracking-tight animate-holographic"
+                style={{
+                  textShadow: `
+                    0 0 40px rgba(236, 72, 153, 0.8),
+                    0 0 80px rgba(168, 85, 247, 0.6),
+                    0 0 120px rgba(59, 130, 246, 0.4)
+                  `
+                }}
+              >
                 EMPATE!
               </h1>
-              <p className="text-5xl font-bold opacity-90">
-                Ambos jogadores foram incríveis! 🎮
+              <p className="text-6xl font-bold opacity-90 animate-pulse-slow">
+                Ambos jogadores foram incríveis! 
               </p>
             </>
           ) : (
             <>
-              <div className="relative">
-                <Trophy className="h-40 w-40 mx-auto animate-bounce text-yellow-400 drop-shadow-2xl" />
-                <div className="absolute inset-0 animate-ping">
-                  <Star className="h-40 w-40 mx-auto text-yellow-400 opacity-30" />
+              {/* Troféu com rotação 3D e raios de luz */}
+              <div className="relative inline-block">
+                {/* Glow dourado pulsante */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-48 h-48 bg-yellow-400 rounded-full blur-3xl opacity-40 animate-pulse-slow"></div>
                 </div>
+
+                {/* Troféu principal */}
+                <Trophy className="h-32 w-32 mx-auto text-yellow-400 animate-rotate-3d relative z-10" style={{
+                  filter: 'drop-shadow(0 0 30px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 60px rgba(251, 191, 36, 0.5))'
+                }} />
               </div>
-              <h1 className="text-9xl font-black tracking-tight drop-shadow-2xl">
+
+              <h1
+                className="text-6xl font-black tracking-tight animate-slide-top"
+                style={{
+                  textShadow: `
+                    4px 4px 0px rgba(0, 0, 0, 0.3),
+                    8px 8px 0px rgba(0, 0, 0, 0.2),
+                    0 0 40px rgba(251, 191, 36, 0.6)
+                  `
+                }}
+              >
                 FIM DE JOGO!
               </h1>
             </>
           )}
 
-          <div className="grid grid-cols-2 gap-12 mt-12 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 gap-8 mt-8 max-w-5xl mx-auto">
             {/* Band 010 */}
-            <div className={`bg-blue-600/30 backdrop-blur-sm rounded-3xl p-10 border-4 ${
-              winner === 'band010' 
-                ? 'border-yellow-400 scale-110 shadow-2xl shadow-yellow-400/50' 
-                : 'border-white/20 opacity-70'
-            } transition-all duration-500`}>
-              <div className="text-3xl font-bold mb-6">PULSEIRA 010</div>
-              <div className="text-8xl font-black mb-4 tabular-nums">{totalPoints010}</div>
-              <div className="text-2xl font-semibold mb-2">{band010?.userName}</div>
-              <div className="text-lg opacity-80">{band010?.userEmail}</div>
+            <div className={`relative rounded-2xl p-6 border-4 transition-all duration-700 ${
+              winner === 'band010'
+                ? 'scale-105 animate-victory'
+                : winner === 'band020'
+                ? 'scale-95 opacity-60 grayscale-[30%]'
+                : ''
+            }`}>
+              {/* Vencedor: efeito dourado */}
               {winner === 'band010' && (
-                <div className="mt-6 text-5xl font-black text-yellow-400 animate-pulse">
-                  🏆 VENCEDOR! 🏆
-                </div>
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 rounded-2xl blur-xl opacity-50"></div>
+                  <div className="absolute inset-0 border-4 border-yellow-400 rounded-2xl animate-neon-pulse"></div>
+                </>
               )}
+
+              {/* Card principal */}
+              <div className={`relative glass-morphism-strong rounded-2xl p-6 border-3 ${
+                winner === 'band010' ? 'border-yellow-400' : 'border-blue-300/40'
+              } shadow-2xl`}>
+                <div className="space-y-4">
+                  <div className="text-2xl font-black tracking-wide">PULSEIRA 010</div>
+
+                  <div
+                    className="text-[5rem] font-black tabular-nums text-white"
+                    style={{
+                      textShadow: winner === 'band010'
+                        ? '0 0 30px rgba(251, 191, 36, 0.8), 0 0 60px rgba(251, 191, 36, 0.5), 3px 3px 0px rgba(0, 0, 0, 0.3)'
+                        : '0 0 15px rgba(59, 130, 246, 0.5), 3px 3px 0px rgba(0, 0, 0, 0.3)'
+                    }}
+                  >
+                    {totalPoints010}
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="text-xl font-bold">{band010?.userName}</div>
+                    <div className="text-sm opacity-80">{band010?.userEmail}</div>
+                  </div>
+
+                  {winner === 'band010' && (
+                    <div className="mt-4 flex items-center justify-center gap-2">
+                      <Crown className="h-10 w-10 text-yellow-400 animate-bounce" />
+                      <div className="text-3xl font-black text-yellow-400 animate-pulse-slow">
+                        VENCEDOR!
+                      </div>
+                      <Crown className="h-10 w-10 text-yellow-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Band 020 */}
-            <div className={`bg-red-600/30 backdrop-blur-sm rounded-3xl p-10 border-4 ${
-              winner === 'band020' 
-                ? 'border-yellow-400 scale-110 shadow-2xl shadow-yellow-400/50' 
-                : 'border-white/20 opacity-70'
-            } transition-all duration-500`}>
-              <div className="text-3xl font-bold mb-6">PULSEIRA 020</div>
-              <div className="text-8xl font-black mb-4 tabular-nums">{totalPoints020}</div>
-              <div className="text-2xl font-semibold mb-2">{band020?.userName}</div>
-              <div className="text-lg opacity-80">{band020?.userEmail}</div>
+            <div className={`relative rounded-2xl p-6 border-4 transition-all duration-700 ${
+              winner === 'band020'
+                ? 'scale-105 animate-victory'
+                : winner === 'band010'
+                ? 'scale-95 opacity-60 grayscale-[30%]'
+                : ''
+            }`}>
+              {/* Vencedor: efeito dourado */}
               {winner === 'band020' && (
-                <div className="mt-6 text-5xl font-black text-yellow-400 animate-pulse">
-                  🏆 VENCEDOR! 🏆
-                </div>
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 rounded-2xl blur-xl opacity-50"></div>
+                  <div className="absolute inset-0 border-4 border-yellow-400 rounded-2xl animate-neon-pulse"></div>
+                </>
               )}
+
+              {/* Card principal */}
+              <div className={`relative glass-morphism-strong rounded-2xl p-6 border-3 ${
+                winner === 'band020' ? 'border-yellow-400' : 'border-red-300/40'
+              } shadow-2xl`}>
+                <div className="space-y-4">
+                  <div className="text-2xl font-black tracking-wide">PULSEIRA 020</div>
+
+                  <div
+                    className="text-[5rem] font-black tabular-nums text-white"
+                    style={{
+                      textShadow: winner === 'band020'
+                        ? '0 0 30px rgba(251, 191, 36, 0.8), 0 0 60px rgba(251, 191, 36, 0.5), 3px 3px 0px rgba(0, 0, 0, 0.3)'
+                        : '0 0 15px rgba(239, 68, 68, 0.5), 3px 3px 0px rgba(0, 0, 0, 0.3)'
+                    }}
+                  >
+                    {totalPoints020}
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="text-xl font-bold">{band020?.userName}</div>
+                    <div className="text-sm opacity-80">{band020?.userEmail}</div>
+                  </div>
+
+                  {winner === 'band020' && (
+                    <div className="mt-4 flex items-center justify-center gap-2">
+                      <Crown className="h-10 w-10 text-yellow-400 animate-bounce" />
+                      <div className="text-3xl font-black text-yellow-400 animate-pulse-slow">
+                        VENCEDOR!
+                      </div>
+                      <Crown className="h-10 w-10 text-yellow-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="mt-16 space-y-4">
-            <p className="text-4xl font-bold">
+          <div className="mt-12 space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <p className="text-4xl font-black" style={{
+              textShadow: '0 0 25px rgba(255, 255, 255, 0.5)'
+            }}>
               Parabéns aos participantes! 🎉
             </p>
-            <p className="text-2xl opacity-70">
+            <p className="text-2xl opacity-80 animate-pulse">
               Aguarde o ranking geral...
             </p>
           </div>

@@ -150,12 +150,28 @@ body {
 @layer base {
   * {
     @apply border-border;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gray-900 text-foreground;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+    overflow-y: hidden;
   }
   html {
     scroll-behavior: smooth;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 100%;
+  }
+  #__next {
+    height: 100%;
+    overflow: hidden;
   }
 }
 
@@ -199,4 +215,345 @@ body {
 
 .animate-pulse-slow {
   animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* ===========================
+   ANIMAÇÕES PARA GAME DISPLAY
+   =========================== */
+
+/* 1. Gradiente em movimento contínuo */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* 2. Borda neon pulsante */
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 30px currentColor, 0 0 60px currentColor, 0 0 90px currentColor;
+  }
+}
+
+.animate-neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* 3. Brilho radiante intenso */
+@keyframes glow-intense {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 40px currentColor) drop-shadow(0 0 60px currentColor);
+  }
+}
+
+.animate-glow {
+  animation: glow-intense 2s ease-in-out infinite;
+}
+
+/* 4. Brilho deslizante (shimmer) */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* 5. Tremor sutil */
+@keyframes shake-subtle {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+.animate-shake {
+  animation: shake-subtle 0.5s ease-in-out;
+}
+
+/* 6. Escala com bounce */
+@keyframes scale-bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.animate-scale-bounce {
+  animation: scale-bounce 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 7. Flutuação aleatória */
+@keyframes float-random {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(10px, -15px) rotate(5deg);
+  }
+  66% {
+    transform: translate(-10px, -10px) rotate(-5deg);
+  }
+}
+
+.animate-float {
+  animation: float-random 6s ease-in-out infinite;
+}
+
+/* 7b. Float suave (para elementos decorativos) */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* 8. Confete caindo */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall 4s linear infinite;
+}
+
+/* 9. Explosão de fogos */
+@keyframes firework-burst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.animate-firework {
+  animation: firework-burst 1s ease-out infinite;
+}
+
+/* 10. Slide do topo */
+@keyframes slide-from-top {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-top {
+  animation: slide-from-top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 11. Slide da esquerda */
+@keyframes slide-from-left {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-left {
+  animation: slide-from-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 11b. Slide do pódio (subir de baixo) */
+@keyframes slide-up-podium {
+  0% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-podium {
+  animation: slide-up-podium 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 12. Energia fluindo */
+@keyframes energy-flow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.animate-energy {
+  background-size: 200% 200%;
+  animation: energy-flow 2s linear infinite;
+}
+
+/* 13. Efeito holográfico */
+@keyframes holographic {
+  0%, 100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(180deg);
+  }
+}
+
+.animate-holographic {
+  animation: holographic 3s ease-in-out infinite;
+}
+
+/* 14. Brilho metálico */
+@keyframes metallic-shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-metallic {
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: metallic-shine 2s infinite;
+}
+
+/* 15. Shockwave expandindo */
+@keyframes shockwave {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.animate-shockwave {
+  animation: shockwave 1s ease-out infinite;
+}
+
+/* 16. Rotação 3D suave */
+@keyframes rotate-3d {
+  0% {
+    transform: rotateY(0deg) rotateX(0deg);
+  }
+  50% {
+    transform: rotateY(180deg) rotateX(10deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateX(0deg);
+  }
+}
+
+.animate-rotate-3d {
+  animation: rotate-3d 4s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+/* 17. Pulse de vitória */
+@keyframes victory-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 20px rgba(251, 191, 36, 0);
+  }
+}
+
+.animate-victory {
+  animation: victory-pulse 1.5s ease-in-out infinite;
+}
+
+/* 18. Beat de pontos */
+@keyframes points-beat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-points-beat {
+  animation: points-beat 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Utilidade: Will-change para performance */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Glass morphism */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-morphism-strong {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
