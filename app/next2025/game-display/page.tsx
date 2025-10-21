@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { subscribeToGameEvent, updateGameStatus, updateCurrentRound, updateBandPoints, setRoundWinner, setGameWinner, GameEvent, GameBand } from '@/lib/game-service';
-import { getBandScores, startEventForAllBands, stopEventForAllBands, controlBandEvent } from '@/lib/band-service';
-import { addPointsToNext2025Band, getTopUsersByPoints, getTopUsersByVictories, LeaderboardEntry } from '@/lib/next2025-service';
+import { subscribeToGameEvent, updateGameStatus, updateCurrentRound, updateBandPoints, setRoundWinner, setGameWinner, setRoundStartTime, GameEvent, GameBand } from '@/lib/game-service';
+import { getBandScores, startEventForAllBands, stopEventForAllBands, controlBandEvent, BandLink } from '@/lib/band-service';
+import { addPointsToNext2025Band, getTopUsersByVictories, subscribeToBandLink, LeaderboardEntry, addVictoryToUser, getBandLinkInfo } from '@/lib/next2025-service';
 import { Trophy, Zap, Crown, Star } from 'lucide-react';
 
 export default function GameDisplayPage() {
@@ -13,23 +13,90 @@ export default function GameDisplayPage() {
   const [band010Points, setBand010Points] = useState<number>(0);
   const [band020Points, setBand020Points] = useState<number>(0);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [leaderboardType, setLeaderboardType] = useState<'points' | 'victories'>('points');
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  
+  // States para dados em tempo real das pulseiras
+  const [band010Info, setBand010Info] = useState<BandLink | null>(null);
+  const [band020Info, setBand020Info] = useState<BandLink | null>(null);
   
   const statusRef = useRef<string>('');
   const roundStartTimeRef = useRef<number>(0);
+  const currentEventIdRef = useRef<string>('');
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Escutar mudanças nas pulseiras vinculadas em tempo real
+  useEffect(() => {
+    if (!gameEvent) return;
+    
+    console.log('Iniciando listeners das pulseiras...');
+    
+    // Listener para band 010
+    const unsubscribe010 = subscribeToBandLink('010', (bandLink) => {
+      console.log('Band 010 atualizada:', bandLink);
+      setBand010Info(bandLink);
+    });
+    
+    // Listener para band 020
+    const unsubscribe020 = subscribeToBandLink('020', (bandLink) => {
+      console.log('Band 020 atualizada:', bandLink);
+      setBand020Info(bandLink);
+    });
+    
+    return () => {
+      console.log('Parando listeners das pulseiras');
+      unsubscribe010();
+      unsubscribe020();
+    };
+  }, [gameEvent?.id]); // Re-inscreve quando o ID do jogo mudar
 
   // Escutar mudanças no evento
   useEffect(() => {
     const unsubscribe = subscribeToGameEvent((event) => {
+      // Detectar se é um novo jogo (ID diferente) ou se não há ID salvo ainda
+      const isNewGame = event && (!currentEventIdRef.current || event.id !== currentEventIdRef.current);
+      
+      if (isNewGame && event) {
+        console.log('Novo jogo detectado! ID:', event.id);
+        console.log('Band IDs:', event.bandIds);
+        console.log('Band 010:', event.bands?.band010?.userName, event.bands?.band010?.userEmail);
+        console.log('Band 020:', event.bands?.band020?.userName, event.bands?.band020?.userEmail);
+        
+        // Limpar countdown anterior se existir
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
+        
+        // Resetar estados para novo jogo
+        currentEventIdRef.current = event.id;
+        statusRef.current = '';
+        setShowLeaderboard(false);
+        setLeaderboardData([]);
+        setBand010Points(0);
+        setBand020Points(0);
+        setCountdown(3);
+        setTimeRemaining(0);
+      }
+      
+      // SEMPRE atualiza o gameEvent com os dados mais recentes do Firebase
+      // Isso garante que nomes e emails sejam sempre os corretos
+      console.log('Atualizando gameEvent com dados do Firebase');
       setGameEvent(event);
       
-      // Quando evento é criado, inicia automaticamente
-      if (event && event.status === 'waiting' && statusRef.current !== 'waiting') {
+      // Se é um novo jogo em 'waiting', inicia automaticamente
+      if (isNewGame && event && event.status === 'waiting') {
         statusRef.current = 'waiting';
         setTimeout(() => {
           startRound1Intro();
         }, 1000);
+      } else if (event && statusRef.current !== event.status) {
+        // Sincroniza com o estado atual se já estava em andamento
+        statusRef.current = event.status;
+        
+        // Carrega pontos atuais se estiver em um round ativo
+        if (event.status === 'round1_active' || event.status === 'round2_active') {
+          updatePoints();
+        }
       }
     });
     
@@ -39,23 +106,39 @@ export default function GameDisplayPage() {
   // Gerenciar contagem regressiva
   useEffect(() => {
     if (gameEvent?.status === 'round1_countdown' || gameEvent?.status === 'round2_countdown') {
-      const interval = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            // Inicia o round ativo
-            if (gameEvent.status === 'round1_countdown') {
-              startRound1();
-            } else {
-              startRound2();
-            }
-            return 0;
+      // Limpa qualquer countdown anterior
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+      
+      // Reseta para 3 quando entra no countdown
+      setCountdown(3);
+      
+      let currentCount = 3;
+      countdownIntervalRef.current = setInterval(() => {
+        currentCount--;
+        setCountdown(currentCount);
+        
+        if (currentCount <= 0) {
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
           }
-          return prev - 1;
-        });
+          // Inicia o round ativo
+          if (gameEvent.status === 'round1_countdown') {
+            startRound1();
+          } else {
+            startRound2();
+          }
+        }
       }, 1000);
       
-      return () => clearInterval(interval);
+      return () => {
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
+      };
     }
   }, [gameEvent?.status]);
 
@@ -63,8 +146,25 @@ export default function GameDisplayPage() {
   useEffect(() => {
     if (gameEvent?.status === 'round1_active' || gameEvent?.status === 'round2_active') {
       const currentRound = gameEvent.rounds[gameEvent.currentRound];
-      roundStartTimeRef.current = Date.now();
-      setTimeRemaining(currentRound.duration);
+      
+      // Usa o timestamp do Firebase se disponível, caso contrário usa o tempo atual
+      const startTime = gameEvent.roundStartTime || Date.now();
+      roundStartTimeRef.current = startTime;
+      
+      // Calcula o tempo já decorrido
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = Math.max(0, currentRound.duration - elapsed);
+      setTimeRemaining(remaining);
+      
+      // Se o tempo já acabou, finaliza imediatamente
+      if (remaining <= 0) {
+        if (gameEvent.status === 'round1_active') {
+          finishRound1();
+        } else {
+          finishRound2();
+        }
+        return;
+      }
       
       const interval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - roundStartTimeRef.current) / 1000);
@@ -94,7 +194,13 @@ export default function GameDisplayPage() {
         clearInterval(pointsInterval);
       };
     }
-  }, [gameEvent?.status]);
+    
+    // IMPORTANTE: Limpa os intervals quando sair do estado ativo
+    // Isso previne que updatePoints continue rodando após o jogo terminar
+    return () => {
+      // Cleanup automático quando o status mudar
+    };
+  }, [gameEvent?.status, gameEvent?.roundStartTime]);
   
   // Gerenciar leaderboard após finalizar
   useEffect(() => {
@@ -102,33 +208,16 @@ export default function GameDisplayPage() {
       // Aguardar 8 segundos antes de mostrar o leaderboard (mais tempo para ver o resultado)
       const timer = setTimeout(() => {
         setShowLeaderboard(true);
-        loadLeaderboard('points');
+        loadLeaderboard();
       }, 8000);
       
       return () => clearTimeout(timer);
     }
   }, [gameEvent?.status, showLeaderboard]);
   
-  // Alternar entre leaderboard de pontos e vitórias
-  useEffect(() => {
-    if (showLeaderboard) {
-      const interval = setInterval(() => {
-        setLeaderboardType(prev => {
-          const newType = prev === 'points' ? 'victories' : 'points';
-          loadLeaderboard(newType);
-          return newType;
-        });
-      }, 8000); // Alterna a cada 8 segundos
-      
-      return () => clearInterval(interval);
-    }
-  }, [showLeaderboard]);
-  
-  const loadLeaderboard = async (type: 'points' | 'victories') => {
+  const loadLeaderboard = async () => {
     try {
-      const data = type === 'points' 
-        ? await getTopUsersByPoints(10)
-        : await getTopUsersByVictories(10);
+      const data = await getTopUsersByVictories(10);
       setLeaderboardData(data);
     } catch (error) {
       console.error('Error loading leaderboard:', error);
@@ -144,13 +233,14 @@ export default function GameDisplayPage() {
   };
 
   const startRound1Countdown = async () => {
-    setCountdown(3);
     await updateGameStatus('round1_countdown');
   };
 
   const startRound1 = async () => {
     if (!gameEvent) return;
     
+    const startTime = Date.now();
+    await setRoundStartTime(startTime);
     await updateGameStatus('round1_active');
     setBand010Points(0);
     setBand020Points(0);
@@ -162,12 +252,20 @@ export default function GameDisplayPage() {
   const finishRound1 = async () => {
     if (!gameEvent) return;
     
+    console.log('Finalizando Round 1');
+    
     // Parar pulseiras
     await stopEventForAllBands(['010', '020']);
+    
+    // Aguardar um pouco para garantir que os dados foram coletados
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     // Capturar pontos finais
     const finalPoints010 = await getFinalPoints('010');
     const finalPoints020 = await getFinalPoints('020');
+    
+    console.log('Round 1 - Band 010:', finalPoints010);
+    console.log('Round 1 - Band 020:', finalPoints020);
     
     setBand010Points(finalPoints010);
     setBand020Points(finalPoints020);
@@ -176,6 +274,8 @@ export default function GameDisplayPage() {
     const winner = finalPoints010 > finalPoints020 ? 'band010' : 
                    finalPoints020 > finalPoints010 ? 'band020' : 'tie';
     await setRoundWinner(0, winner);
+    
+    console.log('Round 1 Finalizado');
     
     // Aguardar 3 segundos antes de iniciar round 2
     setTimeout(() => {
@@ -192,14 +292,18 @@ export default function GameDisplayPage() {
   };
 
   const startRound2Countdown = async () => {
-    setCountdown(3);
     await updateGameStatus('round2_countdown');
   };
 
   const startRound2 = async () => {
     if (!gameEvent) return;
     
+    const startTime = Date.now();
+    await setRoundStartTime(startTime);
     await updateGameStatus('round2_active');
+    
+    // NÃO reseta os pontos aqui - mantém os do Round 1
+    // Os pontos serão somados em updatePoints()
     
     // Iniciar evento nas pulseiras
     await startEventForAllBands(['010', '020']);
@@ -208,7 +312,10 @@ export default function GameDisplayPage() {
   const finishRound2 = async () => {
     if (!gameEvent) return;
     
-    console.log('=== Finalizando Round 2 ===');
+    console.log('Finalizando Round 2');
+    
+    // PRIMEIRO: Atualizar o status para 'finished' para parar updatePoints
+    await updateGameStatus('finished');
     
     // Parar pulseiras
     await stopEventForAllBands(['010', '020']);
@@ -246,19 +353,37 @@ export default function GameDisplayPage() {
     
     await setGameWinner(winner);
     
+    // Adicionar vitória ao vencedor
+    if (winner === 'band010' && (gameEvent.bandIds?.band010 || gameEvent.bands?.band010)) {
+      const bandLink = await getBandLinkInfo('010');
+      if (bandLink) {
+        await addVictoryToUser(bandLink.userId, gameEvent.id);
+        console.log('Vitoria adicionada para Band 010:', bandLink.userName);
+      }
+    } else if (winner === 'band020' && (gameEvent.bandIds?.band020 || gameEvent.bands?.band020)) {
+      const bandLink = await getBandLinkInfo('020');
+      if (bandLink) {
+        await addVictoryToUser(bandLink.userId, gameEvent.id);
+        console.log('Vitoria adicionada para Band 020:', bandLink.userName);
+      }
+    }
+    
     // Adicionar pontos aos usuários NEXT 2025
-    if (gameEvent.bands.band010) {
+    // Usa os IDs das pulseiras do evento
+    if (gameEvent.bandIds?.band010 || gameEvent.bands?.band010) {
       await addPointsToNext2025Band('010', totalPoints010, 'Pontos ganhos no Jogo de Movimento');
     }
-    if (gameEvent.bands.band020) {
+    if (gameEvent.bandIds?.band020 || gameEvent.bands?.band020) {
       await addPointsToNext2025Band('020', totalPoints020, 'Pontos ganhos no Jogo de Movimento');
     }
     
-    console.log('=== Round 2 Finalizado ===');
+    console.log('Round 2 Finalizado');
   };
 
   const updatePoints = async () => {
-    if (!gameEvent || (gameEvent.status !== 'round1_active' && gameEvent.status !== 'round2_active')) return;
+    // Para de atualizar se o jogo já terminou
+    if (!gameEvent || gameEvent.status === 'finished') return;
+    if (gameEvent.status !== 'round1_active' && gameEvent.status !== 'round2_active') return;
     
     try {
       const scores010 = await getBandScores('010');
@@ -271,12 +396,14 @@ export default function GameDisplayPage() {
       const points020 = Math.abs(scores020[`score${axis}`]?.value || 0);
       
       if (gameEvent.status === 'round1_active') {
+        // Round 1: apenas seta os pontos
         setBand010Points(Math.round(points010));
         setBand020Points(Math.round(points020));
-      } else {
-        // Round 2: adiciona aos pontos do round 1
-        setBand010Points(prev => Math.round(points010));
-        setBand020Points(prev => Math.round(points020));
+      } else if (gameEvent.status === 'round2_active') {
+        // Round 2: NÃO soma aqui! Só mostra os pontos do round 2
+        // A soma será feita apenas no finishRound2
+        setBand010Points(Math.round(points010));
+        setBand020Points(Math.round(points020));
       }
     } catch (error) {
       console.error('Error updating points:', error);
@@ -307,9 +434,28 @@ export default function GameDisplayPage() {
     );
   }
 
+  // Extrai dados do evento atual
   const currentRound = gameEvent.rounds[gameEvent.currentRound];
-  const band010 = gameEvent.bands.band010;
-  const band020 = gameEvent.bands.band020;
+  
+  // Usa dados em tempo real das pulseiras vinculadas
+  // Se não houver dados do Firebase ainda, usa os dados do evento como fallback
+  const band010 = band010Info ? {
+    bandId: '010',
+    userId: band010Info.userId,
+    userName: band010Info.userName,
+    userEmail: band010Info.userEmail,
+    points: 0,
+    color: 'blue' as const
+  } : gameEvent.bands?.band010 || null;
+  
+  const band020 = band020Info ? {
+    bandId: '020',
+    userId: band020Info.userId,
+    userName: band020Info.userName,
+    userEmail: band020Info.userEmail,
+    points: 0,
+    color: 'red' as const
+  } : gameEvent.bands?.band020 || null;
 
   // TELA 1: Intro do Round
   if (gameEvent.status === 'round1_intro' || gameEvent.status === 'round2_intro') {
@@ -463,17 +609,13 @@ export default function GameDisplayPage() {
             {/* Header do Leaderboard */}
             <div className="text-center mb-12 animate-fade-in">
               <div className="flex items-center justify-center gap-4 mb-6">
-                {leaderboardType === 'points' ? (
-                  <Crown className="h-16 w-16 text-yellow-400" />
-                ) : (
-                  <Trophy className="h-16 w-16 text-yellow-400" />
-                )}
+                <Trophy className="h-16 w-16 text-yellow-400" />
               </div>
               <h1 className="text-7xl font-black text-white mb-4 drop-shadow-2xl">
-                {leaderboardType === 'points' ? 'TOP PONTUADORES' : 'TOP VENCEDORES'}
+                TOP VENCEDORES
               </h1>
               <p className="text-2xl text-white/80">
-                {leaderboardType === 'points' ? 'Ranking por Pontos' : 'Ranking por Vitórias'}
+                Ranking por Vitórias
               </p>
             </div>
 
@@ -513,37 +655,18 @@ export default function GameDisplayPage() {
 
                   {/* Estatísticas */}
                   <div className="flex gap-8 items-center">
-                    {leaderboardType === 'points' ? (
-                      <>
-                        <div className="text-right">
-                          <p className="text-5xl font-black text-white tabular-nums">
-                            {entry.points}
-                          </p>
-                          <p className="text-sm text-white/60 uppercase">Pontos</p>
-                        </div>
-                        <div className="text-right opacity-60">
-                          <p className="text-2xl font-bold text-white">
-                            {entry.victories}
-                          </p>
-                          <p className="text-xs text-white/60 uppercase">Vitórias</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="text-right">
-                          <p className="text-5xl font-black text-white tabular-nums">
-                            {entry.victories}
-                          </p>
-                          <p className="text-sm text-white/60 uppercase">Vitórias</p>
-                        </div>
-                        <div className="text-right opacity-60">
-                          <p className="text-2xl font-bold text-white">
-                            {entry.points}
-                          </p>
-                          <p className="text-xs text-white/60 uppercase">Pontos</p>
-                        </div>
-                      </>
-                    )}
+                    <div className="text-right">
+                      <p className="text-5xl font-black text-white tabular-nums">
+                        {entry.victories}
+                      </p>
+                      <p className="text-sm text-white/60 uppercase">Vitórias</p>
+                    </div>
+                    <div className="text-right opacity-60">
+                      <p className="text-2xl font-bold text-white">
+                        {entry.points}
+                      </p>
+                      <p className="text-xs text-white/60 uppercase">Pontos</p>
+                    </div>
                   </div>
                 </div>
               ))}
