@@ -1,4 +1,10 @@
 // Serviço para gerenciar eventos de jogo no estilo Nintendo Switch
+// 
+// ARQUITETURA:
+// - GameEvent armazena apenas o CONTROLE do jogo (status, rounds, vencedor)
+// - Dados dos usuários (nome, email) vêm em TEMPO REAL de next2025BandLinks
+// - Isso permite atualização automática se o vínculo mudar durante o jogo
+//
 import { database } from './firebase';
 import { ref, set, get, update, onValue, off, remove } from 'firebase/database';
 import { MovementPreset } from './band-service';
@@ -10,6 +16,7 @@ export interface GameRound {
   preset?: MovementPreset;
 }
 
+// Mantemos GameBand para compatibilidade com código existente (será usado apenas em memória no game-display)
 export interface GameBand {
   bandId: string;
   userId: string;
@@ -29,19 +36,27 @@ export type GameStatus =
   | 'round2_active'
   | 'finished';
 
+// GameEvent agora só armazena controle do jogo, não dados dos usuários
 export interface GameEvent {
   id: string;
   status: GameStatus;
   createdAt: string;
   rounds: GameRound[];
   currentRound: number; // 0 ou 1
-  bands: {
-    band010?: GameBand;
-    band020?: GameBand;
+  roundStartTime?: number; // Timestamp do início do round atual
+  // IDs das pulseiras participantes (dados dos usuários vêm do Firebase em tempo real)
+  bandIds: {
+    band010: string; // '010'
+    band020: string; // '020'
   };
   winner?: 'band010' | 'band020' | 'tie';
   round1Winner?: 'band010' | 'band020' | 'tie';
   round2Winner?: 'band010' | 'band020' | 'tie';
+  // Mantém bands por compatibilidade temporária, mas será removido em breve
+  bands?: {
+    band010?: GameBand;
+    band020?: GameBand;
+  };
 }
 
 /**
@@ -55,13 +70,31 @@ export async function createGameEvent(
   try {
     const eventRef = ref(database, 'gameEvents/currentEvent');
     
+    console.log('🔍 Verificando evento existente...');
+    
     // Verificar se já existe um evento ativo
     const snapshot = await get(eventRef);
     if (snapshot.exists()) {
       const existingEvent = snapshot.val() as GameEvent;
+      console.log('📋 Evento existente encontrado:', {
+        id: existingEvent.id,
+        status: existingEvent.status
+      });
+      
       if (existingEvent.status !== 'finished' && existingEvent.status !== 'waiting') {
+        console.log('❌ Evento ainda está ativo, não pode criar novo');
         return { success: false, error: 'Já existe um evento ativo' };
       }
+      
+      // IMPORTANTE: Remove o evento antigo primeiro para forçar o onValue a disparar
+      console.log('🗑️ Removendo evento antigo (status: ' + existingEvent.status + ')...');
+      await remove(eventRef);
+      console.log('✓ Evento removido');
+      
+      // Aguarda um pouco para garantir que o Firebase processou a remoção
+      await new Promise(resolve => setTimeout(resolve, 200));
+    } else {
+      console.log('📭 Nenhum evento existente, criando primeiro evento');
     }
     
     const eventId = Date.now().toString();
@@ -71,6 +104,12 @@ export async function createGameEvent(
       createdAt: new Date().toISOString(),
       rounds,
       currentRound: 0,
+      // Apenas IDs das pulseiras - dados dos usuários vêm do Firebase em tempo real
+      bandIds: {
+        band010: '010',
+        band020: '020'
+      },
+      // Mantém bands por compatibilidade temporária
       bands: {
         band010: {
           ...band010,
@@ -85,7 +124,30 @@ export async function createGameEvent(
       }
     };
     
+    console.log('💾 Salvando novo evento no Firebase:', {
+      id: eventId,
+      bandIds: gameEvent.bandIds,
+      // Dados dos usuários são temporários, virão do Firebase em tempo real
+      band010: band010.userName,
+      band020: band020.userName
+    });
+    
     await set(eventRef, gameEvent);
+    
+    console.log('✅ Evento salvo com sucesso!');
+    
+    // Verificar se realmente salvou
+    const verifySnapshot = await get(eventRef);
+    if (verifySnapshot.exists()) {
+      const savedEvent = verifySnapshot.val() as GameEvent;
+      console.log('✓ Verificação: Evento no Firebase:', {
+        id: savedEvent.id,
+        bandIds: savedEvent.bandIds,
+        status: savedEvent.status
+      });
+    } else {
+      console.error('⚠️ ERRO: Evento não foi encontrado no Firebase após salvar!');
+    }
     
     return { success: true, eventId };
   } catch (error) {
@@ -118,6 +180,20 @@ export async function updateCurrentRound(roundIndex: number): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Error updating current round:', error);
+    return false;
+  }
+}
+
+/**
+ * Definir timestamp de início do round
+ */
+export async function setRoundStartTime(timestamp: number): Promise<boolean> {
+  try {
+    const eventRef = ref(database, 'gameEvents/currentEvent');
+    await update(eventRef, { roundStartTime: timestamp });
+    return true;
+  } catch (error) {
+    console.error('Error setting round start time:', error);
     return false;
   }
 }
@@ -204,9 +280,20 @@ export function subscribeToGameEvent(
   const eventRef = ref(database, 'gameEvents/currentEvent');
   
   const unsubscribe = onValue(eventRef, (snapshot) => {
+    console.log('🔥 Firebase onValue disparado!', new Date().toLocaleTimeString());
+    
     if (snapshot.exists()) {
-      callback(snapshot.val() as GameEvent);
+      const eventData = snapshot.val() as GameEvent;
+      console.log('📦 Dados do evento:', {
+        id: eventData.id,
+        status: eventData.status,
+        bandIds: eventData.bandIds,
+        // Dados dos usuários agora vêm do Firebase RT via subscribeToBandLink
+        note: 'Dados dos usuários serão buscados em tempo real de next2025BandLinks'
+      });
+      callback(eventData);
     } else {
+      console.log('❌ Nenhum evento encontrado no Firebase');
       callback(null);
     }
   });
