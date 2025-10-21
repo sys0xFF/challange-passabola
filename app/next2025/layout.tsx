@@ -12,8 +12,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   // Rotas públicas que não precisam de autenticação
-  const publicRoutes = ['/next2025/login', '/next2025/cadastro'];
+  const publicRoutes = ['/next2025/login', '/next2025/cadastro', '/next2025/game-display'];
   const isPublicRoute = publicRoutes.includes(pathname);
+  
+  // Rotas que não devem redirecionar quando logado (ex: game-display para TV)
+  const noRedirectWhenLoggedIn = ['/next2025/game-display'];
+  const shouldNotRedirect = noRedirectWhenLoggedIn.includes(pathname);
   
   // Rotas que não devem mostrar a navbar
   const hideNavRoutes = ['/next2025/game-display'];
@@ -23,7 +27,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!loading) {
       if (!user && !isPublicRoute) {
         router.push('/next2025/login');
-      } else if (user && isPublicRoute) {
+      } else if (user && isPublicRoute && !shouldNotRedirect) {
         router.push('/next2025');
       }
     }
