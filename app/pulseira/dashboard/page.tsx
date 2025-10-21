@@ -613,15 +613,6 @@ export default function BandDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-4 sm:gap-0">
             <div className="flex items-center gap-3 sm:gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push('/admin/dashboard')}
-                className="shrink-0"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Voltar
-              </Button>
               <div className="relative h-8 w-8 sm:h-10 sm:w-10">
                 <Image src="/logo.png" alt="Passa Bola Logo" fill className="object-contain" />
               </div>
@@ -647,21 +638,15 @@ export default function BandDashboard() {
                   <p className="text-xs mt-2">Os controles manuais estão desabilitados</p>
                 </div>
               )}
-              {/* Botão de Debug (temporário) */}
+              
               <Button 
-                onClick={() => {
-                  console.log('=== DEBUG INFO ===')
-                  console.log('Score History:', scoreHistory)
-                  console.log('Devices:', devices)
-                  console.log('Band Links:', bandLinks)
-                  console.log('Event Status:', eventStatus)
-                  alert(`Score History: ${scoreHistory.length} registros. Veja o console para detalhes.`)
-                }}
+                onClick={() => router.push('/admin/dashboard')}
                 variant="outline" 
                 size="sm"
                 className="w-full sm:w-auto"
               >
-                🐛 Debug
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
               </Button>
               
               <Button 
