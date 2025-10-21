@@ -21,7 +21,7 @@ export default function LeaderboardPage() {
   const [topByPoints, setTopByPoints] = useState<LeaderboardEntry[]>([]);
   const [topByVictories, setTopByVictories] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'points' | 'victories'>('points');
+  const [activeTab, setActiveTab] = useState<'points' | 'victories'>('victories');
 
   useEffect(() => {
     loadData();
@@ -110,13 +110,13 @@ export default function LeaderboardPage() {
           className="space-y-4"
         >
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="points" className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              Mais Pontos
-            </TabsTrigger>
             <TabsTrigger value="victories" className="flex items-center gap-2">
               <Trophy className="h-4 w-4" />
               Mais Vitórias
+            </TabsTrigger>
+            <TabsTrigger value="points" className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Mais Pontos
             </TabsTrigger>
           </TabsList>
 
