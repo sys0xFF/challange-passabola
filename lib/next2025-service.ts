@@ -1,7 +1,7 @@
 // Serviço para o sistema gamificado NEXT 2025
 // Este sistema é SEPARADO do site Passa Bola principal
 import { database } from './firebase';
-import { ref, push, set, get, update, query, orderByChild, limitToLast, remove } from 'firebase/database';
+import { ref, push, set, get, update, query, orderByChild, limitToLast, remove, onValue, off } from 'firebase/database';
 import { BandLink } from './band-service';
 
 // ============= INTERFACES =============
@@ -872,6 +872,49 @@ export async function unlinkNext2025Band(bandId: string): Promise<boolean> {
     console.error('Error unlinking NEXT 2025 band:', error);
     return false;
   }
+}
+
+/**
+ * Buscar informações de uma pulseira vinculada
+ */
+export async function getBandLinkInfo(bandId: string): Promise<BandLink | null> {
+  try {
+    const bandLinkRef = ref(database, `next2025BandLinks/${bandId}`);
+    const snapshot = await get(bandLinkRef);
+    
+    if (!snapshot.exists()) {
+      return null;
+    }
+    
+    return snapshot.val() as BandLink;
+  } catch (error) {
+    console.error('Error fetching band link info:', error);
+    return null;
+  }
+}
+
+/**
+ * Escutar mudanças em tempo real de uma pulseira vinculada
+ */
+export function subscribeToBandLink(
+  bandId: string,
+  callback: (bandLink: BandLink | null) => void
+): () => void {
+  const bandLinkRef = ref(database, `next2025BandLinks/${bandId}`);
+  
+  const unsubscribe = onValue(bandLinkRef, (snapshot) => {
+    console.log(`🔔 Band ${bandId} atualizada no Firebase!`);
+    if (snapshot.exists()) {
+      const bandLink = snapshot.val() as BandLink;
+      console.log(`   └─ Usuário: ${bandLink.userName}, Email: ${bandLink.userEmail}`);
+      callback(bandLink);
+    } else {
+      console.log(`   └─ Pulseira desvinculada`);
+      callback(null);
+    }
+  });
+  
+  return () => off(bandLinkRef, 'value', unsubscribe);
 }
 
 /**
