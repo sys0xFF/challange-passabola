@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getNext2025Settings } from '@/lib/next2025-service'
 
 const BAND_API_BASE_URL = "http://156.67.25.64:1026/v2/entities"
 
@@ -41,16 +42,35 @@ export async function GET(
     
     const result: any = {}
     
+    // Buscar multiplicador de pontos
+    const settings = await getNext2025Settings()
+    const multiplier = settings.pointsMultiplier || 1.0
+    
     if (scoreXRes.ok) {
-      result.scoreX = await scoreXRes.json()
+      const scoreData = await scoreXRes.json()
+      // Aplicar multiplicador ao valor
+      if (scoreData.value !== undefined) {
+        scoreData.value = scoreData.value * multiplier
+      }
+      result.scoreX = scoreData
     }
     
     if (scoreYRes.ok) {
-      result.scoreY = await scoreYRes.json()
+      const scoreData = await scoreYRes.json()
+      // Aplicar multiplicador ao valor
+      if (scoreData.value !== undefined) {
+        scoreData.value = scoreData.value * multiplier
+      }
+      result.scoreY = scoreData
     }
     
     if (scoreZRes.ok) {
-      result.scoreZ = await scoreZRes.json()
+      const scoreData = await scoreZRes.json()
+      // Aplicar multiplicador ao valor
+      if (scoreData.value !== undefined) {
+        scoreData.value = scoreData.value * multiplier
+      }
+      result.scoreZ = scoreData
     }
     
     return new NextResponse(JSON.stringify(result), {
@@ -81,10 +101,6 @@ export async function PATCH(
     const entityId = `urn:ngsi-ld:Band:${bandId.padStart(3, '0')}`
     const body = await request.json()
     
-    console.log(`[PATCH /api/bands/${bandId}] Recebido:`, body)
-    console.log(`[PATCH] Entity ID: ${entityId}`)
-    console.log(`[PATCH] URL: ${BAND_API_BASE_URL}/${entityId}/attrs`)
-    
     const response = await fetch(`${BAND_API_BASE_URL}/${entityId}/attrs`, {
       method: 'PATCH',
       headers: {
@@ -95,11 +111,7 @@ export async function PATCH(
       body: JSON.stringify(body)
     })
     
-    console.log(`[PATCH] Response status: ${response.status}`)
-    
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`[PATCH] Error response:`, errorText)
       return NextResponse.json(
         { error: `Erro ao controlar evento: ${response.status}` },
         { status: response.status }
