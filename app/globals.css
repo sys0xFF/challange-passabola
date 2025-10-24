@@ -159,19 +159,19 @@ body {
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: auto;
   }
   html {
     scroll-behavior: smooth;
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: auto;
     height: 100%;
   }
   #__next {
     height: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 }
 
