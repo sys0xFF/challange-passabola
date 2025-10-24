@@ -82,6 +82,19 @@ export interface LeaderboardEntry {
   rank: number;
 }
 
+export interface Next2025Preset {
+  id: string;
+  name: string;
+  axis: 'X' | 'Y' | 'Z';
+  duration: number; // em segundos
+  description: string;
+  createdAt: string;
+}
+
+export interface Next2025Settings {
+  pointsMultiplier: number; // multiplicador de pontos (padrão 1.0)
+}
+
 // ============= FUNÇÕES DE USUÁRIO =============
 
 /**
@@ -950,6 +963,151 @@ export async function addPointsToNext2025Band(
     return result;
   } catch (error) {
     console.error('Error adding points to NEXT 2025 band:', error);
+    return { success: false, error };
+  }
+}
+
+// ============= FUNÇÕES DE PRESETS =============
+
+/**
+ * Criar novo preset de movimento
+ */
+export async function createNext2025Preset(presetData: {
+  name: string;
+  axis: 'X' | 'Y' | 'Z';
+  duration: number;
+  description: string;
+}): Promise<{ success: boolean; presetId?: string; error?: any }> {
+  try {
+    const presetsRef = ref(database, 'next2025Config/presets');
+    const newPresetRef = push(presetsRef);
+    
+    const preset: Next2025Preset = {
+      id: newPresetRef.key!,
+      name: presetData.name,
+      axis: presetData.axis,
+      duration: presetData.duration,
+      description: presetData.description,
+      createdAt: new Date().toISOString()
+    };
+    
+    await set(newPresetRef, preset);
+    
+    return { success: true, presetId: preset.id };
+  } catch (error) {
+    console.error('Error creating preset:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Buscar todos os presets
+ */
+export async function getNext2025Presets(): Promise<Next2025Preset[]> {
+  try {
+    const presetsRef = ref(database, 'next2025Config/presets');
+    const snapshot = await get(presetsRef);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+    
+    const presets = snapshot.val();
+    return Object.values(presets) as Next2025Preset[];
+  } catch (error) {
+    console.error('Error fetching presets:', error);
+    return [];
+  }
+}
+
+/**
+ * Buscar preset por ID
+ */
+export async function getNext2025Preset(presetId: string): Promise<Next2025Preset | null> {
+  try {
+    const presetRef = ref(database, `next2025Config/presets/${presetId}`);
+    const snapshot = await get(presetRef);
+    
+    if (!snapshot.exists()) {
+      return null;
+    }
+    
+    return snapshot.val() as Next2025Preset;
+  } catch (error) {
+    console.error('Error fetching preset:', error);
+    return null;
+  }
+}
+
+/**
+ * Atualizar preset existente
+ */
+export async function updateNext2025Preset(
+  presetId: string,
+  updates: Partial<Omit<Next2025Preset, 'id' | 'createdAt'>>
+): Promise<{ success: boolean; error?: any }> {
+  try {
+    const presetRef = ref(database, `next2025Config/presets/${presetId}`);
+    await update(presetRef, updates);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating preset:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Deletar preset
+ */
+export async function deleteNext2025Preset(presetId: string): Promise<{ success: boolean; error?: any }> {
+  try {
+    const presetRef = ref(database, `next2025Config/presets/${presetId}`);
+    await remove(presetRef);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting preset:', error);
+    return { success: false, error };
+  }
+}
+
+// ============= FUNÇÕES DE CONFIGURAÇÕES =============
+
+/**
+ * Buscar configurações do NEXT 2025
+ */
+export async function getNext2025Settings(): Promise<Next2025Settings> {
+  try {
+    const settingsRef = ref(database, 'next2025Config/settings');
+    const snapshot = await get(settingsRef);
+    
+    if (!snapshot.exists()) {
+      // Retorna valores padrão
+      return {
+        pointsMultiplier: 1.0
+      };
+    }
+    
+    return snapshot.val() as Next2025Settings;
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    return {
+      pointsMultiplier: 1.0
+    };
+  }
+}
+
+/**
+ * Atualizar configurações do NEXT 2025
+ */
+export async function updateNext2025Settings(
+  settings: Partial<Next2025Settings>
+): Promise<{ success: boolean; error?: any }> {
+  try {
+    const settingsRef = ref(database, 'next2025Config/settings');
+    await update(settingsRef, settings);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating settings:', error);
     return { success: false, error };
   }
 }
