@@ -21,7 +21,15 @@ import {
 import { 
   getAllNext2025BandLinks, 
   unlinkNext2025Band, 
-  addPointsToNext2025Band
+  addPointsToNext2025Band,
+  getNext2025Presets,
+  createNext2025Preset,
+  updateNext2025Preset,
+  deleteNext2025Preset,
+  getNext2025Settings,
+  updateNext2025Settings,
+  Next2025Preset,
+  Next2025Settings
 } from "@/lib/next2025-service"
 import { 
   createGameEvent, 
@@ -37,6 +45,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
 import { 
   Activity,
   ArrowLeft, 
@@ -51,7 +62,11 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle2,
-  Trophy
+  Trophy,
+  Plus,
+  Edit2,
+  Trash2,
+  Shuffle
 } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts'
 
@@ -111,6 +126,26 @@ export default function BandDashboard() {
   const [gameMode, setGameMode] = useState(false)
   const [activeGame, setActiveGame] = useState<GameEvent | null>(null)
   
+  // Estados para NEXT 2025
+  const [presets, setPresets] = useState<Next2025Preset[]>([])
+  const [settings, setSettings] = useState<Next2025Settings>({ pointsMultiplier: 1.0 })
+  const [loadingPresets, setLoadingPresets] = useState(false)
+  const [presetModalOpen, setPresetModalOpen] = useState(false)
+  const [editingPreset, setEditingPreset] = useState<Next2025Preset | null>(null)
+  const [presetFormData, setPresetFormData] = useState({
+    name: '',
+    axis: 'Y' as 'X' | 'Y' | 'Z',
+    duration: 30,
+    description: ''
+  })
+  
+  // Estados para iniciar jogo NEXT 2025
+  const [band1Selected, setBand1Selected] = useState('010')
+  const [band2Selected, setBand2Selected] = useState('020')
+  const [presetSelectionMode, setPresetSelectionMode] = useState<'manual' | 'random'>('manual')
+  const [round1PresetId, setRound1PresetId] = useState<string>('')
+  const [round2PresetId, setRound2PresetId] = useState<string>('')
+  
   // Estados para interface
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -139,6 +174,14 @@ export default function BandDashboard() {
     
     return unsubscribe
   }, [])
+  
+  // Carregar presets e settings quando mudar para a aba NEXT 2025
+  useEffect(() => {
+    if (activeTab === 'next2025') {
+      loadPresets()
+      loadSettings()
+    }
+  }, [activeTab])
 
   // Atualiza dados em tempo real durante eventos
   useEffect(() => {
@@ -198,6 +241,127 @@ export default function BandDashboard() {
     setGameMode(hasGame)
   }
   
+  // Funções para NEXT 2025
+  const loadPresets = async () => {
+    try {
+      setLoadingPresets(true)
+      const presetsData = await getNext2025Presets()
+      setPresets(presetsData)
+    } catch (err) {
+      console.error('Erro ao carregar presets:', err)
+    } finally {
+      setLoadingPresets(false)
+    }
+  }
+  
+  const loadSettings = async () => {
+    try {
+      const settingsData = await getNext2025Settings()
+      setSettings(settingsData)
+    } catch (err) {
+      console.error('Erro ao carregar configurações:', err)
+    }
+  }
+  
+  const handleCreatePreset = async () => {
+    try {
+      const result = await createNext2025Preset(presetFormData)
+      if (result.success) {
+        setEventMessage('Preset criado com sucesso!')
+        setPresetModalOpen(false)
+        resetPresetForm()
+        loadPresets()
+      } else {
+        setEventMessage(`Erro ao criar preset: ${result.error}`)
+      }
+      setTimeout(() => setEventMessage(''), 3000)
+    } catch (err) {
+      setEventMessage('Erro ao criar preset: ' + (err as Error).message)
+      setTimeout(() => setEventMessage(''), 3000)
+    }
+  }
+  
+  const handleUpdatePreset = async () => {
+    if (!editingPreset) return
+    
+    try {
+      const result = await updateNext2025Preset(editingPreset.id, presetFormData)
+      if (result.success) {
+        setEventMessage('Preset atualizado com sucesso!')
+        setPresetModalOpen(false)
+        setEditingPreset(null)
+        resetPresetForm()
+        loadPresets()
+      } else {
+        setEventMessage(`Erro ao atualizar preset: ${result.error}`)
+      }
+      setTimeout(() => setEventMessage(''), 3000)
+    } catch (err) {
+      setEventMessage('Erro ao atualizar preset: ' + (err as Error).message)
+      setTimeout(() => setEventMessage(''), 3000)
+    }
+  }
+  
+  const handleDeletePreset = async (presetId: string) => {
+    if (!confirm('Deseja realmente deletar este preset?')) return
+    
+    try {
+      const result = await deleteNext2025Preset(presetId)
+      if (result.success) {
+        setEventMessage('Preset deletado com sucesso!')
+        loadPresets()
+      } else {
+        setEventMessage(`Erro ao deletar preset: ${result.error}`)
+      }
+      setTimeout(() => setEventMessage(''), 3000)
+    } catch (err) {
+      setEventMessage('Erro ao deletar preset: ' + (err as Error).message)
+      setTimeout(() => setEventMessage(''), 3000)
+    }
+  }
+  
+  const handleUpdateMultiplier = async (value: number) => {
+    try {
+      const result = await updateNext2025Settings({ pointsMultiplier: value })
+      if (result.success) {
+        setSettings({ pointsMultiplier: value })
+        setEventMessage('Multiplicador atualizado com sucesso!')
+      } else {
+        setEventMessage(`Erro ao atualizar multiplicador: ${result.error}`)
+      }
+      setTimeout(() => setEventMessage(''), 3000)
+    } catch (err) {
+      setEventMessage('Erro ao atualizar multiplicador: ' + (err as Error).message)
+      setTimeout(() => setEventMessage(''), 3000)
+    }
+  }
+  
+  const resetPresetForm = () => {
+    setPresetFormData({
+      name: '',
+      axis: 'Y',
+      duration: 30,
+      description: ''
+    })
+  }
+  
+  const openEditPresetModal = (preset: Next2025Preset) => {
+    setEditingPreset(preset)
+    setPresetFormData({
+      name: preset.name,
+      axis: preset.axis,
+      duration: preset.duration,
+      description: preset.description
+    })
+    setPresetModalOpen(true)
+  }
+  
+  const openCreatePresetModal = () => {
+    setEditingPreset(null)
+    resetPresetForm()
+    setPresetModalOpen(true)
+  }
+  
   const handleStartGameMode = async () => {
     // Verificar se há exatamente 2 pulseiras vinculadas (010 e 020)
     const band010 = bandLinks.find(link => link.bandId === '010' && link.status === 'linked')
@@ -247,6 +411,110 @@ export default function BandDashboard() {
     
     if (result.success) {
       setEventMessage('Modo de jogo iniciado! Abra /next2025/game-display na TV')
+      setGameMode(true)
+      setTimeout(() => setEventMessage(''), 5000)
+    } else {
+      setEventMessage(`Erro ao iniciar modo de jogo: ${result.error}`)
+      setTimeout(() => setEventMessage(''), 5000)
+    }
+  }
+  
+  const handleStartNext2025GameMode = async () => {
+    // Verificar se as pulseiras selecionadas estão vinculadas
+    const band1 = bandLinks.find(link => link.bandId === band1Selected && link.status === 'linked')
+    const band2 = bandLinks.find(link => link.bandId === band2Selected && link.status === 'linked')
+    
+    if (!band1 || !band2) {
+      setEventMessage('Ambas as pulseiras devem estar vinculadas!')
+      setTimeout(() => setEventMessage(''), 5000)
+      return
+    }
+    
+    if (band1Selected === band2Selected) {
+      setEventMessage('Selecione pulseiras diferentes para os jogadores!')
+      setTimeout(() => setEventMessage(''), 5000)
+      return
+    }
+    
+    // Selecionar presets
+    let preset1: Next2025Preset | undefined
+    let preset2: Next2025Preset | undefined
+    
+    if (presetSelectionMode === 'manual') {
+      preset1 = presets.find(p => p.id === round1PresetId)
+      preset2 = presets.find(p => p.id === round2PresetId)
+      
+      if (!preset1 || !preset2) {
+        setEventMessage('Selecione os presets para ambos os rounds!')
+        setTimeout(() => setEventMessage(''), 5000)
+        return
+      }
+      
+      if (preset1.id === preset2.id) {
+        setEventMessage('Selecione presets diferentes para cada round!')
+        setTimeout(() => setEventMessage(''), 5000)
+        return
+      }
+    } else {
+      // Modo aleatório: escolhe 2 presets diferentes
+      if (presets.length < 2) {
+        setEventMessage('É necessário ter pelo menos 2 presets para o modo aleatório!')
+        setTimeout(() => setEventMessage(''), 5000)
+        return
+      }
+      
+      const shuffled = [...presets].sort(() => Math.random() - 0.5)
+      preset1 = shuffled[0]
+      preset2 = shuffled[1]
+    }
+    
+    // Configurar rounds com presets do Firebase
+    const rounds = [
+      {
+        movement: preset1.name,
+        duration: preset1.duration,
+        axis: preset1.axis,
+        preset: {
+          id: preset1.id,
+          name: preset1.name,
+          axis: preset1.axis,
+          duration: preset1.duration,
+          description: preset1.description
+        }
+      },
+      {
+        movement: preset2.name,
+        duration: preset2.duration,
+        axis: preset2.axis,
+        preset: {
+          id: preset2.id,
+          name: preset2.name,
+          axis: preset2.axis,
+          duration: preset2.duration,
+          description: preset2.description
+        }
+      }
+    ]
+    
+    // Criar evento de jogo
+    const result = await createGameEvent(
+      rounds,
+      {
+        bandId: band1Selected,
+        userId: band1.userId,
+        userName: band1.userName,
+        userEmail: band1.userEmail
+      },
+      {
+        bandId: band2Selected,
+        userId: band2.userId,
+        userName: band2.userName,
+        userEmail: band2.userEmail
+      }
+    )
+    
+    if (result.success) {
+      setEventMessage(`Modo de jogo iniciado! ${preset1.name} vs ${preset2.name}. Abra /next2025/game-display na TV`)
       setGameMode(true)
       setTimeout(() => setEventMessage(''), 5000)
     } else {
@@ -691,35 +959,8 @@ export default function BandDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Aviso de Modo de Jogo */}
-        {gameMode && activeGame && (
-          <div className="mb-6 p-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg text-white">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className="text-5xl">🎮</div>
-                <div>
-                  <h3 className="text-2xl font-bold mb-1">Modo de Jogo Ativo!</h3>
-                  <p className="text-white/90">
-                    O jogo está sendo controlado pela tela de exibição. Os controles manuais estão desabilitados.
-                  </p>
-                  <p className="text-sm text-white/80 mt-1">
-                    Status: <span className="font-bold">{activeGame.status}</span> | Round: {activeGame.currentRound + 1}/2
-                  </p>
-                </div>
-              </div>
-              <a 
-                href="/next2025/game-display" 
-                target="_blank"
-                className="px-6 py-3 bg-white text-purple-600 font-bold rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                Abrir Tela do Jogo →
-              </a>
-            </div>
-          </div>
-        )}
-        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 gap-1 h-auto p-1">
             <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="truncate">Visão Geral</span>
@@ -735,6 +976,10 @@ export default function BandDashboard() {
             <TabsTrigger value="manage" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
               <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="truncate">Gerenciar</span>
+            </TabsTrigger>
+            <TabsTrigger value="next2025" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
+              <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="truncate">NEXT 2025</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1027,27 +1272,15 @@ export default function BandDashboard() {
                           </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <Button 
-                            onClick={handleStartEvent}
-                            disabled={devices.length === 0 || gameMode}
-                            className="w-full"
-                            variant="default"
-                          >
-                            <Play className="h-4 w-4 mr-2" />
-                            Iniciar Evento
-                          </Button>
-                          
-                          <Button 
-                            onClick={handleStartGameMode}
-                            disabled={gameMode}
-                            className="w-full"
-                            variant="default"
-                          >
-                            <Trophy className="h-4 w-4 mr-2" />
-                            Modo de Jogo
-                          </Button>
-                        </div>
+                        <Button 
+                          onClick={handleStartEvent}
+                          disabled={devices.length === 0 || gameMode}
+                          className="w-full"
+                          variant="default"
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Iniciar Evento
+                        </Button>
                       </div>
                   ) : gameMode ? (
                     <div className="text-center py-8 text-gray-500">
@@ -1191,8 +1424,350 @@ export default function BandDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Aba NEXT 2025 */}
+          <TabsContent value="next2025" className="space-y-4 sm:space-y-6">
+            {/* Configurações Gerais */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Configurações Gerais
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Multiplicador de Pontos */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base font-semibold">Multiplicador de Pontos</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Controla a quantidade de pontos gerados pelos movimentos
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="text-lg font-bold px-4 py-2">
+                      {settings.pointsMultiplier.toFixed(1)}x
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Slider
+                      value={[settings.pointsMultiplier]}
+                      onValueChange={(value) => handleUpdateMultiplier(value[0])}
+                      min={0.1}
+                      max={5.0}
+                      step={0.1}
+                      className="w-full"
+                      trackClassName="bg-gray-200 dark:bg-gray-700"
+                      rangeClassName="bg-purple-600"
+                      thumbClassName="border-purple-600"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>0.1x (Mínimo)</span>
+                      <span>5.0x (Máximo)</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Gerenciamento de Presets */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5" />
+                    Presets de Movimento
+                  </CardTitle>
+                  <Button onClick={openCreatePresetModal} size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Preset
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {loadingPresets ? (
+                  <div className="flex justify-center items-center py-8">
+                    <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : presets.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Nenhum preset criado ainda</p>
+                    <p className="text-sm mt-2">Clique em "Novo Preset" para começar</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {presets.map((preset) => (
+                      <Card key={preset.id} className="p-4 hover:shadow-md transition-shadow">
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between">
+                            <h3 className="font-semibold text-lg">{preset.name}</h3>
+                            <Badge variant="outline">{preset.axis}</Badge>
+                          </div>
+                          
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {preset.description}
+                          </p>
+                          
+                          <div className="flex items-center gap-2 text-sm">
+                            <Timer className="h-4 w-4" />
+                            <span>{preset.duration}s</span>
+                          </div>
+                          
+                          <div className="flex gap-2 pt-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openEditPresetModal(preset)}
+                              className="flex-1"
+                            >
+                              <Edit2 className="h-3 w-3 mr-1" />
+                              Editar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeletePreset(preset.id)}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Iniciar Modo de Jogo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5" />
+                  Iniciar Modo de Jogo
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Seleção de Pulseiras */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Pulseira 1 (Azul)</Label>
+                    <Select value={band1Selected} onValueChange={setBand1Selected}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {bandLinks.filter(l => l.status === 'linked').map((link) => (
+                          <SelectItem key={link.bandId} value={link.bandId}>
+                            {formatBandId(link.bandId)} - {link.userName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Pulseira 2 (Vermelho)</Label>
+                    <Select value={band2Selected} onValueChange={setBand2Selected}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {bandLinks.filter(l => l.status === 'linked').map((link) => (
+                          <SelectItem key={link.bandId} value={link.bandId}>
+                            {formatBandId(link.bandId)} - {link.userName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Modo de Seleção de Presets */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Modo de Seleção de Presets</Label>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm ${presetSelectionMode === 'manual' ? 'font-semibold' : 'text-muted-foreground'}`}>
+                        Manual
+                      </span>
+                      <Switch
+                        checked={presetSelectionMode === 'random'}
+                        onCheckedChange={(checked) => setPresetSelectionMode(checked ? 'random' : 'manual')}
+                      />
+                      <span className={`text-sm ${presetSelectionMode === 'random' ? 'font-semibold' : 'text-muted-foreground'}`}>
+                        Aleatório
+                      </span>
+                    </div>
+                  </div>
+
+                  {presetSelectionMode === 'manual' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Preset Round 1</Label>
+                        <Select value={round1PresetId} onValueChange={setRound1PresetId}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um preset" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {presets.map((preset) => (
+                              <SelectItem key={preset.id} value={preset.id}>
+                                {preset.name} ({preset.axis} - {preset.duration}s)
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>Preset Round 2</Label>
+                        <Select value={round2PresetId} onValueChange={setRound2PresetId}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um preset" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {presets.map((preset) => (
+                              <SelectItem key={preset.id} value={preset.id}>
+                                {preset.name} ({preset.axis} - {preset.duration}s)
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  ) : (
+                    <Card className="p-4 bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+                      <div className="flex items-start gap-3">
+                        <Shuffle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-amber-900 dark:text-amber-100">Modo Aleatório</p>
+                          <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                            O sistema escolherá automaticamente 2 presets diferentes para os rounds
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+                </div>
+
+                {/* Botão Iniciar */}
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleStartNext2025GameMode}
+                    disabled={
+                      gameMode || 
+                      presets.length < 2 ||
+                      !band1Selected ||
+                      !band2Selected ||
+                      band1Selected === band2Selected ||
+                      (presetSelectionMode === 'manual' && (!round1PresetId || !round2PresetId || round1PresetId === round2PresetId))
+                    }
+                    size="lg"
+                  >
+                    <Trophy className="h-4 w-4 mr-2" />
+                    {gameMode ? 'Jogo em Andamento' : 'Iniciar Modo de Jogo'}
+                  </Button>
+                </div>
+
+                {/* Avisos */}
+                {presets.length < 2 && (
+                  <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>É necessário ter pelo menos 2 presets para iniciar o jogo</span>
+                  </div>
+                )}
+                
+                {band1Selected === band2Selected && band1Selected && (
+                  <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>Selecione pulseiras diferentes para os dois jogadores</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </main>
+
+      {/* Modal de Criar/Editar Preset */}
+      <Dialog open={presetModalOpen} onOpenChange={setPresetModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingPreset ? 'Editar Preset' : 'Novo Preset'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingPreset 
+                ? 'Modifique as informações do preset' 
+                : 'Crie um novo preset de movimento para usar nos jogos'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="preset-name">Nome do Preset</Label>
+              <Input
+                id="preset-name"
+                value={presetFormData.name}
+                onChange={(e) => setPresetFormData({ ...presetFormData, name: e.target.value })}
+                placeholder="Ex: Movimento Lateral"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="preset-axis">Eixo de Movimento</Label>
+              <Select 
+                value={presetFormData.axis} 
+                onValueChange={(value: 'X' | 'Y' | 'Z') => setPresetFormData({ ...presetFormData, axis: value })}
+              >
+                <SelectTrigger id="preset-axis">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="X">Eixo X</SelectItem>
+                  <SelectItem value="Y">Eixo Y</SelectItem>
+                  <SelectItem value="Z">Eixo Z</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="preset-duration">Duração (segundos)</Label>
+              <Input
+                id="preset-duration"
+                type="number"
+                min={10}
+                max={300}
+                value={presetFormData.duration}
+                onChange={(e) => setPresetFormData({ ...presetFormData, duration: parseInt(e.target.value) || 30 })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="preset-description">Descrição</Label>
+              <Input
+                id="preset-description"
+                value={presetFormData.description}
+                onChange={(e) => setPresetFormData({ ...presetFormData, description: e.target.value })}
+                placeholder="Descreva o movimento..."
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPresetModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={editingPreset ? handleUpdatePreset : handleCreatePreset}
+              disabled={!presetFormData.name || !presetFormData.description}
+            >
+              {editingPreset ? 'Atualizar' : 'Criar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
